@@ -1,46 +1,29 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
-import Html exposing (Html, div)
+import Html exposing (Html)
 import Html.Attributes exposing (width, height, style)
 import Html.Events.Extra.Touch as Touch
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
-import Math.Vector4 exposing (vec4, Vec4)
-import WebGL exposing (Mesh, Shader)
+import WebGL
 
-type alias Model = { width: Int, height: Int, pos: Vec2, from: Vec2 }
+import Graphics exposing (drawRectangle)
+
+type alias Model = {
+    width: Int,
+    height: Int,
+    pos: Vec2,
+    from: Vec2 }
+
 init: Model
-init = { width = 160, height = 240, pos = (vec2 0.0 0.0), from = (vec2 0.0 0.0)}
+init = { width = 160, height = 240, pos = vec2 0.0 0.0, from = vec2 0.0 0.0 }
 
 type TouchEvent
-    = None
-    | Start (Float, Float)
+    = Start (Float, Float)
     | Move (Float, Float)
     | End (Float, Float)
 
 type Msg = TouchEvent
-
-type alias Vertex = { position : Vec2 }
--- x : Int -> Mesh Vertex
--- x pos = WebGL.points [ List.map (\p -> Vertex (vec2 (toFloat p) (toFloat p) ) ) (List.range 1 pos) ]
-
-
-rect : Vec2 -> Float -> Float -> Mesh Vertex
-rect point width height = 
-    WebGL.indexedTriangles
-        [ 
-          Vertex ( Vec2.add point (vec2 width height) ),
-          Vertex ( Vec2.add point (vec2 width 0.0) ),
-          Vertex point,
-          Vertex ( Vec2.add point (vec2 0.0 height) ) ]
-        [ (0, 1, 2), (2, 3, 0) ]
-
-makeEntity: Vec2 -> Vec2 -> WebGL.Entity
-makeEntity pos res = WebGL.entity
-                vertexShader
-                fragmentShader
-                (rect pos 16.0 16.0)
-                { u_res = res } 
 
 touchCoordinates : Touch.Event -> ( Float, Float )
 touchCoordinates touchEvent =
@@ -59,7 +42,9 @@ view model =
           height model.height,
           style "backgroundColor" "#000000",
           style "display" "block" ]
-        [ makeEntity model.pos (vec2 (toFloat model.width) (toFloat model.height) ) ]
+        [ drawRectangle 
+            { pos = model.pos, width = 16.0, height = 16.0 }
+            (vec2 (toFloat model.width) (toFloat model.height) ) ]
 
 moveTo: Model -> Vec2 -> Vec2
 moveTo model to =
@@ -84,26 +69,5 @@ update event model =
             pos = moveTo model (vec2 x y) ,
             from = vec2 x y }
         _ -> model
-
-vertexShader : Shader Vertex { u_res: Vec2 } {}
-vertexShader = 
-    [glsl|
-        attribute vec2 position;
-        uniform vec2 u_res;
-
-        void main() {
-            vec2 zeroOne = position / u_res;
-            vec2 clipSpace = zeroOne * 2.0 - 1.0;
-            gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-        }
-    |]
-
-fragmentShader : Shader { } { u_res: Vec2 } {}
-fragmentShader =
-    [glsl|
-        void main() {
-            gl_FragColor = vec4(0.5, 0.5, 1.0, 1.0);
-        }
-    |]
 
 main = Browser.sandbox { init = init, view = view, update = update }
