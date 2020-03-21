@@ -8,10 +8,10 @@ import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import Math.Vector4 exposing (vec4, Vec4)
 import WebGL exposing (Mesh, Shader)
 
-type alias Model = Vec2
-
+type alias Model = 
+    { width: Int, height: Int }
 init: Model
-init = vec2 160.0 240.0
+init = { width = 160, height = 240 }
 
 type TouchEvent
     = None
@@ -50,7 +50,7 @@ view pos = WebGL.toHtml
         [ width 160, height 240,
           style "backgroundColor" "#000000",
           style "display" "block" ]
-        [ makeEntity pos ]
+        [ makeEntity (vec2 (toFloat pos.width) (toFloat pos.height) ) ]
 
 vertexShader : Shader Vertex { u_res: Vec2 } {}
 vertexShader = 
