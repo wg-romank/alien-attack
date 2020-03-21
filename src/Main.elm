@@ -5,7 +5,6 @@ import Html exposing (Html)
 import Html.Attributes exposing (width, height, style)
 import Html.Events.Extra.Touch as Touch
 import Math.Vector2 exposing (vec2, Vec2)
-import Math.Vector3 exposing (vec3, Vec3)
 import WebGL exposing (Mesh, Shader)
 
 type alias Model = Int
@@ -22,8 +21,7 @@ type TouchEvent
 
 type Msg = TouchEvent
 
-type alias Vertex =
-    { position : Vec2 }
+type alias Vertex = { position : Vec2 }
 
 -- x : Int -> Mesh Vertex
 -- x pos = WebGL.points [ List.map (\p -> Vertex (vec2 (toFloat p) (toFloat p) ) ) (List.range 1 pos) ]
@@ -33,9 +31,8 @@ mesh : Mesh Vertex
 mesh =
     WebGL.triangles
         [ ( Vertex (vec2 0 0)
-          , Vertex (vec2 1 1)
-          , Vertex (vec2 1 -1)
-          ) ]
+          , Vertex (vec2 100 0)
+          , Vertex (vec2 100 100) ) ]
 
 makeEntity: Int -> WebGL.Entity
 makeEntity pos = WebGL.entity
@@ -57,13 +54,11 @@ vertexShader =
         attribute vec2 position;
 
         void main() {
-            gl_Position = vec4(position, 0, 1);
+            vec2 zeroOne = position / vec2(640.0, 480.0);
+            vec2 clipSpace = zeroOne * 2.0 - 1.0;
+            gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
         }
     |]
-            -- vec2 zeroOne = position / resolution;
-            -- vec2 zeroTwo = position * 2.0;
-            -- vec2 clipSpace = zeroTwo - 1.0;
-            -- gl_Position = vec4(clipSpace * vec(1, -1), 0, 1);
 
 fragmentShader : Shader {} { } { }
 fragmentShader =
