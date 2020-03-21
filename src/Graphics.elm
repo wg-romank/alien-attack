@@ -4,7 +4,7 @@ import Math.Vector4 as Vec4 exposing (vec4, Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import WebGL exposing (Mesh, Shader)
 type alias Vertex = { position : Vec2 }
-vertexShader : Shader Vertex { u_res: Vec2, color: Vec4 } { }
+vertexShader : Shader Vertex { u_res: Vec2, vcolor: Vec4 } { }
 vertexShader = 
     [glsl|
         attribute vec2 position;
@@ -17,11 +17,13 @@ vertexShader =
         }
     |]
 
-fragmentShader : Shader { } { u_res: Vec2, color: Vec4 } { }
+fragmentShader : Shader { } { u_res: Vec2, vcolor: Vec4 } { }
 fragmentShader =
     [glsl|
+        precision mediump float;
+        uniform vec4 vcolor;
         void main() {
-            gl_FragColor = vec4(0.5, 0.0, 1.0, 1.0);
+            gl_FragColor = vcolor;
         }
     |]
 
@@ -47,5 +49,5 @@ drawRectangle rec res = WebGL.entity
                 vertexShader
                 fragmentShader
                 (rect rec.pos rec.width rec.height)
-                { u_res = res, color = rec.color } 
+                { u_res = res, vcolor = rec.color } 
 
