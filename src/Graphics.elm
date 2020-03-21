@@ -1,9 +1,10 @@
-module Graphics exposing (drawRectangle)
+module Graphics exposing (drawRectangle, Rectangle)
 
+import Math.Vector4 as Vec4 exposing (vec4, Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import WebGL exposing (Mesh, Shader)
 type alias Vertex = { position : Vec2 }
-vertexShader : Shader Vertex { u_res: Vec2 } {}
+vertexShader : Shader Vertex { u_res: Vec2, color: Vec4 } { }
 vertexShader = 
     [glsl|
         attribute vec2 position;
@@ -16,11 +17,11 @@ vertexShader =
         }
     |]
 
-fragmentShader : Shader { } { u_res: Vec2 } {}
+fragmentShader : Shader { } { u_res: Vec2, color: Vec4 } { }
 fragmentShader =
     [glsl|
         void main() {
-            gl_FragColor = vec4(0.5, 0.5, 1.0, 1.0);
+            gl_FragColor = vec4(0.5, 0.0, 1.0, 1.0);
         }
     |]
 
@@ -38,12 +39,13 @@ rect point width height =
 type alias Rectangle = {
     pos: Vec2,
     width: Float,
-    height: Float }
+    height: Float,
+    color: Vec4 }
 
 drawRectangle: Rectangle -> Vec2 -> WebGL.Entity
 drawRectangle rec res = WebGL.entity
                 vertexShader
                 fragmentShader
                 (rect rec.pos rec.width rec.height)
-                { u_res = res } 
+                { u_res = res, color = rec.color } 
 

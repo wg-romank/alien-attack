@@ -5,18 +5,28 @@ import Html exposing (Html)
 import Html.Attributes exposing (width, height, style)
 import Html.Events.Extra.Touch as Touch
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
+import Math.Vector4 as Vec4 exposing (vec4, Vec4)
 import WebGL
 
-import Graphics exposing (drawRectangle)
+import Graphics exposing (drawRectangle, Rectangle)
 
 type alias Model = {
     width: Int,
     height: Int,
-    pos: Vec2,
-    from: Vec2 }
+    from: Vec2,
+    player: Rectangle }
 
 init: Model
-init = { width = 160, height = 240, pos = vec2 0.0 0.0, from = vec2 0.0 0.0 }
+init = { 
+    width = 160,
+    height = 240,
+    from = vec2 0.0 0.0,
+    player = {
+        pos = vec2 0 0,
+        width = 16.0,
+        height = 16.0,
+        color = vec4 0.5 0 1 1
+    } }
 
 type TouchEvent
     = Start (Float, Float)
@@ -43,30 +53,29 @@ view model =
           style "backgroundColor" "#000000",
           style "display" "block" ]
         [ drawRectangle 
-            { pos = model.pos, width = 16.0, height = 16.0 }
+            model.player
             (vec2 (toFloat model.width) (toFloat model.height) ) ]
 
-moveTo: Model -> Vec2 -> Vec2
-moveTo model to =
-        Vec2.sub to model.from
-        |> Vec2.add model.pos
+moveTo: Rectangle -> Vec2 -> Vec2 -> Int -> Int -> Rectangle
+moveTo player from to width height =
+        Vec2.sub to from
+        |> Vec2.add player.pos
         |> \p -> vec2
-                    ( Basics.clamp 0.0 (toFloat model.width - 16) (Vec2.getX p) )
-                    ( Basics.clamp 0.0 (toFloat model.height - 16) (Vec2.getY p) )
+                    ( Basics.clamp 0.0 (toFloat width - 16) (Vec2.getX p) )
+                    ( Basics.clamp 0.0 (toFloat height - 16) (Vec2.getY p) )
+        |> \q -> { player | pos = q }
 
 
 update: TouchEvent -> Model -> Model
 update event model =
     case event of
         Start (x, y) -> {
-            width = model.width,
-            height = model.height,
-            pos = model.pos,
+            model |
+            player = model.player,
             from = vec2 x y }
         Move (x, y) -> {
-            width = model.width,
-            height = model.height,
-            pos = moveTo model (vec2 x y) ,
+            model |
+            player = moveTo model.player model.from (vec2 x y) model.width model.height,
             from = vec2 x y }
         _ -> model
 
