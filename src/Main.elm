@@ -1,17 +1,16 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html)
+import Html exposing (Html, div)
 import Html.Attributes exposing (width, height, style)
 import Html.Events.Extra.Touch as Touch
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import Math.Vector4 exposing (vec4, Vec4)
 import WebGL exposing (Mesh, Shader)
 
-type alias Model = 
-    { width: Int, height: Int }
+type alias Model = { width: Int, height: Int, pos: Vec2 }
 init: Model
-init = { width = 160, height = 240 }
+init = { width = 160, height = 240, pos = (vec2 0.0 0.0)}
 
 type TouchEvent
     = None
@@ -37,20 +36,32 @@ rect point width height =
           Vertex ( Vec2.add point (vec2 0.0 height) ) ]
         [ (0, 1, 2), (2, 3, 0) ]
 
-makeEntity: Vec2 -> WebGL.Entity
-makeEntity pos = WebGL.entity
+makeEntity: Vec2 -> Vec2 -> WebGL.Entity
+makeEntity pos res = WebGL.entity
                 vertexShader
                 fragmentShader
-                (rect (vec2 0.0 0.0) 16.0 16.0)
-                -- (x pos) { 
-                { u_res = pos } 
+                (rect pos 16.0 16.0)
+                { u_res = res } 
 
-view: Model -> Html msg
-view pos = WebGL.toHtml 
-        [ width 160, height 240,
+view: Model -> Html TouchEvent
+view model =
+        WebGL.toHtml 
+        [ 
+          Touch.onStart Start,
+          Touch.onMove Move,
+          Touch.onEnd End,
+          Touch.onCancel Cancel,
+          width model.width,
+          height model.height,
           style "backgroundColor" "#000000",
           style "display" "block" ]
-        [ makeEntity (vec2 (toFloat pos.width) (toFloat pos.height) ) ]
+        [ makeEntity model.pos (vec2 (toFloat model.width) (toFloat model.height) ) ]
+
+update: TouchEvent -> Model -> Model
+update event model =
+    case event of
+        End ev -> model
+        _ -> model
 
 vertexShader : Shader Vertex { u_res: Vec2 } {}
 vertexShader = 
@@ -73,4 +84,4 @@ fragmentShader =
         }
     |]
 
-main = Browser.sandbox { init = init, view = view, update = always }
+main = Browser.sandbox { init = init, view = view, update = update }
