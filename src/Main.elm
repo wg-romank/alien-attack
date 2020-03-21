@@ -1,27 +1,67 @@
 module Main exposing (..)
 
 import Browser
-import Html exposing (Html, button, div, text)
-import Html.Events exposing (onClick)
+import Html exposing (Html)
+import Html.Attributes exposing (width, height)
+import Html.Events.Extra.Touch as Touch
+import Math.Vector2 exposing (vec2, Vec2)
+import WebGL exposing (Mesh, Shader)
 
 type alias Model = Int
 
 init: Model
-init = 0
+init = 150
 
-type Msg = Increment | Decrement
+type TouchEvent
+    = None
+    | Start Touch.Event
+    | Move Touch.Event
+    | End Touch.Event
+    | Cancel Touch.Event
 
-update: Msg -> Model -> Model
-update msg model =
-    case msg of
-        Increment -> model + 1
-        Decrement -> model - 1
+type Msg = TouchEvent
 
-view : Model -> Html Msg
-view model =
-    div [] [ 
-        button [ onClick Decrement ] [ text "-"],
-        div [] [ text (String.fromInt model)],
-        button [ onClick Increment ] [ text "+"] ]
+type alias Vertex =
+    { position : Vec2 }
 
-main = Browser.sandbox { init = init, update = update, view = view }
+x : Int -> Mesh Vertex
+x pos = WebGL.points [ List.map (\p -> Vertex (vec2 (toFloat p) (toFloat p) ) ) (List.range 1 pos) ]
+
+makeEntity: Int -> WebGL.Entity
+makeEntity pos = WebGL.entity
+                vertexShader
+                fragmentShader
+                (x pos) { 
+                    resolution = vec2 640 480
+                } 
+
+view: Model -> Html msg
+view pos = WebGL.toHtml 
+        [ width 640, height 480 ]
+        [ makeEntity pos ]
+
+vertexShader : Shader { position: Vec2 } { resolution: Vec2 } { }
+vertexShader = 
+    [glsl|
+        attribute vec2 position;
+        uniform vec2 resolution;
+
+        void main() {
+            vec2 zeroOne = position / resolution;
+            vec2 zeroTwo = position * 2.0;
+            vec2 clipSpace = zeroTwo - 1.0;
+            gl_Position = vec4(clipSpace * vec(1, -1), 0, 1);
+        }
+    |]
+
+fragmentShader : Shader {} { resolution: Vec2 } { }
+fragmentShader =
+    [glsl|
+        uniform vec2 resolution;
+
+        void main() {
+            gl_FragColor = vec4(120, 120, 120, 120);
+        }
+    |]
+
+main = Browser.sandbox { init = init, view = view, update = always }
