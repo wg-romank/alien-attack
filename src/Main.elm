@@ -74,7 +74,7 @@ loadAtlas =
                     |> Task.map (\tex -> (gameObjectTypeToInt typ, tex) )
             )
             [
-                -- (Enemy, "http://192.168.0.107:8888/assets/Octo.png"),
+                (Enemy, "http://192.168.0.107:8888/assets/Octo.png"),
                 (User, "http://192.168.0.107:8888/assets/Player_v1.png")
             ] |> Task.sequence
               |> Task.map Dict.fromList
@@ -122,8 +122,9 @@ moveTo player model to =
 
 
 initialObjects: Atlas -> List Rectangle
-initialObjects atlas =
-        List.map user (ME.toList (Dict.get (gameObjectTypeToInt User) atlas))
+initialObjects atlas = List.concat
+        [List.map user (ME.toList (Dict.get (gameObjectTypeToInt User) atlas)) ,
+         List.map enemy (ME.toList (Dict.get (gameObjectTypeToInt Enemy) atlas)) ]
         -- MaybeExtra.toList (Dict.get atlas (gameObjectTypeToInt User))
 
 update: TouchEvent -> Model -> (Model, Cmd TouchEvent)
