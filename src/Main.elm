@@ -68,8 +68,8 @@ loadAtlas =
                     |> Task.map (\tex -> (gameObjectTypeToInt typ, tex) )
             )
             [
-                (Enemy, "http://192.168.0.107:8888/assets/Octo.png"),
-                (User, "http://192.168.0.107:8888/assets/Player_v1.png")
+                (Enemy, "https://wg-romank.github.io/alien-attack/assets/Octo.png"),
+                (User, "https://wg-romank.github.io/alien-attack/assets/Player_v1.png")
             ] |> Task.sequence
               |> Task.map Dict.fromList
         )
