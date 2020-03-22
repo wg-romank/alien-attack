@@ -47,10 +47,10 @@ rect : Vec2 -> Float -> Float -> Mesh Vertex
 rect point width height = 
     WebGL.indexedTriangles
         [ 
-          Vertex point (vec2 0 0),
-          Vertex ( Vec2.add point (vec2 width 0.0) ) (vec2 1 0),
-          Vertex ( Vec2.add point (vec2 0.0 height) ) (vec2 0 1),
-          Vertex ( Vec2.add point (vec2 width height) ) (vec2 1 1)
+          Vertex point (vec2 1 1),
+          Vertex ( Vec2.add point (vec2 width 0.0) ) (vec2 0 1),
+          Vertex ( Vec2.add point (vec2 0.0 height) ) (vec2 1 0),
+          Vertex ( Vec2.add point (vec2 width height) ) (vec2 0 0)
         ]
         [ (0, 1, 2), (2, 1, 3) ]
 
