@@ -1,4 +1,4 @@
-module Graphics exposing (drawRectangle, Rectangle, RectDisplay(..))
+module Graphics exposing (drawRectangle, Rectangle, RectDisplay(..), GameObjectType(..), gameObjectTypeToInt)
 
 import Math.Vector4 as Vec4 exposing (vec4, Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
@@ -6,6 +6,14 @@ import WebGL exposing (Mesh, Shader)
 import WebGL.Texture as Texture exposing (Error, Texture)
 
 type alias Vertex = { position : Vec2, textureCoord: Vec2 }
+
+type GameObjectType = User | Enemy
+
+gameObjectTypeToInt: GameObjectType -> Int
+gameObjectTypeToInt typ =
+    case typ of
+       User -> 1
+       Enemy -> 2
 
 vertexShader = 
     [glsl|
@@ -56,6 +64,7 @@ rect point width height =
 
 
 type alias Rectangle = {
+    typ: GameObjectType,
     pos: Vec2,
     width: Float,
     height: Float,

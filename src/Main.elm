@@ -14,20 +14,13 @@ import Time
 import Task
 import Maybe.Extra as ME
 
-import Graphics exposing (drawRectangle, Rectangle, RectDisplay(..))
-
-type GameObjectType = User | Enemy
-
-gameObjectTypeToInt: GameObjectType -> Int
-gameObjectTypeToInt typ =
-    case typ of
-       User -> 1
-       Enemy -> 2
+import Graphics exposing (drawRectangle, Rectangle, RectDisplay(..), GameObjectType(..), gameObjectTypeToInt)
 
 type alias Atlas = Dict Int Texture
 
 user: Texture -> Rectangle
 user texture = {
+        typ = User,
         pos = vec2 72 224,
         width = 16.0,
         height = 16.0,
@@ -36,6 +29,7 @@ user texture = {
 
 enemy: Texture -> Rectangle
 enemy texture = {
+        typ = Enemy,
         pos = vec2 72 24,
         width = 32.0,
         height = 32.0,
@@ -132,16 +126,25 @@ update event model =
     case event of
         Start (x, y) -> ({
             model |
-            objects = initialObjects model.atlas,
             from = vec2 x y }, Cmd.none)
-        -- Move (x, y) -> ({
-        --     model |
-        --     player = moveTo model.player model (vec2 x y),
-        --     from = vec2 x y }, Cmd.none)
-        -- Delta delta -> ({
-        --     model |
-        --     player = moveTo model.player model (Vec2.add model.player.pos (vec2 (delta * 1.0 / 1000) (delta * 1.0 / 1000) ) ),
-        --     from = model.player.pos }, Cmd.none)
+        Move (x, y) -> ({
+            model |
+            objects = List.map
+                (\obj ->
+                    case obj.typ of 
+                        User -> moveTo obj model (vec2 x y)
+                        _ -> obj )
+                model.objects,
+            from = vec2 x y }, Cmd.none)
+        Delta delta -> ({
+            model |
+            objects = List.map 
+                (\obj ->
+                    case obj.typ of
+                        Enemy -> moveTo obj model (Vec2.add obj.pos (vec2 0 (delta * 1.0 / 1000) ) )
+                        _ -> obj)
+                model.objects
+            }, Cmd.none)
         -- Delta delta -> ({ model | t = model.t + delta}, Cmd.none)
         AtlasLoaded result ->
             case result of
