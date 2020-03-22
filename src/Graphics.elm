@@ -3,6 +3,7 @@ module Graphics exposing (drawRectangle, Rectangle)
 import Math.Vector4 as Vec4 exposing (vec4, Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import WebGL exposing (Mesh, Shader)
+import WebGL.Texture as Texture exposing (Error, Texture)
 type alias Vertex = { position : Vec2 }
 vertexShader : Shader Vertex { u_res: Vec2, vcolor: Vec4 } { }
 vertexShader = 
@@ -42,7 +43,8 @@ type alias Rectangle = {
     pos: Vec2,
     width: Float,
     height: Float,
-    color: Vec4 }
+    color: Vec4,
+    texture: Maybe Texture }
 
 drawRectangle: Rectangle -> Vec2 -> WebGL.Entity
 drawRectangle rec res = WebGL.entity
