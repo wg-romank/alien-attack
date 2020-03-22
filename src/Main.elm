@@ -15,6 +15,7 @@ import Task
 import Graphics exposing (drawRectangle, Rectangle, RectDisplay(..))
 
 type alias Model = {
+    counter: Int,
     message: String,
     t: Float,
     width: Int,
@@ -24,6 +25,7 @@ type alias Model = {
 
 init: () -> (Model, Cmd TouchEvent)
 init _ = ( {
+    counter = 0,
     message = "",
     t = 0,
     width = 160,
@@ -34,7 +36,7 @@ init _ = ( {
         width = 16.0,
         height = 16.0,
         display = RectColor (vec4 0.5 0 1 1)
-    } }, Task.attempt TextureLoaded (Texture.load "http://172.20.10.5:8888/assets/Player_v1.png") )
+    } }, Task.attempt TextureLoaded (Texture.load "http://10.81.136.37:8888/assets/Player_v1.png") )
 
 type TouchEvent
     = Start (Float, Float)
@@ -93,6 +95,7 @@ update event model =
         --     model |
         --     player = moveTo model.player model (Vec2.add model.player.pos (vec2 (delta * 1.0 / 1000) (delta * 1.0 / 1000) ) ),
         --     from = model.player.pos }, Cmd.none)
+        -- Delta delta -> ({ model | t = model.t + delta}, Cmd.none)
         TextureLoaded result ->
             case result of
                 Result.Ok t ->
@@ -100,8 +103,9 @@ update event model =
                         player = model.player
                         newPlayer = { player | display = RectTexture t }
                     in
-                        ({ model | player = newPlayer, message = Debug.toString result}, Cmd.none)
-                _ -> (model, Cmd.none)
+                        ({ model | counter = model.counter + 1, player = newPlayer, message = "ok" }, Cmd.none)
+                Result.Err t ->
+                    ({model | counter = model.counter + 1, message = "err" }, Cmd.none)
         _ -> (model, Cmd.none)
 
 main = Browser.element {
