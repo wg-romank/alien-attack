@@ -5,21 +5,20 @@ import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import WebGL exposing (Mesh, Shader)
 import WebGL.Texture as Texture exposing (Error, Texture)
 
-type alias Vertex = { position : Vec2, coord: Vec2 }
--- type alias Uniforms = { u_res: Vec2, vcolor: Vec4, texture: Texture }
+type alias Vertex = { position : Vec2, textureCoord: Vec2 }
 
 vertexShader = 
     [glsl|
         attribute vec2 position;
-        attribute vec2 coord;
+        attribute vec2 textureCoord;
         uniform vec2 u_res;
-        varying vec2 vcoord;
+        varying vec2 vtextureCoord;
 
         void main() {
             vec2 zeroOne = position / u_res;
             vec2 clipSpace = zeroOne * 2.0 - 1.0;
             gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-            vcoord = coord;
+            vtextureCoord = textureCoord;
         }
     |]
 
@@ -27,7 +26,7 @@ fragmentColorShader =
     [glsl|
         precision mediump float;
         uniform vec4 vcolor;
-        varying vec2 vcoord;
+        varying vec2 vtextureCoord;
         void main() {
             gl_FragColor = vcolor;
         }
@@ -37,9 +36,9 @@ fragmentTextureShader =
     [glsl|
         precision mediump float;
         uniform sampler2D texture;
-        varying vec2 vcoord;
+        varying vec2 vtextureCoord;
         void main() {
-            gl_FragColor = texture2D(texture, vcoord);
+            gl_FragColor = texture2D(texture, vtextureCoord);
         }
     |]
 
