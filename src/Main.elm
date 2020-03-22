@@ -22,7 +22,6 @@ user: Texture -> Rectangle
 user texture = {
         typ = User,
         pos = vec2 72 224,
-        from = vec2 72 224,
         width = 16.0,
         height = 16.0,
         display = RectTexture texture
@@ -31,8 +30,7 @@ user texture = {
 enemy: Texture -> Rectangle
 enemy texture = {
         typ = Enemy,
-        pos = vec2 72 24,
-        from = vec2 72 24,
+        pos = vec2 56 24,
         width = 32.0,
         height = 32.0,
         display = RectTexture texture
@@ -107,17 +105,34 @@ view model =
             text <| Debug.toString model
         ]
 
-moveTo: Rectangle -> Model -> Vec2 -> Rectangle
-moveTo obj model to =
+movePlayer: Rectangle -> Model -> Vec2 -> Rectangle
+movePlayer obj model to =
         Vec2.sub to model.from
         |> Vec2.add obj.pos
         |> \p -> vec2
                     ( Basics.clamp 0.0 (toFloat model.width - obj.width) (Vec2.getX p) )
-                    ( Basics.clamp 0.0 (toFloat model.height - obj.height) (Vec2.getY p) )
-        |> \q -> { obj | pos = q, from = obj.pos }
+                    ( Basics.clamp ( 2.0 * (toFloat model.height - obj.height) / 3.0 ) (toFloat model.height - obj.height) (Vec2.getY p) )
+        |> \q -> { obj | pos = q }
+
+
+modFloat: Float -> Float -> Float -> Float
+modFloat n from to =
+    if n > to then from + (n - to)
+    else if n < from then to - n
+        else n
+
+modCoordinates: Float -> Float -> Vec2 -> Vec2
+modCoordinates w h v =
+    vec2 
+        (modFloat (Vec2.getX v) 0 w)
+        (modFloat (Vec2.getY v) 0 h)
 
 moveEnemy: Rectangle -> Model -> Float -> Rectangle
-moveEnemy obj model time = obj
+moveEnemy obj model time =
+        Vec2.add obj.pos (vec2 0.0 (time / 200.0) )
+        |> \p -> vec2 (Vec2.getX p + (sin time / 200.0) * (toFloat model.width / 2.0) ) (Vec2.getY p) 
+        |> modCoordinates (toFloat model.width - obj.width) (toFloat model.height - obj.height)
+        |> \q -> { obj | pos = q }
 
 
 
@@ -125,7 +140,6 @@ initialObjects: Atlas -> List Rectangle
 initialObjects atlas = List.concat
         [List.map user (ME.toList (Dict.get (gameObjectTypeToInt User) atlas)) ,
          List.map enemy (ME.toList (Dict.get (gameObjectTypeToInt Enemy) atlas)) ]
-        -- MaybeExtra.toList (Dict.get atlas (gameObjectTypeToInt User))
 
 update: TouchEvent -> Model -> (Model, Cmd TouchEvent)
 update event model =
@@ -138,7 +152,7 @@ update event model =
             objects = List.map
                 (\obj ->
                     case obj.typ of 
-                        User -> moveTo obj model (vec2 x y)
+                        User -> movePlayer obj model (vec2 x y)
                         _ -> obj )
                 model.objects,
             from = vec2 x y }, Cmd.none)
@@ -149,7 +163,8 @@ update event model =
                     case obj.typ of
                         Enemy -> moveEnemy obj model delta
                         _ -> obj)
-                model.objects
+                model.objects,
+            t = delta
             }, Cmd.none)
         AtlasLoaded result ->
             case result of

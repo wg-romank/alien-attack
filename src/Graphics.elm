@@ -66,7 +66,6 @@ rect point width height =
 type alias Rectangle = {
     typ: GameObjectType,
     pos: Vec2,
-    from: Vec2,
     width: Float,
     height: Float,
     display: RectDisplay }
