@@ -22,6 +22,7 @@ user: Texture -> Rectangle
 user texture = {
         typ = User,
         pos = vec2 72 224,
+        from = vec2 72 224,
         width = 16.0,
         height = 16.0,
         display = RectTexture texture
@@ -31,6 +32,7 @@ enemy: Texture -> Rectangle
 enemy texture = {
         typ = Enemy,
         pos = vec2 72 24,
+        from = vec2 72 24,
         width = 32.0,
         height = 32.0,
         display = RectTexture texture
@@ -53,7 +55,7 @@ init _ = ( {
     t = 0,
     width = 160,
     height = 240,
-    from = vec2 0.0 0.0,
+    from = vec2 72 224,
     atlas = Dict.empty,
     objects = [ ] }, 
     loadAtlas )
@@ -106,13 +108,17 @@ view model =
         ]
 
 moveTo: Rectangle -> Model -> Vec2 -> Rectangle
-moveTo player model to =
+moveTo obj model to =
         Vec2.sub to model.from
-        |> Vec2.add player.pos
+        |> Vec2.add obj.pos
         |> \p -> vec2
-                    ( Basics.clamp 0.0 (toFloat model.width - player.width) (Vec2.getX p) )
-                    ( Basics.clamp 0.0 (toFloat model.height - player.height) (Vec2.getY p) )
-        |> \q -> { player | pos = q }
+                    ( Basics.clamp 0.0 (toFloat model.width - obj.width) (Vec2.getX p) )
+                    ( Basics.clamp 0.0 (toFloat model.height - obj.height) (Vec2.getY p) )
+        |> \q -> { obj | pos = q, from = obj.pos }
+
+moveEnemy: Rectangle -> Model -> Float -> Rectangle
+moveEnemy obj model time = obj
+
 
 
 initialObjects: Atlas -> List Rectangle
@@ -141,25 +147,14 @@ update event model =
             objects = List.map 
                 (\obj ->
                     case obj.typ of
-                        Enemy -> moveTo obj model (Vec2.add obj.pos (vec2 0 (delta * 1.0 / 1000) ) )
+                        Enemy -> moveEnemy obj model delta
                         _ -> obj)
                 model.objects
             }, Cmd.none)
-        -- Delta delta -> ({ model | t = model.t + delta}, Cmd.none)
         AtlasLoaded result ->
             case result of
                 Result.Ok t -> ({model | message = "atlas loaded", atlas = t, objects = initialObjects t}, Cmd.none)
                 Result.Err t -> ({model | message = Debug.toString t}, Cmd.none)
-        -- PlayerTextureLoaded result ->
-        --     case result of
-        --         Result.Ok t ->
-        --             let
-        --                 player = model.player
-        --                 newPlayer = { player | display = RectTexture t }
-        --             in
-        --                 ({ model | counter = model.counter + 1, player = newPlayer, message = "ok" }, Cmd.none)
-        --         Result.Err t ->
-        --             ({model | counter = model.counter + 1, message = "err" }, Cmd.none)
         _ -> (model, Cmd.none)
 
 main = Browser.element {
