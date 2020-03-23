@@ -7031,10 +7031,13 @@ var $elm$core$Dict$fromList = function (assocs) {
 		assocs);
 };
 var $author$project$Graphics$gameObjectTypeToInt = function (typ) {
-	if (typ.$ === 'User') {
-		return 1;
-	} else {
-		return 2;
+	switch (typ.$) {
+		case 'User':
+			return 1;
+		case 'Enemy':
+			return 2;
+		default:
+			return 3;
 	}
 };
 var $elm_explorations$webgl$WebGL$Texture$Resize = function (a) {
@@ -7240,6 +7243,75 @@ var $elm$browser$Browser$AnimationManager$onAnimationFrameDelta = function (tagg
 		$elm$browser$Browser$AnimationManager$Delta(tagger));
 };
 var $elm$browser$Browser$Events$onAnimationFrameDelta = $elm$browser$Browser$AnimationManager$onAnimationFrameDelta;
+var $author$project$Graphics$Bullet = {$: 'Bullet'};
+var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
+var $author$project$Graphics$RectColor = function (a) {
+	return {$: 'RectColor', a: a};
+};
+var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
+var $author$project$Main$bullet = function (pos) {
+	return {
+		display: $author$project$Graphics$RectColor(
+			A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
+		height: 4.0,
+		pos: pos,
+		typ: $author$project$Graphics$Bullet,
+		width: 2.0
+	};
+};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$maybeCons = F3(
+	function (f, mx, xs) {
+		var _v0 = f(mx);
+		if (_v0.$ === 'Just') {
+			var x = _v0.a;
+			return A2($elm$core$List$cons, x, xs);
+		} else {
+			return xs;
+		}
+	});
+var $elm$core$List$filterMap = F2(
+	function (f, xs) {
+		return A3(
+			$elm$core$List$foldr,
+			$elm$core$List$maybeCons(f),
+			_List_Nil,
+			xs);
+	});
+var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $author$project$Graphics$RectTexture = function (a) {
+	return {$: 'RectTexture', a: a};
+};
+var $author$project$Main$enemy = function (texture) {
+	return {
+		display: $author$project$Graphics$RectTexture(texture),
+		height: 32.0,
+		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
+		typ: $author$project$Graphics$Enemy,
+		width: 32.0
+	};
+};
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -7271,29 +7343,6 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $author$project$Graphics$RectTexture = function (a) {
-	return {$: 'RectTexture', a: a};
-};
-var $author$project$Main$enemy = function (texture) {
-	return {
-		display: $author$project$Graphics$RectTexture(texture),
-		height: 32.0,
-		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
-		typ: $author$project$Graphics$Enemy,
-		width: 32.0
-	};
-};
 var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 	if (m.$ === 'Nothing') {
 		return _List_Nil;
@@ -7334,9 +7383,30 @@ var $author$project$Main$initialObjects = function (atlas) {
 						atlas)))
 			]));
 };
-var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
 var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
-var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
+var $author$project$Main$intersect = F2(
+	function (a, b) {
+		return (_Utils_cmp(
+			$elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos),
+			$elm$core$Basics$abs(
+				A2($elm$core$Basics$max, a.width, b.width))) < 1) && (_Utils_cmp(
+			$elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos),
+			$elm$core$Basics$abs(
+				A2($elm$core$Basics$max, a.height, b.height))) < 1);
+	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $author$project$Main$modFloat = F3(
 	function (n, from, to) {
 		return (_Utils_cmp(n, to) > 0) ? (from + (n - to)) : ((_Utils_cmp(n, from) < 0) ? (to - n) : n);
@@ -7410,18 +7480,9 @@ var $author$project$Main$movePlayer = F3(
 				obj.pos,
 				A2($elm_explorations$linear_algebra$Math$Vector2$sub, to, model.from)));
 	});
-var $author$project$Main$newEnemy = F2(
-	function (pos, texture) {
-		return {
-			display: $author$project$Graphics$RectTexture(texture),
-			height: 32.0,
-			pos: pos,
-			typ: $author$project$Graphics$Enemy,
-			width: 32.0
-		};
-	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Basics$not = _Basics_not;
 var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$update = F2(
 	function (event, model) {
@@ -7467,28 +7528,30 @@ var $author$project$Main$update = F2(
 				var _v4 = event.a;
 				var x = _v4.a;
 				var y = _v4.b;
-				var enemySpawn = A2(
-					$elm$core$List$map,
-					function (t) {
-						return A2(
-							$author$project$Main$newEnemy,
-							A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
-							t);
+				var playerCoords = A2(
+					$elm$core$List$filterMap,
+					function (obj) {
+						return _Utils_eq(obj.typ, $author$project$Graphics$User) ? $elm$core$Maybe$Just(obj.pos) : $elm$core$Maybe$Nothing;
 					},
-					$elm_community$maybe_extra$Maybe$Extra$toList(
-						A2(
-							$elm$core$Dict$get,
-							$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$Enemy),
-							model.atlas)));
+					model.objects);
 				return _Utils_eq(
 					model.from,
 					A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y)) ? _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							message: 'Detecetd Tap' + $elm$core$Debug$toString(
-								A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y)),
-							objects: _Utils_ap(model.objects, enemySpawn)
+							objects: _Utils_ap(
+								model.objects,
+								A2(
+									$elm$core$List$map,
+									function (pos) {
+										return $author$project$Main$bullet(
+											A2(
+												$elm_explorations$linear_algebra$Math$Vector2$add,
+												pos,
+												A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 7.0, 0.0)));
+									},
+									playerCoords))
 						}),
 					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'Delta':
@@ -7498,13 +7561,31 @@ var $author$project$Main$update = F2(
 						model,
 						{
 							objects: A2(
-								$elm$core$List$map,
+								$elm$core$List$filterMap,
 								function (obj) {
 									var _v5 = obj.typ;
-									if (_v5.$ === 'Enemy') {
-										return A3($author$project$Main$moveEnemy, obj, model, delta);
-									} else {
-										return obj;
+									switch (_v5.$) {
+										case 'Enemy':
+											var hitBullets = A2(
+												$elm$core$List$filter,
+												function (bul) {
+													return _Utils_eq(bul.typ, $author$project$Graphics$Bullet) && A2($author$project$Main$intersect, obj, bul);
+												},
+												model.objects);
+											return (!$elm$core$List$isEmpty(hitBullets)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+												A3($author$project$Main$moveEnemy, obj, model, delta));
+										case 'Bullet':
+											return ($elm_explorations$linear_algebra$Math$Vector2$getY(obj.pos) < 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+												_Utils_update(
+													obj,
+													{
+														pos: A2(
+															$elm_explorations$linear_algebra$Math$Vector2$sub,
+															obj.pos,
+															A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0.0, 1.0))
+													}));
+										default:
+											return $elm$core$Maybe$Just(obj);
 									}
 								},
 								model.objects),

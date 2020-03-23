@@ -28,12 +28,15 @@ user texture = {
     }
 
 enemy: Texture -> Rectangle
-enemy texture = {
-        typ = Enemy,
-        pos = vec2 56 24,
-        width = 32.0,
-        height = 32.0,
-        display = RectTexture texture
+enemy texture = newEnemy (vec2 56 24) texture
+
+bullet: Vec2 -> Rectangle
+bullet pos = {
+        typ = Bullet,
+        pos = pos,
+        width = 2.0,
+        height = 4.0,
+        display = RectColor (vec4 1.0 1.0 1.0 1.0)
     }
 
 newEnemy: Vec2 -> Texture -> Rectangle
@@ -150,6 +153,13 @@ initialObjects atlas = List.concat
         [List.map user (ME.toList (Dict.get (gameObjectTypeToInt User) atlas)) ,
          List.map enemy (ME.toList (Dict.get (gameObjectTypeToInt Enemy) atlas)) ]
 
+-- TODO: double check
+intersect: Rectangle -> Rectangle -> Bool
+intersect a b =
+    (Vec2.getX a.pos - Vec2.getX b.pos) <= abs (max a.width b.width) &&
+        (Vec2.getY a.pos - Vec2.getY b.pos) <= abs (max a.height b.height)
+
+
 update: TouchEvent -> Model -> (Model, Cmd TouchEvent)
 update event model =
     case event of
@@ -166,25 +176,36 @@ update event model =
                 model.objects,
             from = vec2 x y }, Cmd.none)
         End (x, y) ->
-            -- TODO: fire rounds
-            let enemySpawn = List.map
-                    (\t -> newEnemy (vec2 x y) t)
-                    (ME.toList (Dict.get (gameObjectTypeToInt Enemy) model.atlas))
+            let playerCoords = List.filterMap (\obj -> if obj.typ == User then Just obj.pos else Nothing) model.objects
             in
                 if model.from == vec2 x y then
-                    ({
-                        model |
-                        message = "Detecetd Tap" ++ (Debug.toString (vec2 x y)),
-                        objects = model.objects ++ enemySpawn
-                    }, Cmd.none)
+                    ({ model | objects = model.objects ++ (List.map (\pos -> bullet (Vec2.add pos (vec2 7.0 0.0))) playerCoords) }, Cmd.none)
                 else (model, Cmd.none)
+            -- TODO: enemy spawn
+            -- let enemySpawn = List.map
+            --         (\t -> newEnemy (vec2 x y) t)
+            --         (ME.toList (Dict.get (gameObjectTypeToInt Enemy) model.atlas))
+            -- in
+            --     if model.from == vec2 x y then
+            --         ({
+            --             model |
+            --             message = "Detecetd Tap" ++ (Debug.toString (vec2 x y)),
+            --             objects = model.objects ++ enemySpawn
+            --         }, Cmd.none)
+            --     else (model, Cmd.none)
         Delta delta -> ({
             model |
-            objects = List.map 
+            objects = List.filterMap 
                 (\obj ->
                     case obj.typ of
-                        Enemy -> moveEnemy obj model delta
-                        _ -> obj)
+                        Enemy ->
+                            let
+                                hitBullets = List.filter (\bul -> bul.typ == Bullet && intersect obj bul) model.objects
+                            in if Basics.not (List.isEmpty hitBullets) then Nothing
+                               else Just (moveEnemy obj model delta)
+                        Bullet -> if Vec2.getY obj.pos < 0 then Nothing
+                                  else Just { obj | pos = Vec2.sub obj.pos (vec2 0.0 1.0) }
+                        _ -> Just obj)
                 model.objects,
             t = delta
             }, Cmd.none)

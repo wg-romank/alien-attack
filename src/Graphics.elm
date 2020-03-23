@@ -7,13 +7,14 @@ import WebGL.Texture as Texture exposing (Error, Texture)
 
 type alias Vertex = { position : Vec2, textureCoord: Vec2 }
 
-type GameObjectType = User | Enemy
+type GameObjectType = User | Enemy | Bullet
 
 gameObjectTypeToInt: GameObjectType -> Int
 gameObjectTypeToInt typ =
     case typ of
        User -> 1
        Enemy -> 2
+       Bullet -> 3
 
 vertexShader = 
     [glsl|
