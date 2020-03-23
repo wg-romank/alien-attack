@@ -7240,29 +7240,6 @@ var $elm$browser$Browser$AnimationManager$onAnimationFrameDelta = function (tagg
 		$elm$browser$Browser$AnimationManager$Delta(tagger));
 };
 var $elm$browser$Browser$Events$onAnimationFrameDelta = $elm$browser$Browser$AnimationManager$onAnimationFrameDelta;
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $author$project$Graphics$RectTexture = function (a) {
-	return {$: 'RectTexture', a: a};
-};
-var $author$project$Main$enemy = function (texture) {
-	return {
-		display: $author$project$Graphics$RectTexture(texture),
-		height: 32.0,
-		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
-		typ: $author$project$Graphics$Enemy,
-		width: 32.0
-	};
-};
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -7294,6 +7271,29 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $author$project$Graphics$RectTexture = function (a) {
+	return {$: 'RectTexture', a: a};
+};
+var $author$project$Main$enemy = function (texture) {
+	return {
+		display: $author$project$Graphics$RectTexture(texture),
+		height: 32.0,
+		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
+		typ: $author$project$Graphics$Enemy,
+		width: 32.0
+	};
+};
 var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 	if (m.$ === 'Nothing') {
 		return _List_Nil;
@@ -7410,6 +7410,16 @@ var $author$project$Main$movePlayer = F3(
 				obj.pos,
 				A2($elm_explorations$linear_algebra$Math$Vector2$sub, to, model.from)));
 	});
+var $author$project$Main$newEnemy = F2(
+	function (pos, texture) {
+		return {
+			display: $author$project$Graphics$RectTexture(texture),
+			height: 32.0,
+			pos: pos,
+			typ: $author$project$Graphics$Enemy,
+			width: 32.0
+		};
+	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$Debug$toString = _Debug_toString;
@@ -7453,6 +7463,34 @@ var $author$project$Main$update = F2(
 								model.objects)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'End':
+				var _v4 = event.a;
+				var x = _v4.a;
+				var y = _v4.b;
+				var enemySpawn = A2(
+					$elm$core$List$map,
+					function (t) {
+						return A2(
+							$author$project$Main$newEnemy,
+							A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
+							t);
+					},
+					$elm_community$maybe_extra$Maybe$Extra$toList(
+						A2(
+							$elm$core$Dict$get,
+							$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$Enemy),
+							model.atlas)));
+				return _Utils_eq(
+					model.from,
+					A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y)) ? _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							message: 'Detecetd Tap' + $elm$core$Debug$toString(
+								A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y)),
+							objects: _Utils_ap(model.objects, enemySpawn)
+						}),
+					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'Delta':
 				var delta = event.a;
 				return _Utils_Tuple2(
@@ -7462,8 +7500,8 @@ var $author$project$Main$update = F2(
 							objects: A2(
 								$elm$core$List$map,
 								function (obj) {
-									var _v4 = obj.typ;
-									if (_v4.$ === 'Enemy') {
+									var _v5 = obj.typ;
+									if (_v5.$ === 'Enemy') {
 										return A3($author$project$Main$moveEnemy, obj, model, delta);
 									} else {
 										return obj;
@@ -7473,7 +7511,7 @@ var $author$project$Main$update = F2(
 							t: delta
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'AtlasLoaded':
+			default:
 				var result = event.a;
 				if (result.$ === 'Ok') {
 					var t = result.a;
@@ -7496,8 +7534,6 @@ var $author$project$Main$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$End = function (a) {

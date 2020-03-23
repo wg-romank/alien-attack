@@ -36,6 +36,15 @@ enemy texture = {
         display = RectTexture texture
     }
 
+newEnemy: Vec2 -> Texture -> Rectangle
+newEnemy pos texture = {
+        typ = Enemy,
+        pos = pos,
+        width = 32.0,
+        height = 32.0,
+        display = RectTexture texture
+    }
+
 type alias Model = {
     counter: Int,
     message: String,
@@ -156,6 +165,19 @@ update event model =
                         _ -> obj )
                 model.objects,
             from = vec2 x y }, Cmd.none)
+        End (x, y) ->
+            -- TODO: fire rounds
+            let enemySpawn = List.map
+                    (\t -> newEnemy (vec2 x y) t)
+                    (ME.toList (Dict.get (gameObjectTypeToInt Enemy) model.atlas))
+            in
+                if model.from == vec2 x y then
+                    ({
+                        model |
+                        message = "Detecetd Tap" ++ (Debug.toString (vec2 x y)),
+                        objects = model.objects ++ enemySpawn
+                    }, Cmd.none)
+                else (model, Cmd.none)
         Delta delta -> ({
             model |
             objects = List.map 
@@ -170,7 +192,6 @@ update event model =
             case result of
                 Result.Ok t -> ({model | message = "atlas loaded", atlas = t, objects = initialObjects t}, Cmd.none)
                 Result.Err t -> ({model | message = Debug.toString t}, Cmd.none)
-        _ -> (model, Cmd.none)
 
 main = Browser.element {
           init = init,
