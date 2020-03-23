@@ -153,11 +153,10 @@ initialObjects atlas = List.concat
         [List.map user (ME.toList (Dict.get (gameObjectTypeToInt User) atlas)) ,
          List.map enemy (ME.toList (Dict.get (gameObjectTypeToInt Enemy) atlas)) ]
 
--- TODO: double check
 intersect: Rectangle -> Rectangle -> Bool
 intersect a b =
-    (Vec2.getX a.pos - Vec2.getX b.pos) <= abs (max a.width b.width) &&
-        (Vec2.getY a.pos - Vec2.getY b.pos) <= abs (max a.height b.height)
+    abs (Vec2.getX a.pos + a.width / 2.0 - Vec2.getX b.pos + b.width / 2.0) <= (max a.width b.width) / 2.0 &&
+        abs (Vec2.getY a.pos + a.height / 2.0 - Vec2.getY b.pos + b.width / 2.0) <= (max a.height b.height) / 2.0
 
 
 update: TouchEvent -> Model -> (Model, Cmd TouchEvent)

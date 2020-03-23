@@ -7303,14 +7303,21 @@ var $elm$core$List$concat = function (lists) {
 var $author$project$Graphics$RectTexture = function (a) {
 	return {$: 'RectTexture', a: a};
 };
+var $author$project$Main$newEnemy = F2(
+	function (pos, texture) {
+		return {
+			display: $author$project$Graphics$RectTexture(texture),
+			height: 32.0,
+			pos: pos,
+			typ: $author$project$Graphics$Enemy,
+			width: 32.0
+		};
+	});
 var $author$project$Main$enemy = function (texture) {
-	return {
-		display: $author$project$Graphics$RectTexture(texture),
-		height: 32.0,
-		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
-		typ: $author$project$Graphics$Enemy,
-		width: 32.0
-	};
+	return A2(
+		$author$project$Main$newEnemy,
+		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
+		texture);
 };
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
@@ -7393,12 +7400,12 @@ var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
 var $author$project$Main$intersect = F2(
 	function (a, b) {
 		return (_Utils_cmp(
-			$elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos),
 			$elm$core$Basics$abs(
-				A2($elm$core$Basics$max, a.width, b.width))) < 1) && (_Utils_cmp(
-			$elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos),
+				(($elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) + (a.width / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos)) + (b.width / 2.0)),
+			A2($elm$core$Basics$max, a.width, b.width) / 2.0) < 1) && (_Utils_cmp(
 			$elm$core$Basics$abs(
-				A2($elm$core$Basics$max, a.height, b.height))) < 1);
+				(($elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) + (a.height / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos)) + (b.width / 2.0)),
+			A2($elm$core$Basics$max, a.height, b.height) / 2.0) < 1);
 	});
 var $elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
