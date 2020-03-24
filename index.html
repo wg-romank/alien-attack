@@ -4371,67 +4371,6 @@ function _Browser_load(url)
 }
 
 
-// eslint-disable-next-line no-unused-vars
-var _Texture_load = F6(function (magnify, mininify, horizontalWrap, verticalWrap, flipY, url) {
-  var isMipmap = mininify !== 9728 && mininify !== 9729;
-  return _Scheduler_binding(function (callback) {
-    var img = new Image();
-    function createTexture(gl) {
-      var texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magnify);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mininify);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, horizontalWrap);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, verticalWrap);
-      if (isMipmap) {
-        gl.generateMipmap(gl.TEXTURE_2D);
-      }
-      gl.bindTexture(gl.TEXTURE_2D, null);
-      return texture;
-    }
-    img.onload = function () {
-      var width = img.width;
-      var height = img.height;
-      var widthPowerOfTwo = (width & (width - 1)) === 0;
-      var heightPowerOfTwo = (height & (height - 1)) === 0;
-      var isSizeValid = (widthPowerOfTwo && heightPowerOfTwo) || (
-        !isMipmap
-        && horizontalWrap === 33071 // clamp to edge
-        && verticalWrap === 33071
-      );
-      if (isSizeValid) {
-        callback(_Scheduler_succeed({
-          $: 0,
-          createTexture: createTexture,
-          a: width,
-          b: height
-        }));
-      } else {
-        callback(_Scheduler_fail(A2(
-          $elm_explorations$webgl$WebGL$Texture$SizeError,
-          width,
-          height
-        )));
-      }
-    };
-    img.onerror = function () {
-      callback(_Scheduler_fail($elm_explorations$webgl$WebGL$Texture$LoadError));
-    };
-    if (url.slice(0, 5) !== 'data:') {
-      img.crossOrigin = 'Anonymous';
-    }
-    img.src = url;
-  });
-});
-
-// eslint-disable-next-line no-unused-vars
-var _Texture_size = function (texture) {
-  return _Utils_Tuple2(texture.a, texture.b);
-};
-
-
 /*
  * Copyright (c) 2010 Mozilla Corporation
  * Copyright (c) 2010 Vladimir Vukicevic
@@ -5444,6 +5383,67 @@ var _MJS_m4x4makeBasis = F3(function(vx, vy, vz) {
 
     return r;
 });
+
+
+// eslint-disable-next-line no-unused-vars
+var _Texture_load = F6(function (magnify, mininify, horizontalWrap, verticalWrap, flipY, url) {
+  var isMipmap = mininify !== 9728 && mininify !== 9729;
+  return _Scheduler_binding(function (callback) {
+    var img = new Image();
+    function createTexture(gl) {
+      var texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flipY);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, magnify);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mininify);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, horizontalWrap);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, verticalWrap);
+      if (isMipmap) {
+        gl.generateMipmap(gl.TEXTURE_2D);
+      }
+      gl.bindTexture(gl.TEXTURE_2D, null);
+      return texture;
+    }
+    img.onload = function () {
+      var width = img.width;
+      var height = img.height;
+      var widthPowerOfTwo = (width & (width - 1)) === 0;
+      var heightPowerOfTwo = (height & (height - 1)) === 0;
+      var isSizeValid = (widthPowerOfTwo && heightPowerOfTwo) || (
+        !isMipmap
+        && horizontalWrap === 33071 // clamp to edge
+        && verticalWrap === 33071
+      );
+      if (isSizeValid) {
+        callback(_Scheduler_succeed({
+          $: 0,
+          createTexture: createTexture,
+          a: width,
+          b: height
+        }));
+      } else {
+        callback(_Scheduler_fail(A2(
+          $elm_explorations$webgl$WebGL$Texture$SizeError,
+          width,
+          height
+        )));
+      }
+    };
+    img.onerror = function () {
+      callback(_Scheduler_fail($elm_explorations$webgl$WebGL$Texture$LoadError));
+    };
+    if (url.slice(0, 5) !== 'data:') {
+      img.crossOrigin = 'Anonymous';
+    }
+    img.src = url;
+  });
+});
+
+// eslint-disable-next-line no-unused-vars
+var _Texture_size = function (texture) {
+  return _Utils_Tuple2(texture.a, texture.b);
+};
 
 
 function _WebGL_log(/* msg */) {
@@ -6880,6 +6880,25 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
+var $author$project$GameState$initialState = {
+	boardSize: {height: 240, width: 160},
+	enemies: _List_fromArray(
+		[
+			{
+			height: 32.0,
+			pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
+			width: 32.0
+		}
+		]),
+	playerPosition: {
+		height: 16.0,
+		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 224),
+		width: 16.0
+	},
+	rounds: _List_Nil,
+	userInput: _List_Nil
+};
 var $author$project$Main$AtlasLoaded = function (a) {
 	return {$: 'AtlasLoaded', a: a};
 };
@@ -7096,22 +7115,12 @@ var $author$project$Main$loadAtlas = A2(
 				},
 				_List_fromArray(
 					[
-						_Utils_Tuple2($author$project$Graphics$Enemy, 'https://wg-romank.github.io/alien-attack/assets/Octo.png'),
-						_Utils_Tuple2($author$project$Graphics$User, 'https://wg-romank.github.io/alien-attack/assets/Player_v1.png')
+						_Utils_Tuple2($author$project$Graphics$Enemy, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
+						_Utils_Tuple2($author$project$Graphics$User, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png')
 					])))));
-var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{
-			atlas: $elm$core$Dict$empty,
-			counter: 0,
-			from: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 224),
-			height: 240,
-			message: '',
-			objects: _List_Nil,
-			t: 0,
-			width: 160
-		},
+		{atlas: $elm$core$Dict$empty, height: 240, message: '', objects: _List_Nil, state: $author$project$GameState$initialState, width: 160},
 		$author$project$Main$loadAtlas);
 };
 var $elm$browser$Browser$AnimationManager$Delta = function (a) {
@@ -7243,52 +7252,12 @@ var $elm$browser$Browser$AnimationManager$onAnimationFrameDelta = function (tagg
 		$elm$browser$Browser$AnimationManager$Delta(tagger));
 };
 var $elm$browser$Browser$Events$onAnimationFrameDelta = $elm$browser$Browser$AnimationManager$onAnimationFrameDelta;
-var $author$project$Graphics$Bullet = {$: 'Bullet'};
-var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
-var $author$project$Graphics$RectColor = function (a) {
-	return {$: 'RectColor', a: a};
+var $author$project$GameState$PlayerFire = {$: 'PlayerFire'};
+var $author$project$GameState$PlayerMove = function (a) {
+	return {$: 'PlayerMove', a: a};
 };
-var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
-var $author$project$Main$bullet = function (pos) {
-	return {
-		display: $author$project$Graphics$RectColor(
-			A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
-		height: 4.0,
-		pos: pos,
-		typ: $author$project$Graphics$Bullet,
-		width: 2.0
-	};
-};
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$List$maybeCons = F3(
-	function (f, mx, xs) {
-		var _v0 = f(mx);
-		if (_v0.$ === 'Just') {
-			var x = _v0.a;
-			return A2($elm$core$List$cons, x, xs);
-		} else {
-			return xs;
-		}
-	});
-var $elm$core$List$filterMap = F2(
-	function (f, xs) {
-		return A3(
-			$elm$core$List$foldr,
-			$elm$core$List$maybeCons(f),
-			_List_Nil,
-			xs);
-	});
-var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $elm$core$List$append = F2(
 	function (xs, ys) {
 		if (!ys.b) {
@@ -7303,22 +7272,11 @@ var $elm$core$List$concat = function (lists) {
 var $author$project$Graphics$RectTexture = function (a) {
 	return {$: 'RectTexture', a: a};
 };
-var $author$project$Main$newEnemy = F2(
-	function (pos, texture) {
-		return {
-			display: $author$project$Graphics$RectTexture(texture),
-			height: 32.0,
-			pos: pos,
-			typ: $author$project$Graphics$Enemy,
-			width: 32.0
-		};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
 	});
-var $author$project$Main$enemy = function (texture) {
-	return A2(
-		$author$project$Main$newEnemy,
-		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
-		texture);
-};
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -7359,142 +7317,260 @@ var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 			[x]);
 	}
 };
-var $author$project$Main$user = function (texture) {
-	return {
-		display: $author$project$Graphics$RectTexture(texture),
-		height: 16.0,
-		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 224),
-		typ: $author$project$Graphics$User,
-		width: 16.0
-	};
+var $author$project$Main$enemySprite = F2(
+	function (atlas, state) {
+		var enemyTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
+			A2(
+				$elm$core$Dict$get,
+				$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$Enemy),
+				atlas));
+		return A2(
+			$elm$core$List$concatMap,
+			function (enemy) {
+				return A2(
+					$elm$core$List$map,
+					function (texture) {
+						return {
+							display: $author$project$Graphics$RectTexture(texture),
+							height: enemy.height,
+							pos: enemy.pos,
+							width: enemy.width
+						};
+					},
+					enemyTexture);
+			},
+			state.enemies);
+	});
+var $author$project$Main$playerSprite = F2(
+	function (atlas, state) {
+		var userTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
+			A2(
+				$elm$core$Dict$get,
+				$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$User),
+				atlas));
+		return A2(
+			$elm$core$List$map,
+			function (texture) {
+				return {
+					display: $author$project$Graphics$RectTexture(texture),
+					height: state.playerPosition.height,
+					pos: state.playerPosition.pos,
+					width: state.playerPosition.width
+				};
+			},
+			userTexture);
+	});
+var $author$project$Main$objectsToDraw = F2(
+	function (atlas, state) {
+		return $elm$core$List$concat(
+			_List_fromArray(
+				[
+					A2($author$project$Main$playerSprite, atlas, state),
+					A2($author$project$Main$enemySprite, atlas, state)
+				]));
+	});
+var $author$project$GameState$registerUserInput = F2(
+	function (action, state) {
+		return _Utils_update(
+			state,
+			{
+				userInput: _Utils_ap(
+					state.userInput,
+					_List_fromArray(
+						[action]))
+			});
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
 };
-var $author$project$Main$initialObjects = function (atlas) {
-	return $elm$core$List$concat(
-		_List_fromArray(
-			[
-				A2(
-				$elm$core$List$map,
-				$author$project$Main$user,
-				$elm_community$maybe_extra$Maybe$Extra$toList(
-					A2(
-						$elm$core$Dict$get,
-						$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$User),
-						atlas))),
-				A2(
-				$elm$core$List$map,
-				$author$project$Main$enemy,
-				$elm_community$maybe_extra$Maybe$Extra$toList(
-					A2(
-						$elm$core$Dict$get,
-						$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$Enemy),
-						atlas)))
-			]));
-};
+var $elm_explorations$linear_algebra$Math$Vector2$sub = _MJS_v2sub;
+var $author$project$GameState$moveY = F2(
+	function (p, amount) {
+		return _Utils_update(
+			p,
+			{
+				pos: A2(
+					$elm_explorations$linear_algebra$Math$Vector2$sub,
+					p.pos,
+					A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0.0, amount))
+			});
+	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
-var $elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
-};
 var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
-var $author$project$Main$intersect = F2(
-	function (a, b) {
-		return (_Utils_cmp(
-			$elm$core$Basics$abs(
-				(($elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) + (a.width / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos)) + (b.width / 2.0)),
-			A2($elm$core$Basics$max, a.width, b.width) / 2.0) < 1) && (_Utils_cmp(
-			$elm$core$Basics$abs(
-				(($elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) + (a.height / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos)) + (b.width / 2.0)),
-			A2($elm$core$Basics$max, a.height, b.height) / 2.0) < 1);
-	});
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $author$project$Main$modFloat = F3(
+var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
+var $author$project$GameState$modFloat = F3(
 	function (n, from, to) {
 		return (_Utils_cmp(n, to) > 0) ? (from + (n - to)) : ((_Utils_cmp(n, from) < 0) ? (to - n) : n);
 	});
-var $author$project$Main$modCoordinates = F3(
+var $author$project$GameState$warpCoordinates = F3(
 	function (w, h, v) {
 		return A2(
 			$elm_explorations$linear_algebra$Math$Vector2$vec2,
 			A3(
-				$author$project$Main$modFloat,
+				$author$project$GameState$modFloat,
 				$elm_explorations$linear_algebra$Math$Vector2$getX(v),
 				0,
 				w),
 			A3(
-				$author$project$Main$modFloat,
+				$author$project$GameState$modFloat,
 				$elm_explorations$linear_algebra$Math$Vector2$getY(v),
 				0,
 				h));
 	});
-var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Main$moveEnemy = F3(
-	function (obj, model, time) {
-		return function (p) {
-			return function (q) {
-				return _Utils_update(
-					obj,
-					{pos: q});
-			}(
-				A3(
-					$author$project$Main$modCoordinates,
-					model.width - obj.width,
-					model.height - obj.height,
-					A2(
-						$elm_explorations$linear_algebra$Math$Vector2$vec2,
-						$elm_explorations$linear_algebra$Math$Vector2$getX(p) + (($elm$core$Basics$sin(time) / 200.0) * (model.width / 2.0)),
-						$elm_explorations$linear_algebra$Math$Vector2$getY(p))));
-		}(
-			A2(
-				$elm_explorations$linear_algebra$Math$Vector2$add,
-				obj.pos,
-				A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0.0, time / 200.0)));
+var $author$project$GameState$enemyMove = F4(
+	function (delta, width, height, enemy) {
+		return _Utils_update(
+			enemy,
+			{
+				pos: A3(
+					$author$project$GameState$warpCoordinates,
+					width - enemy.width,
+					height - enemy.height,
+					A2($author$project$GameState$moveY, enemy, -(delta / 200.0)).pos)
+			});
 	});
+var $author$project$GameState$heightFloat = function (size) {
+	return size.height;
+};
+var $author$project$GameState$widthFloat = function (size) {
+	return size.width;
+};
+var $author$project$GameState$moveEnemies = F2(
+	function (delta, state) {
+		var width = $author$project$GameState$widthFloat(state.boardSize);
+		var height = $author$project$GameState$heightFloat(state.boardSize);
+		return _Utils_update(
+			state,
+			{
+				enemies: A2(
+					$elm$core$List$map,
+					A3($author$project$GameState$enemyMove, delta, width, height),
+					state.enemies)
+			});
+	});
+var $author$project$GameState$moveRound = F3(
+	function (delta, state, round) {
+		return ($elm_explorations$linear_algebra$Math$Vector2$getY(round.pos) <= 0) ? _List_Nil : _List_fromArray(
+			[
+				A2($author$project$GameState$moveY, round, 1.0)
+			]);
+	});
+var $author$project$GameState$moveRounds = F2(
+	function (delta, state) {
+		return _Utils_update(
+			state,
+			{
+				rounds: $elm$core$List$concat(
+					A2(
+						$elm$core$List$map,
+						A2($author$project$GameState$moveRound, delta, state),
+						state.rounds))
+			});
+	});
+var $author$project$GameState$moveX = F2(
+	function (p, amount) {
+		return _Utils_update(
+			p,
+			{
+				pos: A2(
+					$elm_explorations$linear_algebra$Math$Vector2$sub,
+					p.pos,
+					A2($elm_explorations$linear_algebra$Math$Vector2$vec2, amount, 0.0))
+			});
+	});
+var $author$project$GameState$spawnRound = function (player) {
+	return A2(
+		$author$project$GameState$moveX,
+		{height: 4.0, pos: player.pos, width: 2.0},
+		7.0);
+};
+var $author$project$GameState$playerFire = function (state) {
+	return _Utils_update(
+		state,
+		{
+			rounds: _Utils_ap(
+				state.rounds,
+				_List_fromArray(
+					[
+						$author$project$GameState$spawnRound(state.playerPosition)
+					]))
+		});
+};
 var $elm$core$Basics$clamp = F3(
 	function (low, high, number) {
 		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
 	});
-var $elm_explorations$linear_algebra$Math$Vector2$sub = _MJS_v2sub;
-var $author$project$Main$movePlayer = F3(
-	function (obj, model, to) {
+var $author$project$GameState$moveTo = F2(
+	function (p, to) {
+		return _Utils_update(
+			p,
+			{pos: to});
+	});
+var $elm_explorations$linear_algebra$Math$Vector2$toRecord = _MJS_v2toRecord;
+var $author$project$GameState$playerMove = F2(
+	function (to, state) {
+		var width = $author$project$GameState$widthFloat(state.boardSize);
+		var playerWidth = state.playerPosition.width;
+		var playerHeight = state.playerPosition.height;
+		var height = $author$project$GameState$heightFloat(state.boardSize);
 		return function (p) {
 			return function (q) {
 				return _Utils_update(
-					obj,
-					{pos: q});
+					state,
+					{
+						playerPosition: A2($author$project$GameState$moveTo, state.playerPosition, q)
+					});
 			}(
 				A2(
 					$elm_explorations$linear_algebra$Math$Vector2$vec2,
-					A3(
-						$elm$core$Basics$clamp,
-						0.0,
-						model.width - obj.width,
-						$elm_explorations$linear_algebra$Math$Vector2$getX(p)),
-					A3(
-						$elm$core$Basics$clamp,
-						(2.0 * (model.height - obj.height)) / 3.0,
-						model.height - obj.height,
-						$elm_explorations$linear_algebra$Math$Vector2$getY(p))));
+					A3($elm$core$Basics$clamp, 0.0, width - playerWidth, p.x),
+					A3($elm$core$Basics$clamp, (2.0 * (height - playerHeight)) / 3.0, height - playerHeight, p.y)));
 		}(
-			A2(
-				$elm_explorations$linear_algebra$Math$Vector2$add,
-				obj.pos,
-				A2($elm_explorations$linear_algebra$Math$Vector2$sub, to, model.from)));
+			$elm_explorations$linear_algebra$Math$Vector2$toRecord(to));
 	});
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$core$Basics$not = _Basics_not;
+var $author$project$GameState$performPlayerAction = F2(
+	function (action, state) {
+		if (action.$ === 'Just') {
+			if (action.a.$ === 'PlayerMove') {
+				var _v1 = action.a.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				return A2(
+					$author$project$GameState$playerMove,
+					A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
+					state);
+			} else {
+				var _v2 = action.a;
+				return $author$project$GameState$playerFire(state);
+			}
+		} else {
+			return state;
+		}
+	});
+var $author$project$GameState$step = F2(
+	function (delta, state) {
+		var userInput = $elm$core$List$head(state.userInput);
+		return A2(
+			$author$project$GameState$performPlayerAction,
+			userInput,
+			A2(
+				$author$project$GameState$moveRounds,
+				delta,
+				A2($author$project$GameState$moveEnemies, delta, state)));
+	});
 var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$update = F2(
 	function (event, model) {
 		switch (event.$) {
-			case 'Start':
+			case 'Move':
 				var _v1 = event.a;
 				var x = _v1.a;
 				var y = _v1.b;
@@ -7502,10 +7578,14 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							from: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y)
+							state: A2(
+								$author$project$GameState$registerUserInput,
+								$author$project$GameState$PlayerMove(
+									_Utils_Tuple2(x, y)),
+								model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'Move':
+			case 'End':
 				var _v2 = event.a;
 				var x = _v2.a;
 				var y = _v2.b;
@@ -7513,115 +7593,46 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							from: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
-							objects: A2(
-								$elm$core$List$map,
-								function (obj) {
-									var _v3 = obj.typ;
-									if (_v3.$ === 'User') {
-										return A3(
-											$author$project$Main$movePlayer,
-											obj,
-											model,
-											A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y));
-									} else {
-										return obj;
-									}
-								},
-								model.objects)
+							state: A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerFire, model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'End':
-				var _v4 = event.a;
-				var x = _v4.a;
-				var y = _v4.b;
-				var playerCoords = A2(
-					$elm$core$List$filterMap,
-					function (obj) {
-						return _Utils_eq(obj.typ, $author$project$Graphics$User) ? $elm$core$Maybe$Just(obj.pos) : $elm$core$Maybe$Nothing;
-					},
-					model.objects);
-				return _Utils_eq(
-					model.from,
-					A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y)) ? _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							objects: _Utils_ap(
-								model.objects,
-								A2(
-									$elm$core$List$map,
-									function (pos) {
-										return $author$project$Main$bullet(
-											A2(
-												$elm_explorations$linear_algebra$Math$Vector2$add,
-												pos,
-												A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 7.0, 0.0)));
-									},
-									playerCoords))
-						}),
-					$elm$core$Platform$Cmd$none) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 			case 'Delta':
 				var delta = event.a;
+				var newState = A2($author$project$GameState$step, delta, model.state);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							objects: A2(
-								$elm$core$List$filterMap,
-								function (obj) {
-									var _v5 = obj.typ;
-									switch (_v5.$) {
-										case 'Enemy':
-											var hitBullets = A2(
-												$elm$core$List$filter,
-												function (bul) {
-													return _Utils_eq(bul.typ, $author$project$Graphics$Bullet) && A2($author$project$Main$intersect, obj, bul);
-												},
-												model.objects);
-											return (!$elm$core$List$isEmpty(hitBullets)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-												A3($author$project$Main$moveEnemy, obj, model, delta));
-										case 'Bullet':
-											return ($elm_explorations$linear_algebra$Math$Vector2$getY(obj.pos) < 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-												_Utils_update(
-													obj,
-													{
-														pos: A2(
-															$elm_explorations$linear_algebra$Math$Vector2$sub,
-															obj.pos,
-															A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0.0, 1.0))
-													}));
-										default:
-											return $elm$core$Maybe$Just(obj);
-									}
-								},
-								model.objects),
-							t: delta
+							objects: A2($author$project$Main$objectsToDraw, model.atlas, newState),
+							state: newState
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'AtlasLoaded':
 				var result = event.a;
+				var state = model.state;
 				if (result.$ === 'Ok') {
-					var t = result.a;
+					var atlas = result.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								atlas: t,
+								atlas: atlas,
 								message: 'atlas loaded',
-								objects: $author$project$Main$initialObjects(t)
+								objects: A2($author$project$Main$objectsToDraw, atlas, state)
 							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
-					var t = result.a;
+					var err = result.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								message: $elm$core$Debug$toString(t)
+								message: $elm$core$Debug$toString(err)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$End = function (a) {
@@ -7634,6 +7645,68 @@ var $author$project$Main$Start = function (a) {
 	return {$: 'Start', a: a};
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm_explorations$webgl$WebGL$Internal$Blend = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return {$: 'Blend', a: a, b: b, c: c, d: d, e: e, f: f, g: g, h: h, i: i, j: j};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $elm_explorations$webgl$WebGL$Settings$Blend$custom = function (_v0) {
+	var r = _v0.r;
+	var g = _v0.g;
+	var b = _v0.b;
+	var a = _v0.a;
+	var color = _v0.color;
+	var alpha = _v0.alpha;
+	var expand = F2(
+		function (_v1, _v2) {
+			var eq1 = _v1.a;
+			var f11 = _v1.b;
+			var f12 = _v1.c;
+			var eq2 = _v2.a;
+			var f21 = _v2.b;
+			var f22 = _v2.c;
+			return $elm_explorations$webgl$WebGL$Internal$Blend(eq1)(f11)(f12)(eq2)(f21)(f22)(r)(g)(b)(a);
+		});
+	return A2(expand, color, alpha);
+};
+var $elm_explorations$webgl$WebGL$Settings$Blend$Blender = F3(
+	function (a, b, c) {
+		return {$: 'Blender', a: a, b: b, c: c};
+	});
+var $elm_explorations$webgl$WebGL$Settings$Blend$customAdd = F2(
+	function (_v0, _v1) {
+		var factor1 = _v0.a;
+		var factor2 = _v1.a;
+		return A3($elm_explorations$webgl$WebGL$Settings$Blend$Blender, 32774, factor1, factor2);
+	});
+var $elm_explorations$webgl$WebGL$Settings$Blend$add = F2(
+	function (factor1, factor2) {
+		return $elm_explorations$webgl$WebGL$Settings$Blend$custom(
+			{
+				a: 0,
+				alpha: A2($elm_explorations$webgl$WebGL$Settings$Blend$customAdd, factor1, factor2),
+				b: 0,
+				color: A2($elm_explorations$webgl$WebGL$Settings$Blend$customAdd, factor1, factor2),
+				g: 0,
+				r: 0
+			});
+	});
 var $elm_explorations$webgl$WebGL$Internal$DepthTest = F4(
 	function (a, b, c, d) {
 		return {$: 'DepthTest', a: a, b: b, c: c, d: d};
@@ -7723,10 +7796,15 @@ var $author$project$Graphics$fragmentTextureShader = {
 	attributes: {},
 	uniforms: {texture: 'texture'}
 };
+var $elm_explorations$webgl$WebGL$Settings$Blend$Factor = function (a) {
+	return {$: 'Factor', a: a};
+};
+var $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha = $elm_explorations$webgl$WebGL$Settings$Blend$Factor(771);
 var $author$project$Graphics$Vertex = F2(
 	function (position, textureCoord) {
 		return {position: position, textureCoord: textureCoord};
 	});
+var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm_explorations$webgl$WebGL$MeshIndexed3 = F3(
 	function (a, b, c) {
 		return {$: 'MeshIndexed3', a: a, b: b, c: c};
@@ -7771,6 +7849,7 @@ var $author$project$Graphics$rect = F3(
 					_Utils_Tuple3(2, 1, 3)
 				]));
 	});
+var $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha = $elm_explorations$webgl$WebGL$Settings$Blend$Factor(770);
 var $author$project$Graphics$vertexShader = {
 	src: '\n        attribute vec2 position;\n        attribute vec2 textureCoord;\n        uniform vec2 u_res;\n        varying vec2 vtextureCoord;\n\n        void main() {\n            vec2 zeroOne = position / u_res;\n            vec2 clipSpace = zeroOne * 2.0 - 1.0;\n            gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);\n            vtextureCoord = textureCoord;\n        }\n    ',
 	attributes: {position: 'position', textureCoord: 'textureCoord'},
@@ -7789,8 +7868,12 @@ var $author$project$Graphics$drawRectangle = F2(
 				{u_res: res, vcolor: c});
 		} else {
 			var t = _v0.a;
-			return A4(
-				$elm_explorations$webgl$WebGL$entity,
+			return A5(
+				$elm_explorations$webgl$WebGL$entityWith,
+				_List_fromArray(
+					[
+						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha)
+					]),
 				$author$project$Graphics$vertexShader,
 				$author$project$Graphics$fragmentTextureShader,
 				A3($author$project$Graphics$rect, rec.pos, rec.width, rec.height),
@@ -7932,8 +8015,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove = A2($mpizenbe
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchstart', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm_explorations$webgl$WebGL$Internal$Alpha = function (a) {
 	return {$: 'Alpha', a: a};
 };
@@ -7955,15 +8036,6 @@ var $elm_explorations$webgl$WebGL$toHtml = $elm_explorations$webgl$WebGL$toHtmlW
 			$elm_explorations$webgl$WebGL$antialias,
 			$elm_explorations$webgl$WebGL$depth(1)
 		]));
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -8018,6 +8090,8 @@ var $author$project$Main$view = function (model) {
 						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
 						$elm$html$Html$Attributes$width(model.width),
 						$elm$html$Html$Attributes$height(model.height),
+						A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+						A2($elm$html$Html$Attributes$style, 'image-rendering', 'webkit-optimize-contrast'),
 						A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
 						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
@@ -8029,9 +8103,7 @@ var $author$project$Main$view = function (model) {
 							o,
 							A2($elm_explorations$linear_algebra$Math$Vector2$vec2, model.width, model.height));
 					},
-					model.objects)),
-				$elm$html$Html$text(
-				$elm$core$Debug$toString(model))
+					model.objects))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

@@ -15,58 +15,63 @@ import Task
 import Maybe.Extra as ME
 
 import Graphics exposing (drawRectangle, Rectangle, RectDisplay(..), GameObjectType(..), gameObjectTypeToInt)
+import GameState exposing (..)
 
 type alias Atlas = Dict Int Texture
 
-user: Texture -> Rectangle
-user texture = {
-        typ = User,
-        pos = vec2 72 224,
-        width = 16.0,
-        height = 16.0,
-        display = RectTexture texture
-    }
 
-enemy: Texture -> Rectangle
-enemy texture = newEnemy (vec2 56 24) texture
+playerSprite: Atlas -> GameState -> List Rectangle
+playerSprite atlas state =
+    let
+        userTexture = ME.toList (Dict.get (gameObjectTypeToInt User) atlas)
+    in
+    List.map
+        (\texture -> {
+            pos = state.playerPosition.pos,
+            width = state.playerPosition.width,
+            height = state.playerPosition.height,
+            display = RectTexture texture
+        }) userTexture
 
-bullet: Vec2 -> Rectangle
-bullet pos = {
-        typ = Bullet,
-        pos = pos,
-        width = 2.0,
-        height = 4.0,
+enemySprite: Atlas -> GameState -> List Rectangle
+enemySprite atlas state =
+    let
+        enemyTexture = ME.toList (Dict.get (gameObjectTypeToInt Enemy) atlas)  
+    in
+        List.concatMap
+            (\enemy -> List.map (\texture -> {
+                pos = enemy.pos,
+                width = enemy.width,
+                height = enemy.height,
+                display = RectTexture texture
+            }) enemyTexture) state.enemies
+    
+
+bulletSprite: GameState -> List Rectangle
+bulletSprite state =
+    List.map (\bullet -> {
+        pos = bullet.pos,
+        width = bullet.width,
+        height = bullet.height,
         display = RectColor (vec4 1.0 1.0 1.0 1.0)
-    }
-
-newEnemy: Vec2 -> Texture -> Rectangle
-newEnemy pos texture = {
-        typ = Enemy,
-        pos = pos,
-        width = 32.0,
-        height = 32.0,
-        display = RectTexture texture
-    }
+    }) state.rounds
 
 type alias Model = {
-    counter: Int,
     message: String,
-    t: Float,
     width: Int,
     height: Int,
-    from: Vec2,
     atlas: Atlas,
+    state: GameState,
     objects: List Rectangle }
+
 
 init: () -> (Model, Cmd TouchEvent)
 init _ = ( {
-    counter = 0,
     message = "",
-    t = 0,
     width = 160,
     height = 240,
-    from = vec2 72 224,
     atlas = Dict.empty,
+    state = initialState,
     objects = [ ] }, 
     loadAtlas )
 
@@ -111,107 +116,43 @@ view model =
               Touch.onEnd (End << touchCoordinates),
               width model.width,
               height model.height,
+              style "height" "100vh",
+              style "image-rendering" "webkit-optimize-contrast",
               style "backgroundColor" "#000000",
               style "display" "block" ]
-            (List.map (\o -> drawRectangle o (vec2 (toFloat model.width) (toFloat model.height) )) model.objects),
-            text <| Debug.toString model
+            (List.map (\o -> drawRectangle o (vec2 (toFloat model.width) (toFloat model.height) )) model.objects)
+            -- text <| Debug.toString model
         ]
 
-movePlayer: Rectangle -> Model -> Vec2 -> Rectangle
-movePlayer obj model to =
-        Vec2.sub to model.from
-        |> Vec2.add obj.pos
-        |> \p -> vec2
-                    ( Basics.clamp 0.0 (toFloat model.width - obj.width) (Vec2.getX p) )
-                    ( Basics.clamp ( 2.0 * (toFloat model.height - obj.height) / 3.0 ) (toFloat model.height - obj.height) (Vec2.getY p) )
-        |> \q -> { obj | pos = q }
-
-
-modFloat: Float -> Float -> Float -> Float
-modFloat n from to =
-    if n > to then from + (n - to)
-    else if n < from then to - n
-        else n
-
-modCoordinates: Float -> Float -> Vec2 -> Vec2
-modCoordinates w h v =
-    vec2 
-        (modFloat (Vec2.getX v) 0 w)
-        (modFloat (Vec2.getY v) 0 h)
-
-moveEnemy: Rectangle -> Model -> Float -> Rectangle
-moveEnemy obj model time =
-        Vec2.add obj.pos (vec2 0.0 (time / 200.0) )
-        |> \p -> vec2 (Vec2.getX p + (sin time / 200.0) * (toFloat model.width / 2.0) ) (Vec2.getY p) 
-        |> modCoordinates (toFloat model.width - obj.width) (toFloat model.height - obj.height)
-        |> \q -> { obj | pos = q }
-
-
-
-initialObjects: Atlas -> List Rectangle
-initialObjects atlas = List.concat
-        [List.map user (ME.toList (Dict.get (gameObjectTypeToInt User) atlas)) ,
-         List.map enemy (ME.toList (Dict.get (gameObjectTypeToInt Enemy) atlas)) ]
-
-intersect: Rectangle -> Rectangle -> Bool
-intersect a b =
-    abs (Vec2.getX a.pos + a.width / 2.0 - Vec2.getX b.pos + b.width / 2.0) <= (max a.width b.width) / 2.0 &&
-        abs (Vec2.getY a.pos + a.height / 2.0 - Vec2.getY b.pos + b.width / 2.0) <= (max a.height b.height) / 2.0
+objectsToDraw: Atlas -> GameState -> List Rectangle
+objectsToDraw atlas state = List.concat
+    [
+        playerSprite atlas state,
+        enemySprite atlas state
+    ]
 
 
 update: TouchEvent -> Model -> (Model, Cmd TouchEvent)
 update event model =
     case event of
-        Start (x, y) -> ({
-            model |
-            from = vec2 x y }, Cmd.none)
-        Move (x, y) -> ({
-            model |
-            objects = List.map
-                (\obj ->
-                    case obj.typ of 
-                        User -> movePlayer obj model (vec2 x y)
-                        _ -> obj )
-                model.objects,
-            from = vec2 x y }, Cmd.none)
+        -- Start (x, y) -> ({ model | from = vec2 x y }, Cmd.none)
+        Move (x, y) ->
+            ({ model | state = registerUserInput (PlayerMove(x, y)) model.state }, Cmd.none)
         End (x, y) ->
-            let playerCoords = List.filterMap (\obj -> if obj.typ == User then Just obj.pos else Nothing) model.objects
+            ({ model | state = registerUserInput PlayerFire model.state }, Cmd.none)
+        Delta delta -> 
+            let newState = step delta model.state
             in
-                if model.from == vec2 x y then
-                    ({ model | objects = model.objects ++ (List.map (\pos -> bullet (Vec2.add pos (vec2 7.0 0.0))) playerCoords) }, Cmd.none)
-                else (model, Cmd.none)
-            -- TODO: enemy spawn
-            -- let enemySpawn = List.map
-            --         (\t -> newEnemy (vec2 x y) t)
-            --         (ME.toList (Dict.get (gameObjectTypeToInt Enemy) model.atlas))
-            -- in
-            --     if model.from == vec2 x y then
-            --         ({
-            --             model |
-            --             message = "Detecetd Tap" ++ (Debug.toString (vec2 x y)),
-            --             objects = model.objects ++ enemySpawn
-            --         }, Cmd.none)
-            --     else (model, Cmd.none)
-        Delta delta -> ({
-            model |
-            objects = List.filterMap 
-                (\obj ->
-                    case obj.typ of
-                        Enemy ->
-                            let
-                                hitBullets = List.filter (\bul -> bul.typ == Bullet && intersect obj bul) model.objects
-                            in if Basics.not (List.isEmpty hitBullets) then Nothing
-                               else Just (moveEnemy obj model delta)
-                        Bullet -> if Vec2.getY obj.pos < 0 then Nothing
-                                  else Just { obj | pos = Vec2.sub obj.pos (vec2 0.0 1.0) }
-                        _ -> Just obj)
-                model.objects,
-            t = delta
-            }, Cmd.none)
+                ({ model | state = newState, objects = objectsToDraw model.atlas newState }, Cmd.none)
         AtlasLoaded result ->
-            case result of
-                Result.Ok t -> ({model | message = "atlas loaded", atlas = t, objects = initialObjects t}, Cmd.none)
-                Result.Err t -> ({model | message = Debug.toString t}, Cmd.none)
+            let
+                state = model.state
+            in case result of
+                Result.Ok atlas ->
+                    ({model | message = "atlas loaded", atlas = atlas, objects = objectsToDraw atlas state}, Cmd.none)
+                Result.Err err ->
+                    ({model | message = Debug.toString err}, Cmd.none)
+        _ -> (model, Cmd.none)
 
 main = Browser.element {
           init = init,

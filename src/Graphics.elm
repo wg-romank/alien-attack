@@ -4,6 +4,7 @@ import Math.Vector4 as Vec4 exposing (vec4, Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import WebGL exposing (Mesh, Shader)
 import WebGL.Texture as Texture exposing (Error, Texture)
+import WebGL.Settings.Blend as Blend
 
 type alias Vertex = { position : Vec2, textureCoord: Vec2 }
 
@@ -65,7 +66,6 @@ rect point width height =
 
 
 type alias Rectangle = {
-    typ: GameObjectType,
     pos: Vec2,
     width: Float,
     height: Float,
@@ -85,7 +85,9 @@ drawRectangle rec res =
                         (rect rec.pos rec.width rec.height)
                         { u_res = res, vcolor = c } 
                 RectTexture t ->
-                    WebGL.entity
+                    WebGL.entityWith
+                        -- ensure transparent texture blending
+                        [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha ]
                         vertexShader
                         fragmentTextureShader
                         (rect rec.pos rec.width rec.height)
