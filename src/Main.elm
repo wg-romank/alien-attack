@@ -2,11 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events exposing (onAnimationFrameDelta)
--- import Html exposing (Html, div, text)
+import Html exposing (Html, div, text)
 import Html.Attributes exposing (width, height, style)
-import Html.Styled exposing (..)
-import Html.Styled.Attributes exposing (css, href, src)
-import Html.Styled.Events exposing (onClick)
 import Html.Events.Extra.Touch as Touch
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import Dict exposing (Dict)
@@ -114,18 +111,10 @@ view model =
               Touch.onEnd (End << touchCoordinates),
               width model.width,
               height model.height,
-            --   style "backgroundColor" "#000000",
-              style "display" "block",
-              style "position" "absolute; left: 0; top: 0; z-index: 1;" ]
+              style "backgroundColor" "#000000",
+              style "display" "block" ]
             (List.map (\o -> drawRectangle o (vec2 (toFloat model.width) (toFloat model.height) )) model.objects),
-            WebGL.toHtml
-            [ 
-                width model.width,
-                height model.height,
-                style "display" "block",
-                style "backgroundColor" "#000000",
-                style "position" "absolute; left: 0; top: 0; z-index: 0;" ] [] --,
-            -- text <| Debug.toString model
+            text <| Debug.toString model
         ]
 
 movePlayer: Rectangle -> Model -> Vec2 -> Rectangle
@@ -227,6 +216,6 @@ update event model =
 main = Browser.element {
           init = init,
           subscriptions = \_ -> Delta |> onAnimationFrameDelta,
-          view = view >> toUnstyled,
+          view = view,
           update = update
        }

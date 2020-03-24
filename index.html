@@ -8018,8 +8018,8 @@ var $author$project$Main$view = function (model) {
 						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
 						$elm$html$Html$Attributes$width(model.width),
 						$elm$html$Html$Attributes$height(model.height),
-						A2($elm$html$Html$Attributes$style, 'display', 'block'),
-						A2($elm$html$Html$Attributes$style, 'position', 'absolute; left: 0; top: 0; z-index: 1;')
+						A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
+						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
 				A2(
 					$elm$core$List$map,
@@ -8030,17 +8030,6 @@ var $author$project$Main$view = function (model) {
 							A2($elm_explorations$linear_algebra$Math$Vector2$vec2, model.width, model.height));
 					},
 					model.objects)),
-				A2(
-				$elm_explorations$webgl$WebGL$toHtml,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$width(model.width),
-						$elm$html$Html$Attributes$height(model.height),
-						A2($elm$html$Html$Attributes$style, 'display', 'block'),
-						A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
-						A2($elm$html$Html$Attributes$style, 'position', 'absolute; left: 0; top: 0; z-index: 0;')
-					]),
-				_List_Nil),
 				$elm$html$Html$text(
 				$elm$core$Debug$toString(model))
 			]));
