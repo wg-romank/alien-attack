@@ -6878,32 +6878,9 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
-var $author$project$GameState$initialState = {
-	boardSize: {height: 240, width: 160},
-	enemies: _List_fromArray(
-		[
-			{
-			height: 32.0,
-			pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
-			width: 32.0
-		}
-		]),
-	playerPosition: {
-		height: 16.0,
-		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 224),
-		width: 16.0
-	},
-	rounds: _List_Nil,
-	userInput: _List_Nil
-};
 var $author$project$Main$AtlasLoaded = function (a) {
 	return {$: 'AtlasLoaded', a: a};
 };
-var $author$project$Graphics$Enemy = {$: 'Enemy'};
-var $author$project$Graphics$User = {$: 'User'};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -6928,6 +6905,30 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $author$project$Sprites$emptyAtlas = $elm$core$Dict$empty;
+var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
+var $author$project$GameState$initialState = {
+	boardSize: {height: 240, width: 160},
+	enemies: _List_fromArray(
+		[
+			{
+			height: 32.0,
+			pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
+			width: 32.0
+		}
+		]),
+	playerPosition: {
+		height: 16.0,
+		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 224),
+		width: 16.0
+	},
+	rounds: _List_Nil,
+	userInput: _List_Nil
+};
+var $author$project$Sprites$Enemy = {$: 'Enemy'};
+var $author$project$Sprites$User = {$: 'User'};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -7049,7 +7050,7 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
-var $author$project$Graphics$gameObjectTypeToInt = function (typ) {
+var $author$project$Sprites$gameObjectTypeToInt = function (typ) {
 	switch (typ.$) {
 		case 'User':
 			return 1;
@@ -7092,36 +7093,33 @@ var $elm_explorations$webgl$WebGL$Texture$loadWith = F2(
 		return A4(expand, magnify, minify, horizontalWrap, verticalWrap);
 	});
 var $elm_explorations$webgl$WebGL$Texture$load = $elm_explorations$webgl$WebGL$Texture$loadWith($elm_explorations$webgl$WebGL$Texture$defaultOptions);
-var $author$project$Main$loadAtlas = A2(
-	$elm$core$Task$attempt,
-	$author$project$Main$AtlasLoaded,
-	A2(
-		$elm$core$Task$map,
-		$elm$core$Dict$fromList,
-		$elm$core$Task$sequence(
-			A2(
-				$elm$core$List$map,
-				function (_v0) {
-					var typ = _v0.a;
-					var url = _v0.b;
-					return A2(
-						$elm$core$Task$map,
-						function (tex) {
-							return _Utils_Tuple2(
-								$author$project$Graphics$gameObjectTypeToInt(typ),
-								tex);
-						},
-						$elm_explorations$webgl$WebGL$Texture$load(url));
-				},
-				_List_fromArray(
-					[
-						_Utils_Tuple2($author$project$Graphics$Enemy, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
-						_Utils_Tuple2($author$project$Graphics$User, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png')
-					])))));
+var $author$project$Sprites$loadAtlas = A2(
+	$elm$core$Task$map,
+	$elm$core$Dict$fromList,
+	$elm$core$Task$sequence(
+		A2(
+			$elm$core$List$map,
+			function (_v0) {
+				var typ = _v0.a;
+				var url = _v0.b;
+				return A2(
+					$elm$core$Task$map,
+					function (tex) {
+						return _Utils_Tuple2(
+							$author$project$Sprites$gameObjectTypeToInt(typ),
+							tex);
+					},
+					$elm_explorations$webgl$WebGL$Texture$load(url));
+			},
+			_List_fromArray(
+				[
+					_Utils_Tuple2($author$project$Sprites$Enemy, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
+					_Utils_Tuple2($author$project$Sprites$User, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png')
+				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{atlas: $elm$core$Dict$empty, height: 240, message: '', objects: _List_Nil, state: $author$project$GameState$initialState, width: 160},
-		$author$project$Main$loadAtlas);
+		{atlas: $author$project$Sprites$emptyAtlas, message: '', state: $author$project$GameState$initialState},
+		A2($elm$core$Task$attempt, $author$project$Main$AtlasLoaded, $author$project$Sprites$loadAtlas));
 };
 var $elm$browser$Browser$AnimationManager$Delta = function (a) {
 	return {$: 'Delta', a: a};
@@ -7258,117 +7256,6 @@ var $author$project$GameState$PlayerMove = function (a) {
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $author$project$Graphics$RectTexture = function (a) {
-	return {$: 'RectTexture', a: a};
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
-	});
-var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
-	if (m.$ === 'Nothing') {
-		return _List_Nil;
-	} else {
-		var x = m.a;
-		return _List_fromArray(
-			[x]);
-	}
-};
-var $author$project$Main$enemySprite = F2(
-	function (atlas, state) {
-		var enemyTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
-			A2(
-				$elm$core$Dict$get,
-				$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$Enemy),
-				atlas));
-		return A2(
-			$elm$core$List$concatMap,
-			function (enemy) {
-				return A2(
-					$elm$core$List$map,
-					function (texture) {
-						return {
-							display: $author$project$Graphics$RectTexture(texture),
-							height: enemy.height,
-							pos: enemy.pos,
-							width: enemy.width
-						};
-					},
-					enemyTexture);
-			},
-			state.enemies);
-	});
-var $author$project$Main$playerSprite = F2(
-	function (atlas, state) {
-		var userTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
-			A2(
-				$elm$core$Dict$get,
-				$author$project$Graphics$gameObjectTypeToInt($author$project$Graphics$User),
-				atlas));
-		return A2(
-			$elm$core$List$map,
-			function (texture) {
-				return {
-					display: $author$project$Graphics$RectTexture(texture),
-					height: state.playerPosition.height,
-					pos: state.playerPosition.pos,
-					width: state.playerPosition.width
-				};
-			},
-			userTexture);
-	});
-var $author$project$Main$objectsToDraw = F2(
-	function (atlas, state) {
-		return $elm$core$List$concat(
-			_List_fromArray(
-				[
-					A2($author$project$Main$playerSprite, atlas, state),
-					A2($author$project$Main$enemySprite, atlas, state)
-				]));
-	});
 var $author$project$GameState$registerUserInput = F2(
 	function (action, state) {
 		return _Utils_update(
@@ -7380,18 +7267,9 @@ var $author$project$GameState$registerUserInput = F2(
 						[action]))
 			});
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $elm_explorations$linear_algebra$Math$Vector2$sub = _MJS_v2sub;
 var $author$project$GameState$moveY = F2(
-	function (p, amount) {
+	function (amount, p) {
 		return _Utils_update(
 			p,
 			{
@@ -7407,7 +7285,7 @@ var $elm$core$Basics$negate = function (n) {
 var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
 var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
 var $author$project$GameState$modFloat = F3(
-	function (n, from, to) {
+	function (from, to, n) {
 		return (_Utils_cmp(n, to) > 0) ? (from + (n - to)) : ((_Utils_cmp(n, from) < 0) ? (to - n) : n);
 	});
 var $author$project$GameState$warpCoordinates = F3(
@@ -7416,14 +7294,14 @@ var $author$project$GameState$warpCoordinates = F3(
 			$elm_explorations$linear_algebra$Math$Vector2$vec2,
 			A3(
 				$author$project$GameState$modFloat,
-				$elm_explorations$linear_algebra$Math$Vector2$getX(v),
 				0,
-				w),
+				w,
+				$elm_explorations$linear_algebra$Math$Vector2$getX(v)),
 			A3(
 				$author$project$GameState$modFloat,
-				$elm_explorations$linear_algebra$Math$Vector2$getY(v),
 				0,
-				h));
+				h,
+				$elm_explorations$linear_algebra$Math$Vector2$getY(v)));
 	});
 var $author$project$GameState$enemyMove = F4(
 	function (delta, width, height, enemy) {
@@ -7434,7 +7312,7 @@ var $author$project$GameState$enemyMove = F4(
 					$author$project$GameState$warpCoordinates,
 					width - enemy.width,
 					height - enemy.height,
-					A2($author$project$GameState$moveY, enemy, -(delta / 200.0)).pos)
+					A2($author$project$GameState$moveY, -(delta / 200.0), enemy).pos)
 			});
 	});
 var $author$project$GameState$heightFloat = function (size) {
@@ -7456,11 +7334,22 @@ var $author$project$GameState$moveEnemies = F2(
 					state.enemies)
 			});
 	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
 var $author$project$GameState$moveRound = F3(
 	function (delta, state, round) {
 		return ($elm_explorations$linear_algebra$Math$Vector2$getY(round.pos) <= 0) ? _List_Nil : _List_fromArray(
 			[
-				A2($author$project$GameState$moveY, round, 1.0)
+				A2($author$project$GameState$moveY, 1.0, round)
 			]);
 	});
 var $author$project$GameState$moveRounds = F2(
@@ -7476,7 +7365,7 @@ var $author$project$GameState$moveRounds = F2(
 			});
 	});
 var $author$project$GameState$moveX = F2(
-	function (p, amount) {
+	function (amount, p) {
 		return _Utils_update(
 			p,
 			{
@@ -7489,8 +7378,8 @@ var $author$project$GameState$moveX = F2(
 var $author$project$GameState$spawnRound = function (player) {
 	return A2(
 		$author$project$GameState$moveX,
-		{height: 4.0, pos: player.pos, width: 2.0},
-		7.0);
+		-7.0,
+		{height: 4.0, pos: player.pos, width: 2.0});
 };
 var $author$project$GameState$playerFire = function (state) {
 	return _Utils_update(
@@ -7538,33 +7427,36 @@ var $author$project$GameState$playerMove = F2(
 	});
 var $author$project$GameState$performPlayerAction = F2(
 	function (action, state) {
-		if (action.$ === 'Just') {
-			if (action.a.$ === 'PlayerMove') {
-				var _v1 = action.a.a;
-				var x = _v1.a;
-				var y = _v1.b;
-				return A2(
-					$author$project$GameState$playerMove,
-					A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
-					state);
-			} else {
-				var _v2 = action.a;
-				return $author$project$GameState$playerFire(state);
-			}
+		if (action.b) {
+			var f = action.a;
+			var rest = action.b;
+			return function () {
+				if (f.$ === 'PlayerMove') {
+					var _v2 = f.a;
+					var x = _v2.a;
+					var y = _v2.b;
+					return $author$project$GameState$playerMove(
+						A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y));
+				} else {
+					return $author$project$GameState$playerFire;
+				}
+			}()(
+				_Utils_update(
+					state,
+					{userInput: rest}));
 		} else {
 			return state;
 		}
 	});
 var $author$project$GameState$step = F2(
 	function (delta, state) {
-		var userInput = $elm$core$List$head(state.userInput);
 		return A2(
-			$author$project$GameState$performPlayerAction,
-			userInput,
+			$author$project$GameState$moveRounds,
+			delta,
 			A2(
-				$author$project$GameState$moveRounds,
+				$author$project$GameState$moveEnemies,
 				delta,
-				A2($author$project$GameState$moveEnemies, delta, state)));
+				A2($author$project$GameState$performPlayerAction, state.userInput, state)));
 	});
 var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$update = F2(
@@ -7598,28 +7490,21 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'Delta':
 				var delta = event.a;
-				var newState = A2($author$project$GameState$step, delta, model.state);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{
-							objects: A2($author$project$Main$objectsToDraw, model.atlas, newState),
-							state: newState
+							state: A2($author$project$GameState$step, delta, model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'AtlasLoaded':
 				var result = event.a;
-				var state = model.state;
 				if (result.$ === 'Ok') {
 					var atlas = result.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{
-								atlas: atlas,
-								message: 'atlas loaded',
-								objects: A2($author$project$Main$objectsToDraw, atlas, state)
-							}),
+							{atlas: atlas, message: 'atlas loaded'}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var err = result.a;
@@ -7645,6 +7530,30 @@ var $author$project$Main$Start = function (a) {
 	return {$: 'Start', a: a};
 };
 var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$Attributes$height = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'height',
+		$elm$core$String$fromInt(n));
+};
+var $author$project$Graphics$RectColor = function (a) {
+	return {$: 'RectColor', a: a};
+};
+var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
+var $author$project$Sprites$bulletSprite = function (state) {
+	return A2(
+		$elm$core$List$map,
+		function (bullet) {
+			return {
+				display: $author$project$Graphics$RectColor(
+					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
+				height: bullet.height,
+				pos: bullet.pos,
+				width: bullet.width
+			};
+		},
+		state.rounds);
+};
 var $elm_explorations$webgl$WebGL$Internal$Blend = function (a) {
 	return function (b) {
 		return function (c) {
@@ -7856,7 +7765,7 @@ var $author$project$Graphics$vertexShader = {
 	uniforms: {u_res: 'u_res'}
 };
 var $author$project$Graphics$drawRectangle = F2(
-	function (rec, res) {
+	function (res, rec) {
 		var _v0 = rec.display;
 		if (_v0.$ === 'RectColor') {
 			var c = _v0.a;
@@ -7880,12 +7789,118 @@ var $author$project$Graphics$drawRectangle = F2(
 				{texture: t, u_res: res});
 		}
 	});
-var $elm$html$Html$Attributes$height = function (n) {
-	return A2(
-		_VirtualDom_attribute,
-		'height',
-		$elm$core$String$fromInt(n));
+var $author$project$Graphics$RectTexture = function (a) {
+	return {$: 'RectTexture', a: a};
 };
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
+	if (m.$ === 'Nothing') {
+		return _List_Nil;
+	} else {
+		var x = m.a;
+		return _List_fromArray(
+			[x]);
+	}
+};
+var $author$project$Sprites$enemySprite = F2(
+	function (atlas, state) {
+		var enemyTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
+			A2(
+				$elm$core$Dict$get,
+				$author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$Enemy),
+				atlas));
+		return A2(
+			$elm$core$List$concatMap,
+			function (enemy) {
+				return A2(
+					$elm$core$List$map,
+					function (texture) {
+						return {
+							display: $author$project$Graphics$RectTexture(texture),
+							height: enemy.height,
+							pos: enemy.pos,
+							width: enemy.width
+						};
+					},
+					enemyTexture);
+			},
+			state.enemies);
+	});
+var $author$project$Sprites$playerSprite = F2(
+	function (atlas, state) {
+		var userTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
+			A2(
+				$elm$core$Dict$get,
+				$author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$User),
+				atlas));
+		return A2(
+			$elm$core$List$map,
+			function (texture) {
+				return {
+					display: $author$project$Graphics$RectTexture(texture),
+					height: state.playerPosition.height,
+					pos: state.playerPosition.pos,
+					width: state.playerPosition.width
+				};
+			},
+			userTexture);
+	});
+var $author$project$Sprites$objectsToDraw = F2(
+	function (atlas, state) {
+		return A2(
+			$elm$core$List$map,
+			function (rect) {
+				return A2(
+					$author$project$Graphics$drawRectangle,
+					A2(
+						$elm_explorations$linear_algebra$Math$Vector2$vec2,
+						$author$project$GameState$widthFloat(state.boardSize),
+						$author$project$GameState$heightFloat(state.boardSize)),
+					rect);
+			},
+			$elm$core$List$concat(
+				_List_fromArray(
+					[
+						A2($author$project$Sprites$playerSprite, atlas, state),
+						A2($author$project$Sprites$enemySprite, atlas, state),
+						$author$project$Sprites$bulletSprite(state)
+					])));
+	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions = {preventDefault: true, stopPropagation: false};
 var $elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 'Custom', a: a};
@@ -8036,6 +8051,15 @@ var $elm_explorations$webgl$WebGL$toHtml = $elm_explorations$webgl$WebGL$toHtmlW
 			$elm_explorations$webgl$WebGL$antialias,
 			$elm_explorations$webgl$WebGL$depth(1)
 		]));
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -8088,22 +8112,13 @@ var $author$project$Main$view = function (model) {
 						A2($elm$core$Basics$composeL, $author$project$Main$Move, $author$project$Main$touchCoordinates)),
 						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd(
 						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
-						$elm$html$Html$Attributes$width(model.width),
-						$elm$html$Html$Attributes$height(model.height),
-						A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+						$elm$html$Html$Attributes$width(model.state.boardSize.width),
+						$elm$html$Html$Attributes$height(model.state.boardSize.height),
 						A2($elm$html$Html$Attributes$style, 'image-rendering', 'webkit-optimize-contrast'),
 						A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
 						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
-				A2(
-					$elm$core$List$map,
-					function (o) {
-						return A2(
-							$author$project$Graphics$drawRectangle,
-							o,
-							A2($elm_explorations$linear_algebra$Math$Vector2$vec2, model.width, model.height));
-					},
-					model.objects))
+				A2($author$project$Sprites$objectsToDraw, model.atlas, model.state))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

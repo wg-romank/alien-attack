@@ -1,21 +1,12 @@
-module Graphics exposing (drawRectangle, Rectangle, RectDisplay(..), GameObjectType(..), gameObjectTypeToInt)
+module Graphics exposing (drawRectangle, Rectangle, RectDisplay(..))
 
-import Math.Vector4 as Vec4 exposing (vec4, Vec4)
+import Math.Vector4 exposing (Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
-import WebGL exposing (Mesh, Shader)
-import WebGL.Texture as Texture exposing (Error, Texture)
+import WebGL exposing (Mesh)
+import WebGL.Texture exposing (Texture)
 import WebGL.Settings.Blend as Blend
 
 type alias Vertex = { position : Vec2, textureCoord: Vec2 }
-
-type GameObjectType = User | Enemy | Bullet
-
-gameObjectTypeToInt: GameObjectType -> Int
-gameObjectTypeToInt typ =
-    case typ of
-       User -> 1
-       Enemy -> 2
-       Bullet -> 3
 
 vertexShader = 
     [glsl|
@@ -75,21 +66,20 @@ type RectDisplay =
     RectColor Vec4 |
     RectTexture Texture
 
-drawRectangle: Rectangle -> Vec2 -> WebGL.Entity
-drawRectangle rec res = 
-            case rec.display of
-                RectColor c ->
-                    WebGL.entity
-                        vertexShader
-                        fragmentColorShader
-                        (rect rec.pos rec.width rec.height)
-                        { u_res = res, vcolor = c } 
-                RectTexture t ->
-                    WebGL.entityWith
-                        -- ensure transparent texture blending
-                        [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha ]
-                        vertexShader
-                        fragmentTextureShader
-                        (rect rec.pos rec.width rec.height)
-                        { u_res = res, texture = t } 
-
+drawRectangle: Vec2 -> Rectangle -> WebGL.Entity
+drawRectangle res rec = 
+    case rec.display of
+        RectColor c ->
+            WebGL.entity
+                vertexShader
+                fragmentColorShader
+                (rect rec.pos rec.width rec.height)
+                { u_res = res, vcolor = c } 
+        RectTexture t ->
+            WebGL.entityWith
+                -- ensure transparent texture blending
+                [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha ]
+                vertexShader
+                fragmentTextureShader
+                (rect rec.pos rec.width rec.height)
+                { u_res = res, texture = t } 
