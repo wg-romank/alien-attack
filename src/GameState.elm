@@ -128,13 +128,12 @@ moveRounds delta state =
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
 
--- TODO: kill user input
 step: Float -> GameState -> GameState
-step delta state =
+step timeDelta state =
         state
             |> performPlayerAction state.userInput
-            |> moveEnemies delta
-            |> moveRounds delta
+            |> moveEnemies timeDelta
+            |> moveRounds timeDelta
 
 
             -- TODO: enemy spawn

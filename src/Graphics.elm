@@ -6,7 +6,10 @@ import WebGL exposing (Mesh)
 import WebGL.Texture exposing (Texture)
 import WebGL.Settings.Blend as Blend
 
-type alias Vertex = { position : Vec2, textureCoord: Vec2 }
+type alias Vertex = {
+        position : Vec2,
+        textureCoord: Vec2
+    }
 
 vertexShader = 
     [glsl|

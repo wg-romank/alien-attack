@@ -20,14 +20,14 @@ type alias Model = {
     state: GameState }
 
 
-init: () -> (Model, Cmd TouchEvent)
+init: () -> (Model, Cmd Event)
 init _ = ( {
     message = "",
     atlas = emptyAtlas,
     state = initialState }, Task.attempt AtlasLoaded loadAtlas )
     
 
-type TouchEvent
+type Event
     = Start (Float, Float)
     | Move (Float, Float)
     | End (Float, Float)
@@ -40,7 +40,7 @@ touchCoordinates touchEvent =
         |> Maybe.map .clientPos
         |> Maybe.withDefault ( 0, 0 )
 
-view: Model -> Html TouchEvent
+view: Model -> Html Event
 view model =
         div []
         [
@@ -60,7 +60,7 @@ view model =
         ]
 
 
-update: TouchEvent -> Model -> (Model, Cmd TouchEvent)
+update: Event -> Model -> (Model, Cmd Event)
 update event model =
     case event of
         -- Start (x, y) -> ({ model | from = vec2 x y }, Cmd.none)
@@ -72,12 +72,11 @@ update event model =
             ({ model | state = step delta model.state }, Cmd.none)
         AtlasLoaded result ->
             case result of
-                Result.Ok atlas ->
-                    ({model | message = "atlas loaded", atlas = atlas}, Cmd.none)
-                Result.Err err ->
-                    ({model | message = Debug.toString err}, Cmd.none)
+                Result.Ok atlas -> ({model | atlas = atlas}, Cmd.none)
+                Result.Err _ -> (model, Cmd.none)
         _ -> (model, Cmd.none)
 
+main: Program() Model Event
 main = Browser.element {
        init = init,
        subscriptions = \_ -> Delta |> onAnimationFrameDelta,
