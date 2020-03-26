@@ -124,17 +124,20 @@ moveEnemies delta state =
             { state | enemies = List.map (enemyMove delta width height) state.enemies }
 
 
-moveRound: Float -> GameState -> Position -> List Position
-moveRound delta state round =
-    if Vec2.getY round.pos <= 0 then []
-    else [round |> moveY 1.0]
+moveRound: Float -> Position -> GameState -> GameState
+moveRound delta round state =
+    let
+        enemies = state.enemies |> List.filter (\e -> intersect e round |> not )
+        rounds = List.filterMap (\rr ->
+            if rr == round then
+                if Vec2.getY round.pos <= 0 || (enemies |> List.isEmpty) then Nothing
+                else Just ( round |> moveY (delta / 10.0) )
+            else Just round) state.rounds
+    in
+        { state | rounds = rounds, enemies = enemies }
 
 moveRounds: Float -> GameState -> GameState
-moveRounds delta state =
-        { state | rounds =
-            List.map (moveRound delta state) state.rounds
-                |> List.concat
-        }
+moveRounds delta state = List.foldl (moveRound delta) state state.rounds
 
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
