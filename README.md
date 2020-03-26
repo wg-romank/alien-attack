@@ -1,6 +1,6 @@
 # WIP: alien attack arcate style game
 
-<img src="https://wg-romank.github.io/alien-attack/assets/alien-attack-url-barcode.png" style="width: 128px; height"/>
+<img src="https://wg-romank.github.io/alien-attack/assets/alien-attack-url-barcode.png" style="width: 64px; height:64px;"/>
 
 ## TODOS
 - [ ] Enemy spawn
