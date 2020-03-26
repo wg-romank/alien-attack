@@ -6881,6 +6881,9 @@ var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$AtlasLoaded = function (a) {
 	return {$: 'AtlasLoaded', a: a};
 };
+var $author$project$Main$ViewPortLoaded = function (a) {
+	return {$: 'ViewPortLoaded', a: a};
+};
 var $elm$core$Basics$composeL = F3(
 	function (g, f, x) {
 		return g(
@@ -6905,9 +6908,11 @@ var $elm$core$Task$attempt = F2(
 							$elm$core$Result$Ok),
 						task))));
 	});
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Sprites$emptyAtlas = $elm$core$Dict$empty;
+var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
 	boardSize: {height: 240, width: 160},
@@ -7118,8 +7123,13 @@ var $author$project$Sprites$loadAtlas = A2(
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{atlas: $author$project$Sprites$emptyAtlas, message: '', state: $author$project$GameState$initialState},
-		A2($elm$core$Task$attempt, $author$project$Main$AtlasLoaded, $author$project$Sprites$loadAtlas));
+		{atlas: $author$project$Sprites$emptyAtlas, message: '', state: $author$project$GameState$initialState, viewportHeight: 0, viewportMultiplier: 1, viewportWidth: 0},
+		$elm$core$Platform$Cmd$batch(
+			_List_fromArray(
+				[
+					A2($elm$core$Task$attempt, $author$project$Main$AtlasLoaded, $author$project$Sprites$loadAtlas),
+					A2($elm$core$Task$perform, $author$project$Main$ViewPortLoaded, $elm$browser$Browser$Dom$getViewport)
+				])));
 };
 var $elm$browser$Browser$AnimationManager$Delta = function (a) {
 	return {$: 'Delta', a: a};
@@ -7254,7 +7264,21 @@ var $author$project$GameState$PlayerFire = {$: 'PlayerFire'};
 var $author$project$GameState$PlayerMove = function (a) {
 	return {$: 'PlayerMove', a: a};
 };
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Basics$round = _Basics_round;
+var $author$project$Main$computeViewportSize = F2(
+	function (viewport, model) {
+		var vpm = viewport.viewport.height / model.state.boardSize.height;
+		var vph = viewport.viewport.height;
+		var ratio = model.state.boardSize.height / model.state.boardSize.width;
+		var vpw = vph / ratio;
+		return _Utils_update(
+			model,
+			{
+				viewportHeight: $elm$core$Basics$round(vph),
+				viewportMultiplier: vpm,
+				viewportWidth: $elm$core$Basics$round(vpw)
+			});
+	});
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$GameState$registerUserInput = F2(
 	function (action, state) {
@@ -7449,16 +7473,15 @@ var $author$project$GameState$performPlayerAction = F2(
 		}
 	});
 var $author$project$GameState$step = F2(
-	function (delta, state) {
+	function (timeDelta, state) {
 		return A2(
 			$author$project$GameState$moveRounds,
-			delta,
+			timeDelta,
 			A2(
 				$author$project$GameState$moveEnemies,
-				delta,
+				timeDelta,
 				A2($author$project$GameState$performPlayerAction, state.userInput, state)));
 	});
-var $elm$core$Debug$toString = _Debug_toString;
 var $author$project$Main$update = F2(
 	function (event, model) {
 		switch (event.$) {
@@ -7466,6 +7489,7 @@ var $author$project$Main$update = F2(
 				var _v1 = event.a;
 				var x = _v1.a;
 				var y = _v1.b;
+				var vm = model.viewportMultiplier;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -7473,7 +7497,7 @@ var $author$project$Main$update = F2(
 							state: A2(
 								$author$project$GameState$registerUserInput,
 								$author$project$GameState$PlayerMove(
-									_Utils_Tuple2(x, y)),
+									_Utils_Tuple2(x / vm, y / vm)),
 								model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -7504,18 +7528,16 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{atlas: atlas, message: 'atlas loaded'}),
+							{atlas: atlas}),
 						$elm$core$Platform$Cmd$none);
 				} else {
-					var err = result.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								message: $elm$core$Debug$toString(err)
-							}),
-						$elm$core$Platform$Cmd$none);
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				}
+			case 'ViewPortLoaded':
+				var viewport = event.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$computeViewportSize, viewport, model),
+					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
@@ -7529,6 +7551,15 @@ var $author$project$Main$Move = function (a) {
 var $author$project$Main$Start = function (a) {
 	return {$: 'Start', a: a};
 };
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$height = function (n) {
 	return A2(
@@ -8099,7 +8130,10 @@ var $elm$html$Html$Attributes$width = function (n) {
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$html$Html$Attributes$align('center')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -8114,7 +8148,11 @@ var $author$project$Main$view = function (model) {
 						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
 						$elm$html$Html$Attributes$width(model.state.boardSize.width),
 						$elm$html$Html$Attributes$height(model.state.boardSize.height),
-						A2($elm$html$Html$Attributes$style, 'image-rendering', 'webkit-optimize-contrast'),
+						A2($elm$html$Html$Attributes$style, 'image-rendering', '-webkit-optimize-contrast'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
 						A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
 						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
