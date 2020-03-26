@@ -29,7 +29,7 @@ heightFloat: Size -> Float
 heightFloat size = toFloat size.height
 
 type PlayerAction =
-    PlayerMove (Float, Float) | PlayerFire
+    PlayerMove (Float, Float) | PlayerFire | PlayerMoveLeft | PlayerMoveRight
 
 type alias GameState = {
         userInput: List PlayerAction,
@@ -74,6 +74,15 @@ playerMove to state =
                         ( clamp ( 2.0 * (height - playerHeight) / 3.0 ) (height - playerHeight) p.y )
             |> \q -> { state| playerPosition = moveTo state.playerPosition q }
 
+playerMoveHorizontal: Float -> GameState -> GameState
+playerMoveHorizontal value state =
+    let
+        previousPosition = state.playerPosition.pos
+        newPosition = Vec2.add previousPosition (vec2 value 0)
+    in
+        playerMove newPosition state
+    
+
 
 performPlayerAction: List PlayerAction -> GameState -> GameState
 performPlayerAction action state =
@@ -82,6 +91,8 @@ performPlayerAction action state =
             { state | userInput = rest } |>
             case f of
                 PlayerMove (x, y) -> playerMove (vec2 x y)
+                PlayerMoveLeft -> playerMoveHorizontal -10
+                PlayerMoveRight -> playerMoveHorizontal 10
                 PlayerFire -> playerFire
         [] -> state
 

@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import Browser.Events exposing (onAnimationFrameDelta)
+import Browser.Events exposing (onAnimationFrameDelta, onKeyDown)
 import Browser.Dom exposing (Viewport)
 import Html exposing (Html, div)
 import Html.Attributes exposing (width, height, style)
@@ -10,6 +10,8 @@ import Task
 import Html.Events.Extra.Touch as Touch
 import WebGL
 import WebGL.Texture exposing (Error)
+
+import Json.Decode as Decode
 
 import Graphics exposing (RectDisplay(..))
 import GameState exposing (..)
@@ -47,12 +49,35 @@ type Msg
     | Delta Float
     | AtlasLoaded (Result Error Atlas)
     | ViewPortLoaded (Viewport)
+    | Left
+    | Right
+    | Fire
+    | Other (String)
 
 touchCoordinates : Touch.Event -> ( Float, Float )
 touchCoordinates touchEvent =
     List.head touchEvent.changedTouches
         |> Maybe.map .clientPos
         |> Maybe.withDefault ( 0, 0 )
+
+
+keyDecoder : Decode.Decoder Msg
+keyDecoder =
+  Decode.map toDirection (Decode.field "key" Decode.string)
+
+toDirection : String -> Msg
+toDirection string =
+  case string of
+    "ArrowLeft" ->
+      Left
+    "ArrowRight" ->
+      Right
+    "f" ->
+      Fire
+    " " ->
+      Fire
+    other ->
+      Other other
 
 view: Model -> Html Msg
 view model =
@@ -98,6 +123,9 @@ update event model =
         -- Start (x, y) -> ({ model | from = vec2 x y }, Cmd.none)
         Move (x, y) -> let vm = model.viewportMultiplier in
             ({ model | state = registerUserInput (PlayerMove(x / vm, y / vm)) model.state }, Cmd.none)
+        Left -> ({ model | state = registerUserInput PlayerMoveLeft model.state }, Cmd.none)
+        Right -> ({ model | state = registerUserInput PlayerMoveRight model.state }, Cmd.none)
+        Fire -> ({model | state = registerUserInput PlayerFire model.state }, Cmd.none)
         End (x, y) ->
             ({ model | state = registerUserInput PlayerFire model.state }, Cmd.none)
         Delta delta -> 
@@ -107,12 +135,14 @@ update event model =
                 Result.Ok atlas -> ({model | atlas = atlas}, Cmd.none)
                 Result.Err _ -> (model, Cmd.none)
         ViewPortLoaded viewport -> (computeViewportSize viewport model, Cmd.none)
+        -- Other key -> (model, jsonConsole key)
         _ -> (model, Cmd.none)
 
 main: Program() Model Msg
 main = Browser.element {
        init = init,
-       subscriptions = \_ -> Delta |> onAnimationFrameDelta,
+       subscriptions = \_ -> Sub.batch [ onAnimationFrameDelta Delta,
+              onKeyDown keyDecoder],
        view = view,
        update = update
     }
