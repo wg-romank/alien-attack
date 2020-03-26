@@ -7698,30 +7698,51 @@ var $elm$core$List$isEmpty = function (xs) {
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$GameState$moveRound = F3(
 	function (delta, round, state) {
-		var enemies = A2(
+		var enemiesHit = A2(
 			$elm$core$List$filter,
 			function (e) {
-				return !A2($author$project$GameState$intersect, e, round);
+				return A2($author$project$GameState$intersect, e, round);
 			},
 			state.enemies);
 		var rounds = A2(
 			$elm$core$List$filterMap,
 			function (rr) {
-				return _Utils_eq(rr, round) ? ((($elm_explorations$linear_algebra$Math$Vector2$getY(round.pos) <= 0) || $elm$core$List$isEmpty(enemies)) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-					A2($author$project$GameState$moveY, delta / 10.0, round))) : $elm$core$Maybe$Just(round);
+				return _Utils_eq(rr, round) ? (($elm$core$List$isEmpty(enemiesHit) && ($elm_explorations$linear_algebra$Math$Vector2$getY(round.pos) > 0)) ? $elm$core$Maybe$Just(
+					A2($author$project$GameState$moveY, delta / 10.0, round)) : $elm$core$Maybe$Nothing) : $elm$core$Maybe$Just(rr);
 			},
 			state.rounds);
+		var enemiesAlive = A2(
+			$elm$core$List$filter,
+			function (e) {
+				return !A2($author$project$GameState$intersect, e, round);
+			},
+			state.enemies);
 		return _Utils_update(
 			state,
-			{enemies: enemies, rounds: rounds});
+			{enemies: enemiesAlive, rounds: rounds});
+	});
+var $author$project$GameState$moveRoundsHelper = F3(
+	function (delta, roundsToMove, state) {
+		moveRoundsHelper:
+		while (true) {
+			if (roundsToMove.b) {
+				var r = roundsToMove.a;
+				var rest = roundsToMove.b;
+				var $temp$delta = delta,
+					$temp$roundsToMove = rest,
+					$temp$state = A3($author$project$GameState$moveRound, delta, r, state);
+				delta = $temp$delta;
+				roundsToMove = $temp$roundsToMove;
+				state = $temp$state;
+				continue moveRoundsHelper;
+			} else {
+				return state;
+			}
+		}
 	});
 var $author$project$GameState$moveRounds = F2(
 	function (delta, state) {
-		return A3(
-			$elm$core$List$foldl,
-			$author$project$GameState$moveRound(delta),
-			state,
-			state.rounds);
+		return A3($author$project$GameState$moveRoundsHelper, delta, state.rounds, state);
 	});
 var $author$project$GameState$moveX = F2(
 	function (amount, p) {

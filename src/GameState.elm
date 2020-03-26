@@ -127,17 +127,25 @@ moveEnemies delta state =
 moveRound: Float -> Position -> GameState -> GameState
 moveRound delta round state =
     let
-        enemies = state.enemies |> List.filter (\e -> intersect e round |> not )
+        enemiesAlive = state.enemies |> List.filter (\e -> intersect e round |> not )
+        enemiesHit = state.enemies |> List.filter (\e -> intersect e round )
         rounds = List.filterMap (\rr ->
             if rr == round then
-                if Vec2.getY round.pos <= 0 || (enemies |> List.isEmpty) then Nothing
-                else Just ( round |> moveY (delta / 10.0) )
-            else Just round) state.rounds
+                if List.isEmpty enemiesHit && Vec2.getY round.pos > 0 then
+                    Just ( round |> moveY (delta / 10.0) )
+                else Nothing
+            else Just rr) state.rounds
     in
-        { state | rounds = rounds, enemies = enemies }
+        { state | rounds = rounds, enemies = enemiesAlive }
+
+moveRoundsHelper: Float -> List Position -> GameState -> GameState
+moveRoundsHelper delta roundsToMove state =
+    case roundsToMove of
+        r :: rest -> moveRoundsHelper delta rest (moveRound delta r state)
+        [] -> state
 
 moveRounds: Float -> GameState -> GameState
-moveRounds delta state = List.foldl (moveRound delta) state state.rounds
+moveRounds delta state = moveRoundsHelper delta state.rounds state
 
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
