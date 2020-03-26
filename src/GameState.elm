@@ -50,7 +50,7 @@ initialState: GameState
 initialState = {
         userInput = [],
         boardSize = { width = 160, height = 240 },
-        playerPosition = { pos = vec2 72 224, width = 16.0, height = 16.0 },
+        playerPosition = { pos = vec2 72 222, width = 16.0, height = 16.0 },
         enemies = [ { pos = vec2 56 24, width = 32.0, height = 32.0} ],
         rounds = []
     }

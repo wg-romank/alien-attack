@@ -5,7 +5,7 @@ import Task
 
 import WebGL
 import WebGL.Texture as Texture exposing (Texture, Error)
-import Math.Vector2 exposing (vec2)
+import Math.Vector2 as Vec2 exposing (Vec2, vec2)
 import Math.Vector4 exposing (vec4)
 import Maybe.Extra as ME
 
@@ -20,6 +20,12 @@ gameObjectTypeToInt typ =
        User -> 1
        Enemy -> 2
        Bullet -> 3
+
+roundPos: Vec2 -> Vec2
+roundPos pos =
+    vec2
+        (Vec2.getX pos |> round |> toFloat)
+        (Vec2.getY pos |> round |> toFloat)
 
 type alias Atlas = Dict Int Texture
 
@@ -60,7 +66,7 @@ playerSprite atlas state =
     in
     List.map
         (\texture -> {
-            pos = state.playerPosition.pos,
+            pos = roundPos state.playerPosition.pos,
             width = state.playerPosition.width,
             height = state.playerPosition.height,
             display = RectTexture texture
@@ -73,7 +79,7 @@ enemySprite atlas state =
     in
         List.concatMap
             (\enemy -> List.map (\texture -> {
-                pos = enemy.pos,
+                pos = roundPos enemy.pos,
                 width = enemy.width,
                 height = enemy.height,
                 display = RectTexture texture
@@ -83,7 +89,7 @@ enemySprite atlas state =
 bulletSprite: GameState -> List Rectangle
 bulletSprite state =
     List.map (\bullet -> {
-        pos = bullet.pos,
+        pos = roundPos bullet.pos,
         width = bullet.width,
         height = bullet.height,
         display = RectColor (vec4 1.0 1.0 1.0 1.0)

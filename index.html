@@ -6926,7 +6926,7 @@ var $author$project$GameState$initialState = {
 		]),
 	playerPosition: {
 		height: 16.0,
-		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 224),
+		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222),
 		width: 16.0
 	},
 	rounds: _List_Nil,
@@ -7570,6 +7570,14 @@ var $elm$html$Html$Attributes$height = function (n) {
 var $author$project$Graphics$RectColor = function (a) {
 	return {$: 'RectColor', a: a};
 };
+var $author$project$Sprites$roundPos = function (pos) {
+	return A2(
+		$elm_explorations$linear_algebra$Math$Vector2$vec2,
+		$elm$core$Basics$round(
+			$elm_explorations$linear_algebra$Math$Vector2$getX(pos)),
+		$elm$core$Basics$round(
+			$elm_explorations$linear_algebra$Math$Vector2$getY(pos)));
+};
 var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
 var $author$project$Sprites$bulletSprite = function (state) {
 	return A2(
@@ -7579,7 +7587,7 @@ var $author$project$Sprites$bulletSprite = function (state) {
 				display: $author$project$Graphics$RectColor(
 					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
 				height: bullet.height,
-				pos: bullet.pos,
+				pos: $author$project$Sprites$roundPos(bullet.pos),
 				width: bullet.width
 			};
 		},
@@ -7884,7 +7892,7 @@ var $author$project$Sprites$enemySprite = F2(
 						return {
 							display: $author$project$Graphics$RectTexture(texture),
 							height: enemy.height,
-							pos: enemy.pos,
+							pos: $author$project$Sprites$roundPos(enemy.pos),
 							width: enemy.width
 						};
 					},
@@ -7905,7 +7913,7 @@ var $author$project$Sprites$playerSprite = F2(
 				return {
 					display: $author$project$Graphics$RectTexture(texture),
 					height: state.playerPosition.height,
-					pos: state.playerPosition.pos,
+					pos: $author$project$Sprites$roundPos(state.playerPosition.pos),
 					width: state.playerPosition.width
 				};
 			},
@@ -8148,7 +8156,7 @@ var $author$project$Main$view = function (model) {
 						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
 						$elm$html$Html$Attributes$width(model.state.boardSize.width),
 						$elm$html$Html$Attributes$height(model.state.boardSize.height),
-						A2($elm$html$Html$Attributes$style, 'image-rendering', '-webkit-optimize-contrast'),
+						A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',
