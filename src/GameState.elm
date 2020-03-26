@@ -138,14 +138,8 @@ moveRound delta round state =
     in
         { state | rounds = rounds, enemies = enemiesAlive }
 
-moveRoundsHelper: Float -> List Position -> GameState -> GameState
-moveRoundsHelper delta roundsToMove state =
-    case roundsToMove of
-        r :: rest -> moveRoundsHelper delta rest (moveRound delta r state)
-        [] -> state
-
 moveRounds: Float -> GameState -> GameState
-moveRounds delta state = moveRoundsHelper delta state.rounds state
+moveRounds delta state = List.foldl (moveRound delta) state state.rounds
 
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }

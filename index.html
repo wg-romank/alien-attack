@@ -7721,28 +7721,13 @@ var $author$project$GameState$moveRound = F3(
 			state,
 			{enemies: enemiesAlive, rounds: rounds});
 	});
-var $author$project$GameState$moveRoundsHelper = F3(
-	function (delta, roundsToMove, state) {
-		moveRoundsHelper:
-		while (true) {
-			if (roundsToMove.b) {
-				var r = roundsToMove.a;
-				var rest = roundsToMove.b;
-				var $temp$delta = delta,
-					$temp$roundsToMove = rest,
-					$temp$state = A3($author$project$GameState$moveRound, delta, r, state);
-				delta = $temp$delta;
-				roundsToMove = $temp$roundsToMove;
-				state = $temp$state;
-				continue moveRoundsHelper;
-			} else {
-				return state;
-			}
-		}
-	});
 var $author$project$GameState$moveRounds = F2(
 	function (delta, state) {
-		return A3($author$project$GameState$moveRoundsHelper, delta, state.rounds, state);
+		return A3(
+			$elm$core$List$foldl,
+			$author$project$GameState$moveRound(delta),
+			state,
+			state.rounds);
 	});
 var $author$project$GameState$moveX = F2(
 	function (amount, p) {
