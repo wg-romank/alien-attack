@@ -57,7 +57,8 @@ objectsToDraw atlas state = List.concat
     [
         playerSprite atlas state,
         enemySprite atlas state,
-        bulletSprite state
+        bulletSprite state,
+        enemyBulletSprite state
     ] |> List.map (\rect ->
         drawRectangle (
             vec2
@@ -104,3 +105,13 @@ bulletSprite state =
         height = bullet.height,
         display = RectColor (vec4 1.0 1.0 1.0 1.0)
     }) state.rounds
+
+
+enemyBulletSprite: GameState -> List Rectangle
+enemyBulletSprite state =
+    List.map (\bullet -> {
+        pos = roundPos bullet.pos,
+        width = bullet.width,
+        height = bullet.height,
+        display = RectColor (vec4 1.0 0.5 1.0 1.0)
+    }) state.enemyRounds

@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Random
 import Browser
 import Browser.Events exposing (onAnimationFrameDelta, onKeyDown)
 import Browser.Dom exposing (Viewport)
@@ -52,6 +53,7 @@ type Msg
     | Left
     | Right
     | Fire
+    | EnemiesRoll (List EnemyAction)
     | Other (String)
 
 touchCoordinates : Touch.Event -> ( Float, Float )
@@ -129,7 +131,16 @@ update event model =
         End (x, y) ->
             ({ model | state = registerUserInput PlayerFire model.state }, Cmd.none)
         Delta delta -> 
-            ({ model | state = step delta model.state }, Cmd.none)
+            let
+              newState = step delta model.state
+            in
+              ({ model | state = newState }, Random.generate EnemiesRoll (enemiesRoll newState) )
+        EnemiesRoll rolls ->
+          let
+            state = model.state
+            newState = { state | enemyRoll = rolls }
+          in
+            ({ model | state = newState }, Cmd.none)
         AtlasLoaded result ->
             case result of
                 Result.Ok atlas -> ({model | atlas = atlas}, Cmd.none)

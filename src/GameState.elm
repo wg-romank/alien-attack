@@ -1,5 +1,6 @@
-module GameState exposing (GameState, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat)
+module GameState exposing (GameState, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, EnemyAction(..))
 
+import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 
 type alias Position = {
@@ -46,16 +47,26 @@ heightFloat size = toFloat size.height
 type PlayerAction =
     PlayerMove (Float, Float) | PlayerFire | PlayerMoveLeft | PlayerMoveRight
 
+type EnemyAction = Move | Attack
+
+rollEnemyAction: Random.Generator EnemyAction
+rollEnemyAction = Random.weighted (99, Move) [(1, Attack)]
+
 type alias GameState = {
         userInput: List PlayerAction,
         boardSize: Size,
         playerPosition: Position,
         enemies: List Position,
-        rounds: List Position
+        rounds: List Position,
+        enemyRounds: List Position,
+        enemyRoll: List (EnemyAction)
     }
 
 spawnRound: Position -> Position
 spawnRound player = newPosition player.pos 2.0 4.0 1000 |> moveX -7.0
+
+spawnEnemyRound: Position -> Position
+spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 1000 |> moveX -13.0 |> moveY -32.0
 
 initialState: GameState
 initialState = {
@@ -63,7 +74,9 @@ initialState = {
         boardSize = { width = 160, height = 240 },
         playerPosition = newPosition (vec2 72 222) 16.0 16.0 1000,
         enemies = [ newPosition (vec2 56 24) 32.0 32.0 1000 ],
-        rounds = []
+        rounds = [],
+        enemyRounds = [],
+        enemyRoll = []
     }
 
 playerFire: GameState -> GameState
@@ -120,19 +133,43 @@ warpCoordinates w h v =
         (Vec2.getX v |> modFloat 0 w)
         (Vec2.getY v |> modFloat 0 h)
 
-enemyMove: Float -> Float -> Float -> Position -> Position
-enemyMove delta width height enemy = 
-    { enemy | pos = 
-        ( enemy |> moveY -(delta / 200.0) ).pos
-        |> warpCoordinates (width - enemy.width) (height - enemy.height) }
+enemyMove: Float -> Position -> GameState -> GameState
+enemyMove delta enemy state = 
+    let
+        width = widthFloat state.boardSize
+        height = heightFloat state.boardSize
+    in
+        { state | 
+            enemies = List.map (\e -> 
+                if e == enemy then
+                    { enemy | pos = 
+                        ( enemy |> moveY -(delta / 200.0) ).pos
+                        |> warpCoordinates (width - enemy.width) (height - enemy.height) }
+                else e
+            ) state.enemies
+        }
 
-moveEnemies: Float -> GameState -> GameState
-moveEnemies delta state =
-        let
-            width = widthFloat state.boardSize
-            height = heightFloat state.boardSize
-        in
-            { state | enemies = List.map (enemyMove delta width height) state.enemies }
+enemyAttack: Position -> GameState -> GameState
+enemyAttack enemy state = { state | enemyRounds = state.enemyRounds ++ [spawnEnemyRound enemy] }
+
+performEnemyAction: Float -> Position -> EnemyAction -> GameState -> GameState
+performEnemyAction delta enemy action state =
+    case action of
+        Move -> enemyMove delta enemy state
+        Attack -> enemyAttack enemy state
+
+performEnemiesActions: Float -> GameState -> GameState
+performEnemiesActions delta state =
+    let
+        -- TODO: potential bug in keys enemy that rolls killed?
+        enemiesWithActions = List.map2 (\a b -> (a, b)) state.enemies state.enemyRoll
+    in
+        List.foldl (\(pos, action) ss -> performEnemyAction delta pos action ss)
+        state
+        enemiesWithActions
+
+enemiesRoll: GameState -> Random.Generator (List EnemyAction)
+enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
 
 
 moveRound: Float -> Position -> GameState -> GameState
@@ -152,6 +189,14 @@ moveRound delta round state =
 moveRounds: Float -> GameState -> GameState
 moveRounds delta state = List.foldl (moveRound delta) state state.rounds
 
+moveEnemyRounds: Float -> GameState -> GameState
+moveEnemyRounds delta state = {
+        state | enemyRounds =
+            List.filterMap (\r ->
+                if Vec2.getY r.pos > heightFloat state.boardSize then Nothing
+                else Just (r |> moveY (-delta / 20.0)) ) state.enemyRounds
+    }
+
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
 
@@ -163,12 +208,17 @@ updateRenderTimes delta state = {
             rounds = List.map (positionNewRender delta) state.rounds
     }
 
+-- enemySpawn: GameState -> GameState
+-- enemySpawn state =
+
+
 step: Float -> GameState -> GameState
 step timeDelta state =
         state
             |> performPlayerAction state.userInput
-            |> moveEnemies timeDelta
             |> moveRounds timeDelta
+            |> performEnemiesActions timeDelta
+            |> moveEnemyRounds timeDelta
             |> updateRenderTimes timeDelta
 
             -- TODO: enemy spawn
