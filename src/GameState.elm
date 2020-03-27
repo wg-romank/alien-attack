@@ -138,13 +138,14 @@ enemyMove delta enemy state =
     let
         width = widthFloat state.boardSize
         height = heightFloat state.boardSize
+        x = 40 * sin (enemy.lastRender / 500 * pi) + 60
+        y = 40 * cos (enemy.lastRender / 500 * pi) + 60
     in
         { state | 
             enemies = List.map (\e -> 
-                if e == enemy then
-                    { enemy | pos = 
-                        ( enemy |> moveY -(delta / 200.0) ).pos
-                        |> warpCoordinates (width - enemy.width) (height - enemy.height) }
+                if e == enemy then moveTo enemy (vec2 x y)
+                         
+                        -- |> warpCoordinates (width - enemy.width) (height - enemy.height) }
                 else e
             ) state.enemies
         }
