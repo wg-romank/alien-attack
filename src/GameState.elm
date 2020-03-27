@@ -62,7 +62,7 @@ initialState = {
         userInput = [],
         boardSize = { width = 160, height = 240 },
         playerPosition = newPosition (vec2 72 222) 16.0 16.0 1000,
-        enemies = [ newPosition (vec2 56 24) 32.0 32.0 500 ],
+        enemies = [ newPosition (vec2 56 24) 32.0 32.0 1000 ],
         rounds = []
     }
 
