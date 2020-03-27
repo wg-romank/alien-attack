@@ -5,8 +5,23 @@ import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 type alias Position = {
         pos: Vec2,
         width: Float,
-        height: Float
+        height: Float,
+        frameId: Int,
+        frameSwitch: Int,
+        lastRender: Float
     }
+
+newPosition: Vec2 -> Float -> Float -> Int -> Position
+newPosition pos width height frameSwitch = { pos = pos, width = width, height = height, frameId = 0, frameSwitch = frameSwitch, lastRender = 0.0 }
+
+positionNewRender: Float -> Position -> Position
+positionNewRender delta pos =
+    let
+        newDelta = pos.lastRender + delta
+        switchFrame = round newDelta >= pos.frameSwitch
+        frameId = if switchFrame then (pos.frameId + 1) |> modBy 2 else pos.frameId
+    in 
+        { pos | lastRender = if switchFrame then 0 else newDelta, frameId = frameId }
 
 moveX: Float -> Position -> Position
 moveX amount p = { p | pos = Vec2.sub p.pos (vec2 amount 0.0) }
@@ -40,18 +55,14 @@ type alias GameState = {
     }
 
 spawnRound: Position -> Position
-spawnRound player = {
-        pos = player.pos,
-        width = 2.0,
-        height = 4.0
-    } |> moveX -7.0
+spawnRound player = newPosition player.pos 2.0 4.0 1000 |> moveX -7.0
 
 initialState: GameState
 initialState = {
         userInput = [],
         boardSize = { width = 160, height = 240 },
-        playerPosition = { pos = vec2 72 222, width = 16.0, height = 16.0 },
-        enemies = [ { pos = vec2 56 24, width = 32.0, height = 32.0} ],
+        playerPosition = newPosition (vec2 72 222) 16.0 16.0 1000,
+        enemies = [ newPosition (vec2 56 24) 32.0 32.0 500 ],
         rounds = []
     }
 
@@ -78,9 +89,9 @@ playerMoveHorizontal: Float -> GameState -> GameState
 playerMoveHorizontal value state =
     let
         previousPosition = state.playerPosition.pos
-        newPosition = Vec2.add previousPosition (vec2 value 0)
+        newPlayerPosition = Vec2.add previousPosition (vec2 value 0)
     in
-        playerMove newPosition state
+        playerMove newPlayerPosition state
     
 
 
@@ -144,13 +155,21 @@ moveRounds delta state = List.foldl (moveRound delta) state state.rounds
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
 
+updateRenderTimes: Float -> GameState -> GameState
+updateRenderTimes delta state = {
+        state |
+            playerPosition = positionNewRender delta state.playerPosition,
+            enemies = List.map (positionNewRender delta) state.enemies,
+            rounds = List.map (positionNewRender delta) state.rounds
+    }
+
 step: Float -> GameState -> GameState
 step timeDelta state =
         state
             |> performPlayerAction state.userInput
             |> moveEnemies timeDelta
             |> moveRounds timeDelta
-
+            |> updateRenderTimes timeDelta
 
             -- TODO: enemy spawn
             -- let enemySpawn = List.map

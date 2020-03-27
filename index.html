@@ -6914,27 +6914,36 @@ var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Sprites$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
+var $author$project$GameState$newPosition = F4(
+	function (pos, width, height, frameSwitch) {
+		return {frameId: 0, frameSwitch: frameSwitch, height: height, lastRender: 0.0, pos: pos, width: width};
+	});
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
 	boardSize: {height: 240, width: 160},
 	enemies: _List_fromArray(
 		[
-			{
-			height: 32.0,
-			pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
-			width: 32.0
-		}
+			A4(
+			$author$project$GameState$newPosition,
+			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
+			32.0,
+			32.0,
+			500)
 		]),
-	playerPosition: {
-		height: 16.0,
-		pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222),
-		width: 16.0
-	},
+	playerPosition: A4(
+		$author$project$GameState$newPosition,
+		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222),
+		16.0,
+		16.0,
+		1000),
 	rounds: _List_Nil,
 	userInput: _List_Nil
 };
-var $author$project$Sprites$Enemy = {$: 'Enemy'};
-var $author$project$Sprites$User = {$: 'User'};
+var $author$project$Sprites$Enemy1 = {$: 'Enemy1'};
+var $author$project$Sprites$Enemy2 = {$: 'Enemy2'};
+var $author$project$Sprites$User1 = {$: 'User1'};
+var $author$project$Sprites$User2 = {$: 'User2'};
+var $author$project$Sprites$User3 = {$: 'User3'};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -7058,12 +7067,18 @@ var $elm$core$Dict$fromList = function (assocs) {
 };
 var $author$project$Sprites$gameObjectTypeToInt = function (typ) {
 	switch (typ.$) {
-		case 'User':
+		case 'User1':
 			return 1;
-		case 'Enemy':
+		case 'User2':
 			return 2;
-		default:
+		case 'User3':
 			return 3;
+		case 'Enemy1':
+			return 4;
+		case 'Enemy2':
+			return 5;
+		default:
+			return 6;
 	}
 };
 var $elm_explorations$webgl$WebGL$Texture$Resize = function (a) {
@@ -7119,8 +7134,11 @@ var $author$project$Sprites$loadAtlas = A2(
 			},
 			_List_fromArray(
 				[
-					_Utils_Tuple2($author$project$Sprites$Enemy, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
-					_Utils_Tuple2($author$project$Sprites$User, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png')
+					_Utils_Tuple2($author$project$Sprites$Enemy1, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
+					_Utils_Tuple2($author$project$Sprites$Enemy2, 'https://wg-romank.github.io/alien-attack/assets/Octo-2.png'),
+					_Utils_Tuple2($author$project$Sprites$User1, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png'),
+					_Utils_Tuple2($author$project$Sprites$User2, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png'),
+					_Utils_Tuple2($author$project$Sprites$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png')
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
@@ -7744,7 +7762,7 @@ var $author$project$GameState$spawnRound = function (player) {
 	return A2(
 		$author$project$GameState$moveX,
 		-7.0,
-		{height: 4.0, pos: player.pos, width: 2.0});
+		A4($author$project$GameState$newPosition, player.pos, 2.0, 4.0, 1000));
 };
 var $author$project$GameState$playerFire = function (state) {
 	return _Utils_update(
@@ -7794,11 +7812,11 @@ var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $author$project$GameState$playerMoveHorizontal = F2(
 	function (value, state) {
 		var previousPosition = state.playerPosition.pos;
-		var newPosition = A2(
+		var newPlayerPosition = A2(
 			$elm_explorations$linear_algebra$Math$Vector2$add,
 			previousPosition,
 			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, value, 0));
-		return A2($author$project$GameState$playerMove, newPosition, state);
+		return A2($author$project$GameState$playerMove, newPlayerPosition, state);
 	});
 var $author$project$GameState$performPlayerAction = F2(
 	function (action, state) {
@@ -7828,15 +7846,50 @@ var $author$project$GameState$performPlayerAction = F2(
 			return state;
 		}
 	});
+var $elm$core$Basics$ge = _Utils_ge;
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $author$project$GameState$positionNewRender = F2(
+	function (delta, pos) {
+		var newDelta = pos.lastRender + delta;
+		var switchFrame = _Utils_cmp(
+			$elm$core$Basics$round(newDelta),
+			pos.frameSwitch) > -1;
+		var frameId = switchFrame ? A2($elm$core$Basics$modBy, 2, pos.frameId + 1) : pos.frameId;
+		return _Utils_update(
+			pos,
+			{
+				frameId: frameId,
+				lastRender: switchFrame ? 0 : newDelta
+			});
+	});
+var $author$project$GameState$updateRenderTimes = F2(
+	function (delta, state) {
+		return _Utils_update(
+			state,
+			{
+				enemies: A2(
+					$elm$core$List$map,
+					$author$project$GameState$positionNewRender(delta),
+					state.enemies),
+				playerPosition: A2($author$project$GameState$positionNewRender, delta, state.playerPosition),
+				rounds: A2(
+					$elm$core$List$map,
+					$author$project$GameState$positionNewRender(delta),
+					state.rounds)
+			});
+	});
 var $author$project$GameState$step = F2(
 	function (timeDelta, state) {
 		return A2(
-			$author$project$GameState$moveRounds,
+			$author$project$GameState$updateRenderTimes,
 			timeDelta,
 			A2(
-				$author$project$GameState$moveEnemies,
+				$author$project$GameState$moveRounds,
 				timeDelta,
-				A2($author$project$GameState$performPlayerAction, state.userInput, state)));
+				A2(
+					$author$project$GameState$moveEnemies,
+					timeDelta,
+					A2($author$project$GameState$performPlayerAction, state.userInput, state))));
 	});
 var $author$project$Main$update = F2(
 	function (event, model) {
@@ -8257,6 +8310,32 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
+var $author$project$Sprites$enemySprite = F2(
+	function (atlas, state) {
+		var enemyTexture2 = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$Enemy2);
+		var enemyTexture1 = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$Enemy1);
+		return A2(
+			$elm$core$List$concatMap,
+			function (enemy) {
+				var textureKey = (!enemy.frameId) ? enemyTexture1 : enemyTexture2;
+				var maybeTexture = A2($elm$core$Dict$get, textureKey, atlas);
+				if (maybeTexture.$ === 'Just') {
+					var t = maybeTexture.a;
+					return _List_fromArray(
+						[
+							{
+							display: $author$project$Graphics$RectTexture(t),
+							height: enemy.height,
+							pos: $author$project$Sprites$roundPos(enemy.pos),
+							width: enemy.width
+						}
+						]);
+				} else {
+					return _List_Nil;
+				}
+			},
+			state.enemies);
+	});
 var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 	if (m.$ === 'Nothing') {
 		return _List_Nil;
@@ -8266,36 +8345,12 @@ var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 			[x]);
 	}
 };
-var $author$project$Sprites$enemySprite = F2(
-	function (atlas, state) {
-		var enemyTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
-			A2(
-				$elm$core$Dict$get,
-				$author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$Enemy),
-				atlas));
-		return A2(
-			$elm$core$List$concatMap,
-			function (enemy) {
-				return A2(
-					$elm$core$List$map,
-					function (texture) {
-						return {
-							display: $author$project$Graphics$RectTexture(texture),
-							height: enemy.height,
-							pos: $author$project$Sprites$roundPos(enemy.pos),
-							width: enemy.width
-						};
-					},
-					enemyTexture);
-			},
-			state.enemies);
-	});
 var $author$project$Sprites$playerSprite = F2(
 	function (atlas, state) {
 		var userTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
 			A2(
 				$elm$core$Dict$get,
-				$author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$User),
+				$author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$User1),
 				atlas));
 		return A2(
 			$elm$core$List$map,
@@ -8545,7 +8600,7 @@ var $author$project$Main$view = function (model) {
 						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
 						$elm$html$Html$Attributes$width(model.state.boardSize.width),
 						$elm$html$Html$Attributes$height(model.state.boardSize.height),
-						A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
+						A2($elm$html$Html$Attributes$style, 'image-rendering', '-webkit-optimize-contrast'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',

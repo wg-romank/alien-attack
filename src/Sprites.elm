@@ -12,14 +12,17 @@ import Maybe.Extra as ME
 import GameState exposing (GameState, widthFloat, heightFloat)
 import Graphics exposing (Rectangle, RectDisplay(..), drawRectangle)
 
-type GameObjectType = User | Enemy | Bullet
+type GameObjectType = User1 | User2 | User3 | Enemy1 | Enemy2 | Bullet
 
 gameObjectTypeToInt: GameObjectType -> Int
 gameObjectTypeToInt typ =
     case typ of
-       User -> 1
-       Enemy -> 2
-       Bullet -> 3
+       User1 -> 1
+       User2 -> 2
+       User3 -> 3
+       Enemy1 -> 4
+       Enemy2 -> 5
+       Bullet -> 6
 
 roundPos: Vec2 -> Vec2
 roundPos pos =
@@ -41,8 +44,11 @@ loadAtlas =
             |> Task.map (\tex -> (gameObjectTypeToInt typ, tex) )
     )
     [
-        (Enemy, "https://wg-romank.github.io/alien-attack/assets/Octo-1.png"),
-        (User, "https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png")
+        (Enemy1, "https://wg-romank.github.io/alien-attack/assets/Octo-1.png"),
+        (Enemy2, "https://wg-romank.github.io/alien-attack/assets/Octo-2.png"),
+        (User1, "https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png"),
+        (User2, "https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png"),
+        (User3, "https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png")
     ] |> Task.sequence
       |> Task.map Dict.fromList
 
@@ -62,7 +68,7 @@ objectsToDraw atlas state = List.concat
 playerSprite: Atlas -> GameState -> List Rectangle
 playerSprite atlas state =
     let
-        userTexture = ME.toList (Dict.get (gameObjectTypeToInt User) atlas)
+        userTexture = ME.toList (Dict.get (gameObjectTypeToInt User1) atlas)
     in
     List.map
         (\texture -> {
@@ -75,15 +81,19 @@ playerSprite atlas state =
 enemySprite: Atlas -> GameState -> List Rectangle
 enemySprite atlas state =
     let
-        enemyTexture = ME.toList (Dict.get (gameObjectTypeToInt Enemy) atlas)  
+        enemyTexture1 = gameObjectTypeToInt Enemy1
+        enemyTexture2 = gameObjectTypeToInt Enemy2
     in
         List.concatMap
-            (\enemy -> List.map (\texture -> {
-                pos = roundPos enemy.pos,
-                width = enemy.width,
-                height = enemy.height,
-                display = RectTexture texture
-            }) enemyTexture) state.enemies
+            (\enemy ->
+                let
+                    textureKey = if enemy.frameId == 0 then enemyTexture1 else enemyTexture2
+                    maybeTexture = Dict.get textureKey atlas
+                in
+                    case maybeTexture of
+                       Just t -> [{ pos = roundPos enemy.pos, width = enemy.width, height = enemy.height, display = RectTexture t }]
+                       Nothing -> []
+            ) state.enemies
     
 
 bulletSprite: GameState -> List Rectangle
