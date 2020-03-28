@@ -98,7 +98,7 @@ view model =
               style "image-rendering" "crisp-edges",
             --   style "width" (String.fromInt model.viewportWidth ++ "px"),
               style "height" (String.fromInt model.viewportHeight ++ "px"),
-              style "backgroundColor" "#000000",
+              -- style "backgroundColor" "#000000",
               -- style "backgroundColor" "#283531",
               style "display" "block" ]
               (objectsToDraw model.atlas model.state)

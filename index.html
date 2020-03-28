@@ -8401,6 +8401,9 @@ var $elm$html$Html$Attributes$height = function (n) {
 		'height',
 		$elm$core$String$fromInt(n));
 };
+var $author$project$Graphics$RectColor = function (a) {
+	return {$: 'RectColor', a: a};
+};
 var $author$project$Graphics$RectTexture = function (a) {
 	return {$: 'RectTexture', a: a};
 };
@@ -8463,27 +8466,40 @@ var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 			[x]);
 	}
 };
+var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
 var $author$project$Sprites$backgroundSprite = F2(
 	function (atlas, state) {
-		var pos = A2(
-			$elm_explorations$linear_algebra$Math$Vector2$vec2,
-			0,
-			$author$project$GameState$heightFloat(state.boardSize) - ((3 * state.bgOffset) / 1000.0));
+		var yScroll = $author$project$GameState$heightFloat(state.boardSize) - ((3 * state.bgOffset) / 1000.0);
+		var w = $author$project$GameState$widthFloat(state.boardSize);
+		var pos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll);
+		var h = $author$project$GameState$heightFloat(state.boardSize);
 		var bgStars = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$BackgroundStars);
 		var bgPlanet = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$BackgroundPlanet);
 		return $elm$core$List$concat(
 			_List_fromArray(
 				[
+					_List_fromArray(
+					[
+						{
+						display: $author$project$Graphics$RectColor(
+							A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 40.0 / 255.0, 53.0 / 255.0, 31.0 / 255.0, 1.0)),
+						far: 1.0,
+						height: h,
+						near: 0.9,
+						pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0),
+						width: w
+					}
+					]),
 					A2(
 					$elm$core$List$map,
 					function (t) {
 						return {
 							display: $author$project$Graphics$RectTexture(t),
-							far: 1.0,
-							height: $author$project$GameState$heightFloat(state.boardSize),
-							near: 0.9,
+							far: 0.9,
+							height: h,
+							near: 0.8,
 							pos: $author$project$Sprites$roundPos(pos),
-							width: $author$project$GameState$widthFloat(state.boardSize)
+							width: w
 						};
 					},
 					$elm_community$maybe_extra$Maybe$Extra$toList(
@@ -8493,21 +8509,29 @@ var $author$project$Sprites$backgroundSprite = F2(
 					function (t) {
 						return {
 							display: $author$project$Graphics$RectTexture(t),
-							far: 0.9,
-							height: $author$project$GameState$heightFloat(state.boardSize),
-							near: 0.8,
+							far: 0.8,
+							height: 69.0,
+							near: 0.7,
 							pos: $author$project$Sprites$roundPos(pos),
-							width: $author$project$GameState$widthFloat(state.boardSize)
+							width: w
 						};
 					},
 					$elm_community$maybe_extra$Maybe$Extra$toList(
-						A2($elm$core$Dict$get, bgPlanet, atlas)))
+						A2($elm$core$Dict$get, bgPlanet, atlas))),
+					_List_fromArray(
+					[
+						{
+						display: $author$project$Graphics$RectColor(
+							A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 88.0 / 255.0, 140.0 / 255.0, 126.0 / 255.0, 1.0)),
+						far: 0.7,
+						height: h,
+						near: 0.6,
+						pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll + 69.0),
+						width: w
+					}
+					])
 				]));
 	});
-var $author$project$Graphics$RectColor = function (a) {
-	return {$: 'RectColor', a: a};
-};
-var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
 var $author$project$Sprites$bulletSprite = function (state) {
 	return A2(
 		$elm$core$List$map,
@@ -9074,7 +9098,6 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Attributes$style,
 						'height',
 						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
-						A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
 						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
 				A2($author$project$Sprites$objectsToDraw, model.atlas, model.state))

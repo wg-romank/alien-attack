@@ -1,4 +1,4 @@
-module GameState exposing (GameState, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, EnemyAction(..))
+module GameState exposing (GameState, Position, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, EnemyAction(..))
 
 import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
