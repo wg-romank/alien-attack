@@ -133,17 +133,18 @@ backgroundSprite atlas state =
     let
         bgPlanet = gameObjectTypeToInt BackgroundPlanet
         bgStars = gameObjectTypeToInt BackgroundStars
-        yScroll = (heightFloat state.boardSize) - (3 * state.bgOffset / 1000.0)
-        pos = vec2 0 yScroll
         w = widthFloat state.boardSize
         h = heightFloat state.boardSize
+        yScroll = h - (3 * state.bgOffset / 1000.0)
+        pos = vec2 0 yScroll
+        skyPos = vec2 0 (h + yScroll)
     in
         List.concat
         [
             [{ pos = vec2 0 0, width = w, height = h, display = RectColor (vec4 (40.0 / 255.0) (53.0 / 255.0) (31.0 / 255.0) 1.0), near = 0.9, far = 1.0}],
-            List.map (\t -> { pos = roundPos pos, width = w, height = h, display = RectTexture t, near = 0.8, far = 0.9 })
+            List.map (\t -> { pos = roundPos (vec2 0.0 0.0), width = w, height = h, display = RectTexture t, near = 0.8, far = 0.9 })
             (Dict.get bgStars atlas |> ME.toList),
             List.map (\t -> { pos = roundPos pos, width = w, height = 69.0, display = RectTexture t , near = 0.7, far = 0.8})
             (Dict.get bgPlanet atlas |> ME.toList),
-            [{ pos = vec2 0 (yScroll + 69.0), width = w, height = h, display = RectColor (vec4 (88.0 / 255.0) (140.0 / 255.0) (126.0 / 255.0) 1.0), near = 0.6, far = 0.7}]
+            [{ pos = vec2 0 (yScroll + 68.0), width = w, height = h, display = RectColor (vec4 (88.0 / 255.0) (140.0 / 255.0) (126.0 / 255.0) 1.0), near = 0.6, far = 0.7}]
         ]
