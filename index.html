@@ -8052,22 +8052,30 @@ var $author$project$GameState$enemyAttack = F2(
 						]))
 			});
 	});
-var $elm$core$Basics$cos = _Basics_cos;
-var $author$project$GameState$moveTo = F2(
-	function (p, to) {
-		return _Utils_update(
-			p,
-			{pos: to});
+var $author$project$GameState$modFloat = F3(
+	function (from, to, n) {
+		return (_Utils_cmp(n, to) > 0) ? (from + (n - to)) : ((_Utils_cmp(n, from) < 0) ? (to - n) : n);
 	});
-var $elm$core$Basics$pi = _Basics_pi;
-var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$GameState$warpCoordinates = F3(
+	function (w, h, v) {
+		return A2(
+			$elm_explorations$linear_algebra$Math$Vector2$vec2,
+			A3(
+				$author$project$GameState$modFloat,
+				0,
+				w,
+				$elm_explorations$linear_algebra$Math$Vector2$getX(v)),
+			A3(
+				$author$project$GameState$modFloat,
+				0,
+				h,
+				$elm_explorations$linear_algebra$Math$Vector2$getY(v)));
+	});
 var $author$project$GameState$widthFloat = function (size) {
 	return size.width;
 };
 var $author$project$GameState$enemyMove = F3(
 	function (delta, enemy, state) {
-		var y = (40 * $elm$core$Basics$cos((enemy.lastRender / 500) * $elm$core$Basics$pi)) + 60;
-		var x = (40 * $elm$core$Basics$sin((enemy.lastRender / 500) * $elm$core$Basics$pi)) + 60;
 		var width = $author$project$GameState$widthFloat(state.boardSize);
 		var height = $author$project$GameState$heightFloat(state.boardSize);
 		return _Utils_update(
@@ -8076,10 +8084,15 @@ var $author$project$GameState$enemyMove = F3(
 				enemies: A2(
 					$elm$core$List$map,
 					function (e) {
-						return _Utils_eq(e, enemy) ? A2(
-							$author$project$GameState$moveTo,
+						return _Utils_eq(e, enemy) ? _Utils_update(
 							enemy,
-							A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y)) : e;
+							{
+								pos: A3(
+									$author$project$GameState$warpCoordinates,
+									width - enemy.width,
+									height - enemy.height,
+									A2($author$project$GameState$moveY, -(delta / 200.0), enemy).pos)
+							}) : e;
 					},
 					state.enemies)
 			});
@@ -8134,6 +8147,12 @@ var $author$project$GameState$playerFire = function (state) {
 var $elm$core$Basics$clamp = F3(
 	function (low, high, number) {
 		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $author$project$GameState$moveTo = F2(
+	function (p, to) {
+		return _Utils_update(
+			p,
+			{pos: to});
 	});
 var $elm_explorations$linear_algebra$Math$Vector2$toRecord = _MJS_v2toRecord;
 var $author$project$GameState$playerMove = F2(
