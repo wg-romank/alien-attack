@@ -50,7 +50,7 @@ type PlayerAction =
 type EnemyAction = Move | Attack
 
 rollEnemyAction: Random.Generator EnemyAction
-rollEnemyAction = Random.weighted (99, Move) [(1, Attack)]
+rollEnemyAction = Random.weighted (100, Move) [(0, Attack)]
 
 type alias GameState = {
         userInput: List PlayerAction,
@@ -136,20 +136,20 @@ warpCoordinates w h v =
         (Vec2.getY v |> modFloat 0 h)
 
 enemyMove: Float -> Position -> GameState -> GameState
-enemyMove delta enemy state = 
-    let
-        width = widthFloat state.boardSize
-        height = heightFloat state.boardSize
-    in
-        { state | 
-            enemies = List.map (\e -> 
-                if e == enemy then
-                    { enemy | pos = 
-                        ( enemy |> moveY -(delta / 200.0) ).pos
-                        |> warpCoordinates (width - enemy.width) (height - enemy.height) }
-                else e
-            ) state.enemies
-        }
+enemyMove delta enemy state = state
+    -- let
+    --     width = widthFloat state.boardSize
+    --     height = heightFloat state.boardSize
+    -- in
+    --     { state | 
+    --         enemies = List.map (\e -> 
+    --             if e == enemy then
+    --                 { enemy | pos = 
+    --                     ( enemy |> moveY -(delta / 200.0) ).pos
+    --                     |> warpCoordinates (width - enemy.width) (height - enemy.height) }
+    --             else e
+    --         ) state.enemies
+    --     }
 
 enemyAttack: Position -> GameState -> GameState
 enemyAttack enemy state = { state | enemyRounds = state.enemyRounds ++ [spawnEnemyRound enemy] }

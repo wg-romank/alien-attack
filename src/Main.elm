@@ -87,7 +87,7 @@ view model =
             Html.Attributes.align "center"
         ]
         [
-            WebGL.toHtml
+            WebGL.toHtmlWith [ WebGL.alpha True, WebGL.depth 1 ]
             [
               Touch.onStart (Start << touchCoordinates),
               Touch.onMove (Move << touchCoordinates),

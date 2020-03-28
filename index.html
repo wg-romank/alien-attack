@@ -7832,10 +7832,10 @@ var $elm$random$Random$weighted = F2(
 	});
 var $author$project$GameState$rollEnemyAction = A2(
 	$elm$random$Random$weighted,
-	_Utils_Tuple2(99, $author$project$GameState$Move),
+	_Utils_Tuple2(100, $author$project$GameState$Move),
 	_List_fromArray(
 		[
-			_Utils_Tuple2(1, $author$project$GameState$Attack)
+			_Utils_Tuple2(0, $author$project$GameState$Attack)
 		]));
 var $author$project$GameState$enemiesRoll = function (state) {
 	return A2(
@@ -8066,50 +8066,9 @@ var $author$project$GameState$enemyAttack = F2(
 						]))
 			});
 	});
-var $author$project$GameState$modFloat = F3(
-	function (from, to, n) {
-		return (_Utils_cmp(n, to) > 0) ? (from + (n - to)) : ((_Utils_cmp(n, from) < 0) ? (to - n) : n);
-	});
-var $author$project$GameState$warpCoordinates = F3(
-	function (w, h, v) {
-		return A2(
-			$elm_explorations$linear_algebra$Math$Vector2$vec2,
-			A3(
-				$author$project$GameState$modFloat,
-				0,
-				w,
-				$elm_explorations$linear_algebra$Math$Vector2$getX(v)),
-			A3(
-				$author$project$GameState$modFloat,
-				0,
-				h,
-				$elm_explorations$linear_algebra$Math$Vector2$getY(v)));
-	});
-var $author$project$GameState$widthFloat = function (size) {
-	return size.width;
-};
 var $author$project$GameState$enemyMove = F3(
 	function (delta, enemy, state) {
-		var width = $author$project$GameState$widthFloat(state.boardSize);
-		var height = $author$project$GameState$heightFloat(state.boardSize);
-		return _Utils_update(
-			state,
-			{
-				enemies: A2(
-					$elm$core$List$map,
-					function (e) {
-						return _Utils_eq(e, enemy) ? _Utils_update(
-							enemy,
-							{
-								pos: A3(
-									$author$project$GameState$warpCoordinates,
-									width - enemy.width,
-									height - enemy.height,
-									A2($author$project$GameState$moveY, -(delta / 200.0), enemy).pos)
-							}) : e;
-					},
-					state.enemies)
-			});
+		return state;
 	});
 var $author$project$GameState$performEnemyAction = F4(
 	function (delta, enemy, action, state) {
@@ -8169,6 +8128,9 @@ var $author$project$GameState$moveTo = F2(
 			{pos: to});
 	});
 var $elm_explorations$linear_algebra$Math$Vector2$toRecord = _MJS_v2toRecord;
+var $author$project$GameState$widthFloat = function (size) {
+	return size.width;
+};
 var $author$project$GameState$playerMove = F2(
 	function (to, state) {
 		var width = $author$project$GameState$widthFloat(state.boardSize);
@@ -8394,6 +8356,16 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $elm_explorations$webgl$WebGL$Internal$Alpha = function (a) {
+	return {$: 'Alpha', a: a};
+};
+var $elm_explorations$webgl$WebGL$alpha = $elm_explorations$webgl$WebGL$Internal$Alpha;
+var $elm_explorations$webgl$WebGL$Internal$Antialias = {$: 'Antialias'};
+var $elm_explorations$webgl$WebGL$antialias = $elm_explorations$webgl$WebGL$Internal$Antialias;
+var $elm_explorations$webgl$WebGL$Internal$Depth = function (a) {
+	return {$: 'Depth', a: a};
+};
+var $elm_explorations$webgl$WebGL$depth = $elm_explorations$webgl$WebGL$Internal$Depth;
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$html$Html$Attributes$height = function (n) {
 	return A2(
@@ -9008,27 +8980,10 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove = A2($mpizenbe
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchstart', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm_explorations$webgl$WebGL$Internal$Alpha = function (a) {
-	return {$: 'Alpha', a: a};
-};
-var $elm_explorations$webgl$WebGL$alpha = $elm_explorations$webgl$WebGL$Internal$Alpha;
-var $elm_explorations$webgl$WebGL$Internal$Antialias = {$: 'Antialias'};
-var $elm_explorations$webgl$WebGL$antialias = $elm_explorations$webgl$WebGL$Internal$Antialias;
-var $elm_explorations$webgl$WebGL$Internal$Depth = function (a) {
-	return {$: 'Depth', a: a};
-};
-var $elm_explorations$webgl$WebGL$depth = $elm_explorations$webgl$WebGL$Internal$Depth;
 var $elm_explorations$webgl$WebGL$toHtmlWith = F3(
 	function (options, attributes, entities) {
 		return A3(_WebGL_toHtml, options, attributes, entities);
 	});
-var $elm_explorations$webgl$WebGL$toHtml = $elm_explorations$webgl$WebGL$toHtmlWith(
-	_List_fromArray(
-		[
-			$elm_explorations$webgl$WebGL$alpha(true),
-			$elm_explorations$webgl$WebGL$antialias,
-			$elm_explorations$webgl$WebGL$depth(1)
-		]));
 var $elm$core$List$head = function (list) {
 	if (list.b) {
 		var x = list.a;
@@ -9083,8 +9038,14 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
-				A2(
-				$elm_explorations$webgl$WebGL$toHtml,
+				A3(
+				$elm_explorations$webgl$WebGL$toHtmlWith,
+				_List_fromArray(
+					[
+						$elm_explorations$webgl$WebGL$alpha(true),
+						$elm_explorations$webgl$WebGL$depth(1),
+						$elm_explorations$webgl$WebGL$antialias
+					]),
 				_List_fromArray(
 					[
 						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart(
