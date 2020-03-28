@@ -54,6 +54,7 @@ rollEnemyAction = Random.weighted (99, Move) [(1, Attack)]
 
 type alias GameState = {
         userInput: List PlayerAction,
+        bgOffset: Float,
         boardSize: Size,
         playerPosition: Position,
         enemies: List Position,
@@ -71,6 +72,7 @@ spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 1000 |> moveX -13.0 |> mov
 initialState: GameState
 initialState = {
         userInput = [],
+        bgOffset = 0,
         boardSize = { width = 160, height = 240 },
         playerPosition = newPosition (vec2 72 222) 16.0 16.0 1000,
         enemies = [ newPosition (vec2 56 24) 32.0 32.0 1000 ],
@@ -212,6 +214,10 @@ updateRenderTimes delta state = {
 -- enemySpawn state =
 
 
+moveBackground: Float -> GameState -> GameState
+moveBackground delta state = { state | bgOffset = state.bgOffset + delta }
+
+
 step: Float -> GameState -> GameState
 step timeDelta state =
         state
@@ -220,6 +226,7 @@ step timeDelta state =
             |> performEnemiesActions timeDelta
             |> moveEnemyRounds timeDelta
             |> updateRenderTimes timeDelta
+            |> moveBackground timeDelta
 
             -- TODO: enemy spawn
             -- let enemySpawn = List.map

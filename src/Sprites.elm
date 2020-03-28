@@ -12,7 +12,7 @@ import Maybe.Extra as ME
 import GameState exposing (GameState, widthFloat, heightFloat)
 import Graphics exposing (Rectangle, RectDisplay(..), drawRectangle)
 
-type GameObjectType = User1 | User2 | User3 | Enemy1 | Enemy2 | Bullet
+type GameObjectType = User1 | User2 | User3 | Enemy1 | Enemy2 | Bullet | BackgroundPlanet | BackgroundStars
 
 gameObjectTypeToInt: GameObjectType -> Int
 gameObjectTypeToInt typ =
@@ -23,6 +23,8 @@ gameObjectTypeToInt typ =
        Enemy1 -> 4
        Enemy2 -> 5
        Bullet -> 6
+       BackgroundPlanet -> 7
+       BackgroundStars -> 8
 
 roundPos: Vec2 -> Vec2
 roundPos pos =
@@ -48,13 +50,16 @@ loadAtlas =
         (Enemy2, "https://wg-romank.github.io/alien-attack/assets/Octo-2.png"),
         (User1, "https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png"),
         (User2, "https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png"),
-        (User3, "https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png")
+        (User3, "https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png"),
+        (BackgroundPlanet, "https://wg-romank.github.io/alien-attack/assets/bg_planet.png"),
+        (BackgroundStars, "https://wg-romank.github.io/alien-attack/assets/bg_stars.png")
     ] |> Task.sequence
       |> Task.map Dict.fromList
 
 objectsToDraw: Atlas -> GameState -> List WebGL.Entity
 objectsToDraw atlas state = List.concat
     [
+        backgroundSprite atlas state,
         playerSprite atlas state,
         enemySprite atlas state,
         bulletSprite state,
@@ -115,3 +120,21 @@ enemyBulletSprite state =
         height = bullet.height,
         display = RectColor (vec4 1.0 0.5 1.0 1.0)
     }) state.enemyRounds
+
+
+backgroundSprite: Atlas -> GameState -> List Rectangle
+backgroundSprite atlas state =
+    let
+        bgPlanet = gameObjectTypeToInt BackgroundPlanet
+        bgStars = gameObjectTypeToInt BackgroundStars
+        pos = (vec2 0 (3 * state.bgOffset / 1000.0) )
+    in
+        List.concat
+        [
+            List.map (\t -> 
+            { pos = roundPos pos, width = widthFloat state.boardSize, height = heightFloat state.boardSize, display = RectTexture t })
+            (Dict.get bgStars atlas |> ME.toList),
+            List.map (\t -> 
+            { pos = roundPos pos, width = widthFloat state.boardSize, height = heightFloat state.boardSize, display = RectTexture t })
+            (Dict.get bgPlanet atlas |> ME.toList)
+        ]
