@@ -7003,6 +7003,7 @@ var $author$project$GameState$newPosition = F4(
 	});
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
+	bgOffset: 0,
 	boardSize: {height: 240, width: 160},
 	enemies: _List_fromArray(
 		[
@@ -7024,6 +7025,8 @@ var $author$project$GameState$initialState = {
 	rounds: _List_Nil,
 	userInput: _List_Nil
 };
+var $author$project$Sprites$BackgroundPlanet = {$: 'BackgroundPlanet'};
+var $author$project$Sprites$BackgroundStars = {$: 'BackgroundStars'};
 var $author$project$Sprites$Enemy1 = {$: 'Enemy1'};
 var $author$project$Sprites$Enemy2 = {$: 'Enemy2'};
 var $author$project$Sprites$User1 = {$: 'User1'};
@@ -7162,20 +7165,14 @@ var $author$project$Sprites$gameObjectTypeToInt = function (typ) {
 			return 4;
 		case 'Enemy2':
 			return 5;
-		default:
+		case 'Bullet':
 			return 6;
+		case 'BackgroundPlanet':
+			return 7;
+		default:
+			return 8;
 	}
 };
-var $elm_explorations$webgl$WebGL$Texture$Resize = function (a) {
-	return {$: 'Resize', a: a};
-};
-var $elm_explorations$webgl$WebGL$Texture$linear = $elm_explorations$webgl$WebGL$Texture$Resize(9729);
-var $elm_explorations$webgl$WebGL$Texture$nearestMipmapLinear = $elm_explorations$webgl$WebGL$Texture$Resize(9986);
-var $elm_explorations$webgl$WebGL$Texture$Wrap = function (a) {
-	return {$: 'Wrap', a: a};
-};
-var $elm_explorations$webgl$WebGL$Texture$repeat = $elm_explorations$webgl$WebGL$Texture$Wrap(10497);
-var $elm_explorations$webgl$WebGL$Texture$defaultOptions = {flipY: true, horizontalWrap: $elm_explorations$webgl$WebGL$Texture$repeat, magnify: $elm_explorations$webgl$WebGL$Texture$linear, minify: $elm_explorations$webgl$WebGL$Texture$nearestMipmapLinear, verticalWrap: $elm_explorations$webgl$WebGL$Texture$repeat};
 var $elm_explorations$webgl$WebGL$Texture$LoadError = {$: 'LoadError'};
 var $elm_explorations$webgl$WebGL$Texture$SizeError = F2(
 	function (a, b) {
@@ -7198,7 +7195,16 @@ var $elm_explorations$webgl$WebGL$Texture$loadWith = F2(
 			});
 		return A4(expand, magnify, minify, horizontalWrap, verticalWrap);
 	});
-var $elm_explorations$webgl$WebGL$Texture$load = $elm_explorations$webgl$WebGL$Texture$loadWith($elm_explorations$webgl$WebGL$Texture$defaultOptions);
+var $elm_explorations$webgl$WebGL$Texture$Wrap = function (a) {
+	return {$: 'Wrap', a: a};
+};
+var $elm_explorations$webgl$WebGL$Texture$clampToEdge = $elm_explorations$webgl$WebGL$Texture$Wrap(33071);
+var $elm_explorations$webgl$WebGL$Texture$Resize = function (a) {
+	return {$: 'Resize', a: a};
+};
+var $elm_explorations$webgl$WebGL$Texture$linear = $elm_explorations$webgl$WebGL$Texture$Resize(9729);
+var $elm_explorations$webgl$WebGL$Texture$nearest = $elm_explorations$webgl$WebGL$Texture$Resize(9728);
+var $elm_explorations$webgl$WebGL$Texture$nonPowerOfTwoOptions = {flipY: true, horizontalWrap: $elm_explorations$webgl$WebGL$Texture$clampToEdge, magnify: $elm_explorations$webgl$WebGL$Texture$linear, minify: $elm_explorations$webgl$WebGL$Texture$nearest, verticalWrap: $elm_explorations$webgl$WebGL$Texture$clampToEdge};
 var $author$project$Sprites$loadAtlas = A2(
 	$elm$core$Task$map,
 	$elm$core$Dict$fromList,
@@ -7215,7 +7221,7 @@ var $author$project$Sprites$loadAtlas = A2(
 							$author$project$Sprites$gameObjectTypeToInt(typ),
 							tex);
 					},
-					$elm_explorations$webgl$WebGL$Texture$load(url));
+					A2($elm_explorations$webgl$WebGL$Texture$loadWith, $elm_explorations$webgl$WebGL$Texture$nonPowerOfTwoOptions, url));
 			},
 			_List_fromArray(
 				[
@@ -7223,7 +7229,9 @@ var $author$project$Sprites$loadAtlas = A2(
 					_Utils_Tuple2($author$project$Sprites$Enemy2, 'https://wg-romank.github.io/alien-attack/assets/Octo-2.png'),
 					_Utils_Tuple2($author$project$Sprites$User1, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png'),
 					_Utils_Tuple2($author$project$Sprites$User2, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png'),
-					_Utils_Tuple2($author$project$Sprites$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png')
+					_Utils_Tuple2($author$project$Sprites$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png'),
+					_Utils_Tuple2($author$project$Sprites$BackgroundPlanet, 'https://wg-romank.github.io/alien-attack/assets/bg_planet.png'),
+					_Utils_Tuple2($author$project$Sprites$BackgroundStars, 'https://wg-romank.github.io/alien-attack/assets/bg_stars.png')
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
@@ -7924,6 +7932,12 @@ var $author$project$GameState$registerUserInput = F2(
 						[action]))
 			});
 	});
+var $author$project$GameState$moveBackground = F2(
+	function (delta, state) {
+		return _Utils_update(
+			state,
+			{bgOffset: state.bgOffset + delta});
+	});
 var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
 var $author$project$GameState$heightFloat = function (size) {
 	return size.height;
@@ -8249,18 +8263,21 @@ var $author$project$GameState$updateRenderTimes = F2(
 var $author$project$GameState$step = F2(
 	function (timeDelta, state) {
 		return A2(
-			$author$project$GameState$updateRenderTimes,
+			$author$project$GameState$moveBackground,
 			timeDelta,
 			A2(
-				$author$project$GameState$moveEnemyRounds,
+				$author$project$GameState$updateRenderTimes,
 				timeDelta,
 				A2(
-					$author$project$GameState$performEnemiesActions,
+					$author$project$GameState$moveEnemyRounds,
 					timeDelta,
 					A2(
-						$author$project$GameState$moveRounds,
+						$author$project$GameState$performEnemiesActions,
 						timeDelta,
-						A2($author$project$GameState$performPlayerAction, state.userInput, state)))));
+						A2(
+							$author$project$GameState$moveRounds,
+							timeDelta,
+							A2($author$project$GameState$performPlayerAction, state.userInput, state))))));
 	});
 var $author$project$Main$update = F2(
 	function (event, model) {
@@ -8384,31 +8401,8 @@ var $elm$html$Html$Attributes$height = function (n) {
 		'height',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Graphics$RectColor = function (a) {
-	return {$: 'RectColor', a: a};
-};
-var $author$project$Sprites$roundPos = function (pos) {
-	return A2(
-		$elm_explorations$linear_algebra$Math$Vector2$vec2,
-		$elm$core$Basics$round(
-			$elm_explorations$linear_algebra$Math$Vector2$getX(pos)),
-		$elm$core$Basics$round(
-			$elm_explorations$linear_algebra$Math$Vector2$getY(pos)));
-};
-var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
-var $author$project$Sprites$bulletSprite = function (state) {
-	return A2(
-		$elm$core$List$map,
-		function (bullet) {
-			return {
-				display: $author$project$Graphics$RectColor(
-					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
-				height: bullet.height,
-				pos: $author$project$Sprites$roundPos(bullet.pos),
-				width: bullet.width
-			};
-		},
-		state.rounds);
+var $author$project$Graphics$RectTexture = function (a) {
+	return {$: 'RectTexture', a: a};
 };
 var $elm$core$List$append = F2(
 	function (xs, ys) {
@@ -8420,6 +8414,115 @@ var $elm$core$List$append = F2(
 	});
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$Dict$get = F2(
+	function (targetKey, dict) {
+		get:
+		while (true) {
+			if (dict.$ === 'RBEmpty_elm_builtin') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var key = dict.b;
+				var value = dict.c;
+				var left = dict.d;
+				var right = dict.e;
+				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
+				switch (_v1.$) {
+					case 'LT':
+						var $temp$targetKey = targetKey,
+							$temp$dict = left;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+					case 'EQ':
+						return $elm$core$Maybe$Just(value);
+					default:
+						var $temp$targetKey = targetKey,
+							$temp$dict = right;
+						targetKey = $temp$targetKey;
+						dict = $temp$dict;
+						continue get;
+				}
+			}
+		}
+	});
+var $author$project$Sprites$roundPos = function (pos) {
+	return A2(
+		$elm_explorations$linear_algebra$Math$Vector2$vec2,
+		$elm$core$Basics$round(
+			$elm_explorations$linear_algebra$Math$Vector2$getX(pos)),
+		$elm$core$Basics$round(
+			$elm_explorations$linear_algebra$Math$Vector2$getY(pos)));
+};
+var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
+	if (m.$ === 'Nothing') {
+		return _List_Nil;
+	} else {
+		var x = m.a;
+		return _List_fromArray(
+			[x]);
+	}
+};
+var $author$project$Sprites$backgroundSprite = F2(
+	function (atlas, state) {
+		var pos = A2(
+			$elm_explorations$linear_algebra$Math$Vector2$vec2,
+			0,
+			$author$project$GameState$heightFloat(state.boardSize) - ((3 * state.bgOffset) / 1000.0));
+		var bgStars = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$BackgroundStars);
+		var bgPlanet = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$BackgroundPlanet);
+		return $elm$core$List$concat(
+			_List_fromArray(
+				[
+					A2(
+					$elm$core$List$map,
+					function (t) {
+						return {
+							display: $author$project$Graphics$RectTexture(t),
+							far: 1.0,
+							height: $author$project$GameState$heightFloat(state.boardSize),
+							near: 0.9,
+							pos: $author$project$Sprites$roundPos(pos),
+							width: $author$project$GameState$widthFloat(state.boardSize)
+						};
+					},
+					$elm_community$maybe_extra$Maybe$Extra$toList(
+						A2($elm$core$Dict$get, bgStars, atlas))),
+					A2(
+					$elm$core$List$map,
+					function (t) {
+						return {
+							display: $author$project$Graphics$RectTexture(t),
+							far: 0.9,
+							height: $author$project$GameState$heightFloat(state.boardSize),
+							near: 0.8,
+							pos: $author$project$Sprites$roundPos(pos),
+							width: $author$project$GameState$widthFloat(state.boardSize)
+						};
+					},
+					$elm_community$maybe_extra$Maybe$Extra$toList(
+						A2($elm$core$Dict$get, bgPlanet, atlas)))
+				]));
+	});
+var $author$project$Graphics$RectColor = function (a) {
+	return {$: 'RectColor', a: a};
+};
+var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
+var $author$project$Sprites$bulletSprite = function (state) {
+	return A2(
+		$elm$core$List$map,
+		function (bullet) {
+			return {
+				display: $author$project$Graphics$RectColor(
+					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
+				far: 0.1,
+				height: bullet.height,
+				near: 0,
+				pos: $author$project$Sprites$roundPos(bullet.pos),
+				width: bullet.width
+			};
+		},
+		state.rounds);
 };
 var $elm_explorations$webgl$WebGL$Internal$Blend = function (a) {
 	return function (b) {
@@ -8483,18 +8586,6 @@ var $elm_explorations$webgl$WebGL$Settings$Blend$add = F2(
 				r: 0
 			});
 	});
-var $elm_explorations$webgl$WebGL$Internal$DepthTest = F4(
-	function (a, b, c, d) {
-		return {$: 'DepthTest', a: a, b: b, c: c, d: d};
-	});
-var $elm_explorations$webgl$WebGL$Settings$DepthTest$less = function (_v0) {
-	var write = _v0.write;
-	var near = _v0.near;
-	var far = _v0.far;
-	return A4($elm_explorations$webgl$WebGL$Internal$DepthTest, 513, write, near, far);
-};
-var $elm_explorations$webgl$WebGL$Settings$DepthTest$default = $elm_explorations$webgl$WebGL$Settings$DepthTest$less(
-	{far: 1, near: 0, write: true});
 var $elm_explorations$webgl$WebGL$Internal$disableSetting = F2(
 	function (cache, setting) {
 		switch (setting.$) {
@@ -8559,9 +8650,6 @@ var $elm_explorations$webgl$WebGL$Internal$enableSetting = F2(
 		}
 	});
 var $elm_explorations$webgl$WebGL$entityWith = _WebGL_entity;
-var $elm_explorations$webgl$WebGL$entity = $elm_explorations$webgl$WebGL$entityWith(
-	_List_fromArray(
-		[$elm_explorations$webgl$WebGL$Settings$DepthTest$default]));
 var $author$project$Graphics$fragmentColorShader = {
 	src: '\n        precision mediump float;\n        uniform vec4 vcolor;\n        varying vec2 vtextureCoord;\n        void main() {\n            gl_FragColor = vcolor;\n        }\n    ',
 	attributes: {},
@@ -8571,6 +8659,16 @@ var $author$project$Graphics$fragmentTextureShader = {
 	src: '\n        precision mediump float;\n        uniform sampler2D texture;\n        varying vec2 vtextureCoord;\n        void main() {\n            gl_FragColor = texture2D(texture, vtextureCoord);\n        }\n    ',
 	attributes: {},
 	uniforms: {texture: 'texture'}
+};
+var $elm_explorations$webgl$WebGL$Internal$DepthTest = F4(
+	function (a, b, c, d) {
+		return {$: 'DepthTest', a: a, b: b, c: c, d: d};
+	});
+var $elm_explorations$webgl$WebGL$Settings$DepthTest$less = function (_v0) {
+	var write = _v0.write;
+	var near = _v0.near;
+	var far = _v0.far;
+	return A4($elm_explorations$webgl$WebGL$Internal$DepthTest, 513, write, near, far);
 };
 var $elm_explorations$webgl$WebGL$Settings$Blend$Factor = function (a) {
 	return {$: 'Factor', a: a};
@@ -8635,8 +8733,14 @@ var $author$project$Graphics$drawRectangle = F2(
 		var _v0 = rec.display;
 		if (_v0.$ === 'RectColor') {
 			var c = _v0.a;
-			return A4(
-				$elm_explorations$webgl$WebGL$entity,
+			return A5(
+				$elm_explorations$webgl$WebGL$entityWith,
+				_List_fromArray(
+					[
+						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha),
+						$elm_explorations$webgl$WebGL$Settings$DepthTest$less(
+						{far: rec.far, near: rec.near, write: true})
+					]),
 				$author$project$Graphics$vertexShader,
 				$author$project$Graphics$fragmentColorShader,
 				A3($author$project$Graphics$rect, rec.pos, rec.width, rec.height),
@@ -8647,7 +8751,9 @@ var $author$project$Graphics$drawRectangle = F2(
 				$elm_explorations$webgl$WebGL$entityWith,
 				_List_fromArray(
 					[
-						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha)
+						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha),
+						$elm_explorations$webgl$WebGL$Settings$DepthTest$less(
+						{far: rec.far, near: rec.near, write: true})
 					]),
 				$author$project$Graphics$vertexShader,
 				$author$project$Graphics$fragmentTextureShader,
@@ -8662,51 +8768,19 @@ var $author$project$Sprites$enemyBulletSprite = function (state) {
 			return {
 				display: $author$project$Graphics$RectColor(
 					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 0.5, 1.0, 1.0)),
+				far: 0.1,
 				height: bullet.height,
+				near: 0,
 				pos: $author$project$Sprites$roundPos(bullet.pos),
 				width: bullet.width
 			};
 		},
 		state.enemyRounds);
 };
-var $author$project$Graphics$RectTexture = function (a) {
-	return {$: 'RectTexture', a: a};
-};
 var $elm$core$List$concatMap = F2(
 	function (f, list) {
 		return $elm$core$List$concat(
 			A2($elm$core$List$map, f, list));
-	});
-var $elm$core$Dict$get = F2(
-	function (targetKey, dict) {
-		get:
-		while (true) {
-			if (dict.$ === 'RBEmpty_elm_builtin') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var key = dict.b;
-				var value = dict.c;
-				var left = dict.d;
-				var right = dict.e;
-				var _v1 = A2($elm$core$Basics$compare, targetKey, key);
-				switch (_v1.$) {
-					case 'LT':
-						var $temp$targetKey = targetKey,
-							$temp$dict = left;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-					case 'EQ':
-						return $elm$core$Maybe$Just(value);
-					default:
-						var $temp$targetKey = targetKey,
-							$temp$dict = right;
-						targetKey = $temp$targetKey;
-						dict = $temp$dict;
-						continue get;
-				}
-			}
-		}
 	});
 var $author$project$Sprites$enemySprite = F2(
 	function (atlas, state) {
@@ -8723,7 +8797,9 @@ var $author$project$Sprites$enemySprite = F2(
 						[
 							{
 							display: $author$project$Graphics$RectTexture(t),
+							far: 0.1,
 							height: enemy.height,
+							near: 0,
 							pos: $author$project$Sprites$roundPos(enemy.pos),
 							width: enemy.width
 						}
@@ -8734,15 +8810,6 @@ var $author$project$Sprites$enemySprite = F2(
 			},
 			state.enemies);
 	});
-var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
-	if (m.$ === 'Nothing') {
-		return _List_Nil;
-	} else {
-		var x = m.a;
-		return _List_fromArray(
-			[x]);
-	}
-};
 var $author$project$Sprites$playerSprite = F2(
 	function (atlas, state) {
 		var userTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
@@ -8755,7 +8822,9 @@ var $author$project$Sprites$playerSprite = F2(
 			function (texture) {
 				return {
 					display: $author$project$Graphics$RectTexture(texture),
+					far: 0.1,
 					height: state.playerPosition.height,
+					near: 0,
 					pos: $author$project$Sprites$roundPos(state.playerPosition.pos),
 					width: state.playerPosition.width
 				};
@@ -8778,6 +8847,7 @@ var $author$project$Sprites$objectsToDraw = F2(
 			$elm$core$List$concat(
 				_List_fromArray(
 					[
+						A2($author$project$Sprites$backgroundSprite, atlas, state),
 						A2($author$project$Sprites$playerSprite, atlas, state),
 						A2($author$project$Sprites$enemySprite, atlas, state),
 						$author$project$Sprites$bulletSprite(state),

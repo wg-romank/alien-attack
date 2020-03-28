@@ -5,6 +5,7 @@ import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 import WebGL exposing (Mesh)
 import WebGL.Texture exposing (Texture)
 import WebGL.Settings.Blend as Blend
+import WebGL.Settings.DepthTest as DepthTest
 
 type alias Vertex = {
         position : Vec2,
@@ -60,6 +61,8 @@ rect point width height =
 
 
 type alias Rectangle = {
+    near: Float,
+    far: Float,
     pos: Vec2,
     width: Float,
     height: Float,
@@ -73,7 +76,9 @@ drawRectangle: Vec2 -> Rectangle -> WebGL.Entity
 drawRectangle res rec = 
     case rec.display of
         RectColor c ->
-            WebGL.entity
+            WebGL.entityWith
+                [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha,
+                  DepthTest.less { write = True, near = rec.near, far = rec.far } ]
                 vertexShader
                 fragmentColorShader
                 (rect rec.pos rec.width rec.height)
@@ -81,7 +86,8 @@ drawRectangle res rec =
         RectTexture t ->
             WebGL.entityWith
                 -- ensure transparent texture blending
-                [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha ]
+                [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha,
+                  DepthTest.less { write = True, near = rec.near, far = rec.far } ]
                 vertexShader
                 fragmentTextureShader
                 (rect rec.pos rec.width rec.height)

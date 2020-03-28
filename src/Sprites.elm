@@ -42,7 +42,7 @@ loadAtlas =
     List.map
     (
         \(typ, url) ->
-            Texture.load url 
+            Texture.loadWith Texture.nonPowerOfTwoOptions url 
             |> Task.map (\tex -> (gameObjectTypeToInt typ, tex) )
     )
     [
@@ -81,7 +81,9 @@ playerSprite atlas state =
             pos = roundPos state.playerPosition.pos,
             width = state.playerPosition.width,
             height = state.playerPosition.height,
-            display = RectTexture texture
+            display = RectTexture texture,
+            near = 0,
+            far = 0.1
         }) userTexture
 
 enemySprite: Atlas -> GameState -> List Rectangle
@@ -97,7 +99,7 @@ enemySprite atlas state =
                     maybeTexture = Dict.get textureKey atlas
                 in
                     case maybeTexture of
-                       Just t -> [{ pos = roundPos enemy.pos, width = enemy.width, height = enemy.height, display = RectTexture t }]
+                       Just t -> [{ pos = roundPos enemy.pos, width = enemy.width, height = enemy.height, display = RectTexture t, near = 0, far = 0.1 }]
                        Nothing -> []
             ) state.enemies
     
@@ -108,7 +110,9 @@ bulletSprite state =
         pos = roundPos bullet.pos,
         width = bullet.width,
         height = bullet.height,
-        display = RectColor (vec4 1.0 1.0 1.0 1.0)
+        display = RectColor (vec4 1.0 1.0 1.0 1.0),
+        near = 0,
+        far = 0.1
     }) state.rounds
 
 
@@ -118,7 +122,9 @@ enemyBulletSprite state =
         pos = roundPos bullet.pos,
         width = bullet.width,
         height = bullet.height,
-        display = RectColor (vec4 1.0 0.5 1.0 1.0)
+        display = RectColor (vec4 1.0 0.5 1.0 1.0),
+        near = 0,
+        far = 0.1
     }) state.enemyRounds
 
 
@@ -127,14 +133,14 @@ backgroundSprite atlas state =
     let
         bgPlanet = gameObjectTypeToInt BackgroundPlanet
         bgStars = gameObjectTypeToInt BackgroundStars
-        pos = (vec2 0 (3 * state.bgOffset / 1000.0) )
+        pos = vec2 0 ( (heightFloat state.boardSize) - (3 * state.bgOffset / 1000.0) )
     in
         List.concat
         [
             List.map (\t -> 
-            { pos = roundPos pos, width = widthFloat state.boardSize, height = heightFloat state.boardSize, display = RectTexture t })
+            { pos = roundPos pos, width = widthFloat state.boardSize, height = heightFloat state.boardSize, display = RectTexture t, near = 0.9, far = 1.0 })
             (Dict.get bgStars atlas |> ME.toList),
             List.map (\t -> 
-            { pos = roundPos pos, width = widthFloat state.boardSize, height = heightFloat state.boardSize, display = RectTexture t })
+            { pos = roundPos pos, width = widthFloat state.boardSize, height = heightFloat state.boardSize, display = RectTexture t , near = 0.8, far = 0.9})
             (Dict.get bgPlanet atlas |> ME.toList)
         ]

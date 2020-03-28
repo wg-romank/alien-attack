@@ -99,6 +99,7 @@ view model =
             --   style "width" (String.fromInt model.viewportWidth ++ "px"),
               style "height" (String.fromInt model.viewportHeight ++ "px"),
               style "backgroundColor" "#000000",
+              -- style "backgroundColor" "#283531",
               style "display" "block" ]
               (objectsToDraw model.atlas model.state)
             -- text <| Debug.toString model
