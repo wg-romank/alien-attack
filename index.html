@@ -9112,7 +9112,11 @@ var $author$project$Main$view = function (model) {
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',
-						$elm$core$String$fromInt(model.viewportHeight) + 'px')
+						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromInt(model.viewportWidth) + 'px')
 					]),
 				_List_fromArray(
 					[
@@ -9123,8 +9127,8 @@ var $author$project$Main$view = function (model) {
 								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-								A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
-								A2($elm$html$Html$Attributes$style, 'left', '10px')
+								A2($elm$html$Html$Attributes$style, 'bottom', '2%'),
+								A2($elm$html$Html$Attributes$style, 'left', '3%')
 							]),
 						_List_fromArray(
 							[
@@ -9137,11 +9141,8 @@ var $author$project$Main$view = function (model) {
 								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-								A2($elm$html$Html$Attributes$style, 'bottom', '10px'),
-								A2(
-								$elm$html$Html$Attributes$style,
-								'left',
-								$elm$core$String$fromInt(model.viewportWidth - 60) + 'px')
+								A2($elm$html$Html$Attributes$style, 'bottom', '2%'),
+								A2($elm$html$Html$Attributes$style, 'right', '3%')
 							]),
 						_List_fromArray(
 							[

@@ -117,15 +117,16 @@ view model =
               style "position" "absolute",
               style "top" "0",
               style "left" (String.fromInt model.offset ++ "px"),
-              style "height" (String.fromInt model.viewportHeight ++ "px")
+              style "height" (String.fromInt model.viewportHeight ++ "px"),
+              style "width" (String.fromInt model.viewportWidth ++ "px")
           ] [
             p
               [
                 style "position" "absolute",
                 style "color" "#FFFFFF",
                 style "font-family" "pixelated",
-                style "bottom" "10px",
-                style "left" "10px"
+                style "bottom" "2%",
+                style "left" "3%"
               ]
               [ text "FUEL" ],
             p
@@ -133,8 +134,8 @@ view model =
                 style "position" "absolute",
                 style "color" "#FFFFFF",
                 style "font-family" "pixelated",
-                style "bottom" "10px",
-                style "left" (String.fromInt (model.viewportWidth - 60) ++ "px")
+                style "bottom" "2%",
+                style "right" "3%"
               ]
               [ text "COURSE" ]
             ]
