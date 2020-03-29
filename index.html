@@ -8385,14 +8385,15 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$End = function (a) {
-	return {$: 'End', a: a};
+var $elm$core$Dict$isEmpty = function (dict) {
+	if (dict.$ === 'RBEmpty_elm_builtin') {
+		return true;
+	} else {
+		return false;
+	}
 };
-var $author$project$Main$Move = function (a) {
-	return {$: 'Move', a: a};
-};
-var $author$project$Main$Start = function (a) {
-	return {$: 'Start', a: a};
+var $author$project$Atlas$loaded = function (atlas) {
+	return !$elm$core$Dict$isEmpty(atlas);
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
@@ -8403,6 +8404,66 @@ var $elm$html$Html$Attributes$stringProperty = F2(
 			$elm$json$Json$Encode$string(string));
 	});
 var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $elm$html$Html$p = _VirtualDom_node('p');
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$loadingScreen = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+				A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'top', '0'),
+				A2(
+				$elm$html$Html$Attributes$style,
+				'left',
+				$elm$core$String$fromInt(model.offset) + 'px'),
+				A2(
+				$elm$html$Html$Attributes$style,
+				'height',
+				$elm$core$String$fromInt(model.viewportHeight) + 'px'),
+				A2(
+				$elm$html$Html$Attributes$style,
+				'width',
+				$elm$core$String$fromInt(model.viewportWidth) + 'px')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$p,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+						A2($elm$html$Html$Attributes$style, 'top', '50%'),
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+						A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+						A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromInt(model.viewportWidth) + 'px')
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('LOADING...')
+					]))
+			]));
+};
+var $author$project$Main$End = function (a) {
+	return {$: 'End', a: a};
+};
+var $author$project$Main$Move = function (a) {
+	return {$: 'Move', a: a};
+};
+var $author$project$Main$Start = function (a) {
+	return {$: 'Start', a: a};
+};
 var $elm_explorations$webgl$WebGL$Internal$Alpha = function (a) {
 	return {$: 'Alpha', a: a};
 };
@@ -8411,7 +8472,6 @@ var $elm_explorations$webgl$WebGL$Internal$Depth = function (a) {
 	return {$: 'Depth', a: a};
 };
 var $elm_explorations$webgl$WebGL$depth = $elm_explorations$webgl$WebGL$Internal$Depth;
-var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$html$Html$Attributes$height = function (n) {
 	return A2(
@@ -9026,11 +9086,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchend', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchmove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchstart', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
-var $elm$html$Html$p = _VirtualDom_node('p');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm_explorations$webgl$WebGL$toHtmlWith = F3(
 	function (options, attributes, entities) {
 		return A3(_WebGL_toHtml, options, attributes, entities);
@@ -9080,7 +9135,7 @@ var $elm$html$Html$Attributes$width = function (n) {
 		'width',
 		$elm$core$String$fromInt(n));
 };
-var $author$project$Main$view = function (model) {
+var $author$project$Main$simulationScreen = function (model) {
 	return A2(
 		$elm$html$Html$div,
 		_List_fromArray(
@@ -9175,6 +9230,9 @@ var $author$project$Main$view = function (model) {
 							]))
 					]))
 			]));
+};
+var $author$project$Main$view = function (model) {
+	return $author$project$Atlas$loaded(model.atlas) ? $author$project$Main$simulationScreen(model) : $author$project$Main$loadingScreen(model);
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{

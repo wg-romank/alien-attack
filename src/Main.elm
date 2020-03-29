@@ -87,12 +87,44 @@ toDirection string =
     other ->
       Other other
 
+view: Model -> Html Msg
+view model =
+  if model.atlas |> loaded then simulationScreen model
+  else loadingScreen model
+
+loadingScreen: Model -> Html Msg
+loadingScreen model =
+  div [
+      style "position" "absolute",
+      style "backgroundColor" "#000000",
+      Html.Attributes.align "center",
+      style "top" "0",
+      style "left" ((String.fromInt model.offset) ++ "px"),
+      style "height" (String.fromInt model.viewportHeight ++ "px"),
+      style "width" (String.fromInt model.viewportWidth ++ "px")
+  ] [
+    p
+      [
+        style "color" "#FFFFFF",
+        style "top" "50%",
+        style "position" "absolute",
+        style "font-family" "pixelated",
+        style "font-size" "2em",
+        style "text-align" "center",
+        style "width" (String.fromInt model.viewportWidth ++ "px")
+        -- Html.Attributes.align "center"
+      ]
+      [ text "LOADING..." ]
+  ]
+
+
+-- TODO: fix layout for Browser.Document
 -- type alias Document msg =
 --     { title : String
 --     , body : List (Html msg)
 --     }
-view: Model -> Html Msg
-view model =
+simulationScreen: Model -> Html Msg
+simulationScreen model =
         div [
             Html.Attributes.align "center",
             style "position" "relative"

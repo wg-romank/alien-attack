@@ -1,4 +1,4 @@
-module Atlas exposing(TextureKey(..), Atlas, get, loadAtlas, emptyAtlas)
+module Atlas exposing(TextureKey(..), Atlas, get, loadAtlas, emptyAtlas, loaded)
 
 import Dict exposing (Dict)
 import Task
@@ -41,6 +41,9 @@ loadAtlas =
         (BackgroundStars, "https://wg-romank.github.io/alien-attack/assets/bg_stars.png")
     ] |> Task.sequence
       |> Task.map Dict.fromList
+
+loaded: Atlas -> Bool
+loaded atlas = Dict.isEmpty atlas |> not
 
 get: Atlas -> TextureKey -> Maybe Texture
 get atlas objTyp =
