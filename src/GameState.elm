@@ -105,6 +105,7 @@ performPlayerAction action state =
         f :: rest ->
             { state | userInput = rest } |>
             case f of
+                -- TODO: move with constant speed on touch
                 PlayerMove (x, y) -> playerMove (vec2 x y)
                 PlayerMoveLeft -> playerMoveHorizontal -10
                 PlayerMoveRight -> playerMoveHorizontal 10
