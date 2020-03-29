@@ -4,7 +4,7 @@ import Random
 import Browser
 import Browser.Events exposing (onAnimationFrameDelta, onKeyDown)
 import Browser.Dom exposing (Viewport)
-import Html exposing (Html, div)
+import Html exposing (Html, div, text, p)
 import Html.Attributes exposing (width, height, style)
 import Task
 
@@ -88,25 +88,41 @@ toDirection string =
 view: Model -> Html Msg
 view model =
         div [
-            Html.Attributes.align "center"
+            Html.Attributes.align "center",
+            style "position" "relative"
         ]
         [
-            WebGL.toHtmlWith [ WebGL.alpha True, WebGL.depth 1 ]
-            [
-              Touch.onStart (Start << touchCoordinates),
-              Touch.onMove (Move << touchCoordinates),
-              Touch.onEnd (End << touchCoordinates),
-              width model.state.boardSize.width,
-              height model.state.boardSize.height,
-              -- style "image-rendering" "-webkit-optimize-contrast",
-              style "image-rendering" "crisp-edges",
-            --   style "width" (String.fromInt model.viewportWidth ++ "px"),
-              style "height" (String.fromInt model.viewportHeight ++ "px"),
-              -- style "backgroundColor" "#000000",
-              -- style "backgroundColor" "#283531",
-              style "display" "block" ]
-              (objectsToDraw model.atlas model.state)
-            -- text <| Debug.toString model
+          WebGL.toHtmlWith [ WebGL.alpha True, WebGL.depth 1 ]
+          [
+            Touch.onStart (Start << touchCoordinates),
+            Touch.onMove (Move << touchCoordinates),
+            Touch.onEnd (End << touchCoordinates),
+            width model.state.boardSize.width,
+            height model.state.boardSize.height,
+            -- style "image-rendering" "-webkit-optimize-contrast",
+            style "position" "absolute",
+            style "top" "0",
+            style "left" "0",
+            style "image-rendering" "crisp-edges",
+          --   style "width" (String.fromInt model.viewportWidth ++ "px"),
+            style "height" (String.fromInt model.viewportHeight ++ "px"),
+            -- style "backgroundColor" "#000000",
+            -- style "backgroundColor" "#283531",
+            style "display" "block" ]
+            (objectsToDraw model.atlas model.state),
+          -- text <| Debug.toString model
+          div [
+              style "position" "absolute"
+          ] [
+            p
+              [
+                style "color" "#FFFFFF",
+                style "font-family" "pixelated",
+                style "margin-top" "10",
+                style "margin-left" "10"
+              ]
+              [ text "FUEL" ]
+            ]
         ]
 
 

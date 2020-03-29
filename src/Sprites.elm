@@ -54,7 +54,7 @@ enemySprite atlas state =
     List.concatMap
         (\enemy ->
             let
-                textureKey = if (enemy.sinceSpawned |> round |> modBy frameSwitch) == 0 then Enemy1 else Enemy2
+                textureKey = if (enemy.sinceSpawned / 1000.0 |> round |> modBy frameSwitch) == 0 then Enemy1 else Enemy2
                 maybeTexture = Atlas.get atlas textureKey
             in
                 case maybeTexture of

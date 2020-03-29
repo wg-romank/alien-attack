@@ -8816,7 +8816,7 @@ var $author$project$Sprites$enemySprite = F2(
 				var textureKey = (!A2(
 					$elm$core$Basics$modBy,
 					frameSwitch,
-					$elm$core$Basics$round(enemy.sinceSpawned))) ? $author$project$Atlas$Enemy1 : $author$project$Atlas$Enemy2;
+					$elm$core$Basics$round(enemy.sinceSpawned / 1000.0))) ? $author$project$Atlas$Enemy1 : $author$project$Atlas$Enemy2;
 				var maybeTexture = A2($author$project$Atlas$get, atlas, textureKey);
 				if (maybeTexture.$ === 'Just') {
 					var t = maybeTexture.a;
@@ -9003,8 +9003,11 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchend', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchmove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onWithOptions, 'touchstart', $mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$defaultOptions);
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $elm_explorations$webgl$WebGL$toHtmlWith = F3(
 	function (options, attributes, entities) {
 		return A3(_WebGL_toHtml, options, attributes, entities);
@@ -9059,7 +9062,8 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$align('center')
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'position', 'relative')
 			]),
 		_List_fromArray(
 			[
@@ -9080,6 +9084,9 @@ var $author$project$Main$view = function (model) {
 						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
 						$elm$html$Html$Attributes$width(model.state.boardSize.width),
 						$elm$html$Html$Attributes$height(model.state.boardSize.height),
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2($elm$html$Html$Attributes$style, 'top', '0'),
+						A2($elm$html$Html$Attributes$style, 'left', '0'),
 						A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
 						A2(
 						$elm$html$Html$Attributes$style,
@@ -9087,7 +9094,29 @@ var $author$project$Main$view = function (model) {
 						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
 						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
-				A2($author$project$Sprites$objectsToDraw, model.atlas, model.state))
+				A2($author$project$Sprites$objectsToDraw, model.atlas, model.state)),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+								A2($elm$html$Html$Attributes$style, 'margin-top', '10'),
+								A2($elm$html$Html$Attributes$style, 'margin-left', '10')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('FUEL')
+							]))
+					]))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
