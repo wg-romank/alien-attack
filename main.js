@@ -9123,6 +9123,7 @@ var $author$project$Main$view = function (model) {
 										A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 										A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
 										A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+										A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
 										A2($elm$html$Html$Attributes$style, 'bottom', '2%'),
 										A2($elm$html$Html$Attributes$style, 'left', '3%')
 									]),
@@ -9138,8 +9139,9 @@ var $author$project$Main$view = function (model) {
 										A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 										A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
 										A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-										A2($elm$html$Html$Attributes$style, 'bottom', '2%'),
-										A2($elm$html$Html$Attributes$style, 'right', '3%')
+										A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+										A2($elm$html$Html$Attributes$style, 'bottom', '6%'),
+										A2($elm$html$Html$Attributes$style, 'left', '3%')
 									]),
 								_List_fromArray(
 									[
