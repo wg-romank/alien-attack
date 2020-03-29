@@ -42,6 +42,8 @@ rollEnemyAction: Random.Generator EnemyAction
 rollEnemyAction = Random.weighted (100, Move) [(0, Attack)]
 
 type alias GameState = {
+        fuel: Int,
+        horizontalSpeed: Float,
         userInput: List PlayerAction,
         bgOffset: Float,
         boardSize: Size,
@@ -60,6 +62,8 @@ spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 |> moveX -13.0 |> moveY -3
 
 initialState: GameState
 initialState = {
+        fuel = 1000,
+        horizontalSpeed = 0,
         userInput = [],
         bgOffset = 10000,
         boardSize = { width = 160, height = 240 },
@@ -89,13 +93,18 @@ playerMove to state =
                         ( clamp ( 2.0 * (height - playerHeight) / 3.0 ) (height - playerHeight) p.y )
             |> \q -> { state| playerPosition = moveTo state.playerPosition q }
 
-playerMoveHorizontal: Float -> GameState -> GameState
+-- positonFromSpeed: Vec2 -> Float -> Float -> Vec2
+-- positonFromSpeed previousPos speed delta =
+--     let
+
+
+playerMoveHorizontal: Int -> GameState -> GameState
 playerMoveHorizontal value state =
     let
         previousPosition = state.playerPosition.pos
-        newPlayerPosition = Vec2.add previousPosition (vec2 value 0)
+        newPlayerPosition = Vec2.add previousPosition (vec2 (value |> toFloat) 0)
     in
-        playerMove newPlayerPosition state
+        playerMove newPlayerPosition { state | fuel = state.fuel - value }
     
 
 
