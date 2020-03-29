@@ -192,7 +192,7 @@ registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
 
 updateTimeSinceSpawned: Float -> Position -> Position
-updateTimeSinceSpawned delta pos = { pos | sinceSpawned = pos.sinceSpawned + delta / 1000.0 }
+updateTimeSinceSpawned delta pos = { pos | sinceSpawned = pos.sinceSpawned + delta }
 
 updateTimesSinceSpawned: Float -> GameState -> GameState
 updateTimesSinceSpawned delta state = {
