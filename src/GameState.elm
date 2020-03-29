@@ -7,22 +7,11 @@ type alias Position = {
         pos: Vec2,
         width: Float,
         height: Float,
-        frameId: Int,
-        frameSwitch: Int,
-        lastRender: Float
+        sinceSpawned: Float
     }
 
-newPosition: Vec2 -> Float -> Float -> Int -> Position
-newPosition pos width height frameSwitch = { pos = pos, width = width, height = height, frameId = 0, frameSwitch = frameSwitch, lastRender = 0.0 }
-
-positionNewRender: Float -> Position -> Position
-positionNewRender delta pos =
-    let
-        newDelta = pos.lastRender + delta
-        switchFrame = round newDelta >= pos.frameSwitch
-        frameId = if switchFrame then (pos.frameId + 1) |> modBy 2 else pos.frameId
-    in 
-        { pos | lastRender = if switchFrame then 0 else newDelta, frameId = frameId }
+newPosition: Vec2 -> Float -> Float -> Position
+newPosition pos width height = { pos = pos, width = width, height = height, sinceSpawned = 0.0 }
 
 moveX: Float -> Position -> Position
 moveX amount p = { p | pos = Vec2.sub p.pos (vec2 amount 0.0) }
@@ -64,18 +53,18 @@ type alias GameState = {
     }
 
 spawnRound: Position -> Position
-spawnRound player = newPosition player.pos 2.0 4.0 1000 |> moveX -7.0
+spawnRound player = newPosition player.pos 2.0 4.0 |> moveX -7.0
 
 spawnEnemyRound: Position -> Position
-spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 1000 |> moveX -13.0 |> moveY -32.0
+spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 |> moveX -13.0 |> moveY -32.0
 
 initialState: GameState
 initialState = {
         userInput = [],
         bgOffset = 0,
         boardSize = { width = 160, height = 240 },
-        playerPosition = newPosition (vec2 72 222) 16.0 16.0 1000,
-        enemies = [ newPosition (vec2 56 24) 32.0 32.0 1000 ],
+        playerPosition = newPosition (vec2 72 222) 16.0 16.0,
+        enemies = [ newPosition (vec2 56 24) 32.0 32.0 ],
         rounds = [],
         enemyRounds = [],
         enemyRoll = []
@@ -202,12 +191,15 @@ moveEnemyRounds delta state = {
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
 
-updateRenderTimes: Float -> GameState -> GameState
-updateRenderTimes delta state = {
+updateTimeSinceSpawned: Float -> Position -> Position
+updateTimeSinceSpawned delta pos = { pos | sinceSpawned = pos.sinceSpawned + delta / 1000.0 }
+
+updateTimesSinceSpawned: Float -> GameState -> GameState
+updateTimesSinceSpawned delta state = {
         state |
-            playerPosition = positionNewRender delta state.playerPosition,
-            enemies = List.map (positionNewRender delta) state.enemies,
-            rounds = List.map (positionNewRender delta) state.rounds
+            playerPosition = updateTimeSinceSpawned delta state.playerPosition,
+            enemies = List.map (updateTimeSinceSpawned delta) state.enemies,
+            rounds = List.map (updateTimeSinceSpawned delta) state.rounds
     }
 
 -- enemySpawn: GameState -> GameState
@@ -225,7 +217,7 @@ step timeDelta state =
             |> moveRounds timeDelta
             |> performEnemiesActions timeDelta
             |> moveEnemyRounds timeDelta
-            |> updateRenderTimes timeDelta
+            |> updateTimesSinceSpawned timeDelta
             |> moveBackground timeDelta
 
             -- TODO: enemy spawn

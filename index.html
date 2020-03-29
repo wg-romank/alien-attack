@@ -6997,9 +6997,9 @@ var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
-var $author$project$GameState$newPosition = F4(
-	function (pos, width, height, frameSwitch) {
-		return {frameId: 0, frameSwitch: frameSwitch, height: height, lastRender: 0.0, pos: pos, width: width};
+var $author$project$GameState$newPosition = F3(
+	function (pos, width, height) {
+		return {height: height, pos: pos, sinceSpawned: 0.0, width: width};
 	});
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
@@ -7007,21 +7007,19 @@ var $author$project$GameState$initialState = {
 	boardSize: {height: 240, width: 160},
 	enemies: _List_fromArray(
 		[
-			A4(
+			A3(
 			$author$project$GameState$newPosition,
 			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
 			32.0,
-			32.0,
-			1000)
+			32.0)
 		]),
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
-	playerPosition: A4(
+	playerPosition: A3(
 		$author$project$GameState$newPosition,
 		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222),
 		16.0,
-		16.0,
-		1000),
+		16.0),
 	rounds: _List_Nil,
 	userInput: _List_Nil
 };
@@ -8051,7 +8049,7 @@ var $author$project$GameState$spawnEnemyRound = function (enemy) {
 		A2(
 			$author$project$GameState$moveX,
 			-13.0,
-			A4($author$project$GameState$newPosition, enemy.pos, 4.0, 4.0, 1000)));
+			A3($author$project$GameState$newPosition, enemy.pos, 4.0, 4.0)));
 };
 var $author$project$GameState$enemyAttack = F2(
 	function (enemy, state) {
@@ -8103,7 +8101,7 @@ var $author$project$GameState$spawnRound = function (player) {
 	return A2(
 		$author$project$GameState$moveX,
 		-7.0,
-		A4($author$project$GameState$newPosition, player.pos, 2.0, 4.0, 1000));
+		A3($author$project$GameState$newPosition, player.pos, 2.0, 4.0));
 };
 var $author$project$GameState$playerFire = function (state) {
 	return _Utils_update(
@@ -8190,35 +8188,25 @@ var $author$project$GameState$performPlayerAction = F2(
 			return state;
 		}
 	});
-var $elm$core$Basics$ge = _Utils_ge;
-var $elm$core$Basics$modBy = _Basics_modBy;
-var $author$project$GameState$positionNewRender = F2(
+var $author$project$GameState$updateTimeSinceSpawned = F2(
 	function (delta, pos) {
-		var newDelta = pos.lastRender + delta;
-		var switchFrame = _Utils_cmp(
-			$elm$core$Basics$round(newDelta),
-			pos.frameSwitch) > -1;
-		var frameId = switchFrame ? A2($elm$core$Basics$modBy, 2, pos.frameId + 1) : pos.frameId;
 		return _Utils_update(
 			pos,
-			{
-				frameId: frameId,
-				lastRender: switchFrame ? 0 : newDelta
-			});
+			{sinceSpawned: pos.sinceSpawned + (delta / 1000.0)});
 	});
-var $author$project$GameState$updateRenderTimes = F2(
+var $author$project$GameState$updateTimesSinceSpawned = F2(
 	function (delta, state) {
 		return _Utils_update(
 			state,
 			{
 				enemies: A2(
 					$elm$core$List$map,
-					$author$project$GameState$positionNewRender(delta),
+					$author$project$GameState$updateTimeSinceSpawned(delta),
 					state.enemies),
-				playerPosition: A2($author$project$GameState$positionNewRender, delta, state.playerPosition),
+				playerPosition: A2($author$project$GameState$updateTimeSinceSpawned, delta, state.playerPosition),
 				rounds: A2(
 					$elm$core$List$map,
-					$author$project$GameState$positionNewRender(delta),
+					$author$project$GameState$updateTimeSinceSpawned(delta),
 					state.rounds)
 			});
 	});
@@ -8228,7 +8216,7 @@ var $author$project$GameState$step = F2(
 			$author$project$GameState$moveBackground,
 			timeDelta,
 			A2(
-				$author$project$GameState$updateRenderTimes,
+				$author$project$GameState$updateTimesSinceSpawned,
 				timeDelta,
 				A2(
 					$author$project$GameState$moveEnemyRounds,
@@ -8781,12 +8769,17 @@ var $elm$core$List$concatMap = F2(
 		return $elm$core$List$concat(
 			A2($elm$core$List$map, f, list));
 	});
+var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Sprites$enemySprite = F2(
 	function (atlas, state) {
+		var frameSwitch = 2;
 		return A2(
 			$elm$core$List$concatMap,
 			function (enemy) {
-				var textureKey = (!enemy.frameId) ? $author$project$Atlas$Enemy1 : $author$project$Atlas$Enemy2;
+				var textureKey = (!A2(
+					$elm$core$Basics$modBy,
+					frameSwitch,
+					$elm$core$Basics$round(enemy.sinceSpawned))) ? $author$project$Atlas$Enemy1 : $author$project$Atlas$Enemy2;
 				var maybeTexture = A2($author$project$Atlas$get, atlas, textureKey);
 				if (maybeTexture.$ === 'Just') {
 					var t = maybeTexture.a;
