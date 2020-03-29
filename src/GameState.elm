@@ -63,7 +63,7 @@ spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 |> moveX -13.0 |> moveY -3
 
 initialState: GameState
 initialState = {
-        fuel = 1000,
+        fuel = 10,
         course = 0,
         horizontalSpeed = 0,
         userInput = [],
@@ -98,7 +98,12 @@ playerMove to state =
 
 playerAdjustCourse: Float -> GameState -> GameState
 playerAdjustCourse value state =
-    { state | fuel = state.fuel - abs value, course = state.course + value  }
+    let
+        budget = abs value
+    in
+    if state.fuel >= budget then
+    { state | fuel = state.fuel - budget, course = state.course + value  }
+    else state
     
 
 performPlayerAction: List PlayerAction -> GameState -> GameState

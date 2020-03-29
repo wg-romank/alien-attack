@@ -7018,7 +7018,7 @@ var $author$project$GameState$initialState = {
 		]),
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
-	fuel: 1000,
+	fuel: 10,
 	horizontalSpeed: 0,
 	playerPosition: A3(
 		$author$project$GameState$newPosition,
@@ -8127,14 +8127,13 @@ var $author$project$GameState$performEnemiesActions = F2(
 			state,
 			enemiesWithActions);
 	});
+var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$GameState$playerAdjustCourse = F2(
 	function (value, state) {
-		return _Utils_update(
+		var budget = $elm$core$Basics$abs(value);
+		return (_Utils_cmp(state.fuel, budget) > -1) ? _Utils_update(
 			state,
-			{
-				course: state.course + value,
-				fuel: state.fuel - $elm$core$Basics$abs(value)
-			});
+			{course: state.course + value, fuel: state.fuel - budget}) : state;
 	});
 var $author$project$GameState$spawnRound = function (player) {
 	return A2(
