@@ -1,4 +1,4 @@
-module Graphics exposing (drawRectangle, Rectangle, RectDisplay(..))
+module Shaders exposing (drawRectangle, Rectangle, RectDisplay(..))
 
 import Math.Vector4 exposing (Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)

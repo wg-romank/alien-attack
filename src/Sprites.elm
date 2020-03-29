@@ -7,7 +7,7 @@ import Maybe.Extra as ME
 
 import Atlas exposing (..)
 import GameState exposing (GameState, widthFloat, heightFloat)
-import Graphics exposing (Rectangle, RectDisplay(..), drawRectangle)
+import Shaders exposing (Rectangle, RectDisplay(..), drawRectangle)
 
 roundPos: Vec2 -> Vec2
 roundPos pos =
