@@ -61,7 +61,7 @@ spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 |> moveX -13.0 |> moveY -3
 initialState: GameState
 initialState = {
         userInput = [],
-        bgOffset = 0,
+        bgOffset = 10000,
         boardSize = { width = 160, height = 240 },
         playerPosition = newPosition (vec2 72 222) 16.0 16.0,
         enemies = [ newPosition (vec2 56 24) 32.0 32.0 ],

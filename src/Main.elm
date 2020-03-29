@@ -20,6 +20,7 @@ import Atlas exposing (..)
 
 type alias Model = {
     paused: Bool,
+    offset: Int,
     viewportHeight: Int,
     viewportWidth: Int,
     viewportMultiplier: Float,
@@ -32,6 +33,7 @@ type alias Model = {
 init: () -> (Model, Cmd Msg)
 init _ = ( {
     paused = False,
+    offset = 0,
     viewportWidth = 0,
     viewportHeight = 0,
     viewportMultiplier = 1,
@@ -100,9 +102,9 @@ view model =
             width model.state.boardSize.width,
             height model.state.boardSize.height,
             -- style "image-rendering" "-webkit-optimize-contrast",
-            style "position" "absolute",
+            -- style "position" "absolute",
             style "top" "0",
-            style "left" "0",
+            style "left" ((String.fromInt model.offset) ++ "px"),
             style "image-rendering" "crisp-edges",
           --   style "width" (String.fromInt model.viewportWidth ++ "px"),
             style "height" (String.fromInt model.viewportHeight ++ "px"),
@@ -112,16 +114,29 @@ view model =
             (objectsToDraw model.atlas model.state),
           -- text <| Debug.toString model
           div [
-              style "position" "absolute"
+              style "position" "absolute",
+              style "top" "0",
+              style "left" (String.fromInt model.offset ++ "px"),
+              style "height" (String.fromInt model.viewportHeight ++ "px")
           ] [
             p
               [
+                style "position" "absolute",
                 style "color" "#FFFFFF",
                 style "font-family" "pixelated",
-                style "margin-top" "10",
-                style "margin-left" "10"
+                style "bottom" "10px",
+                style "left" "10px"
               ]
-              [ text "FUEL" ]
+              [ text "FUEL" ],
+            p
+              [
+                style "position" "absolute",
+                style "color" "#FFFFFF",
+                style "font-family" "pixelated",
+                style "bottom" "10px",
+                style "left" (String.fromInt (model.viewportWidth - 60) ++ "px")
+              ]
+              [ text "COURSE" ]
             ]
         ]
 
@@ -133,8 +148,10 @@ computeViewportSize viewport model =
         vpm = viewport.viewport.height / (toFloat model.state.boardSize.height)
         ratio = (toFloat model.state.boardSize.height) / (toFloat model.state.boardSize.width)
         vpw = vph / ratio
+        offset = (viewport.viewport.width - vpw) / 2.0 |> round
     in 
     {model |
+        offset = offset,
         viewportWidth = Basics.round vpw,
         viewportHeight = Basics.round vph,
         viewportMultiplier = vpm }
