@@ -6995,7 +6995,7 @@ var $elm$core$Task$attempt = F2(
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $author$project$Sprites$emptyAtlas = $elm$core$Dict$empty;
+var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
 var $author$project$GameState$newPosition = F4(
 	function (pos, width, height, frameSwitch) {
@@ -7025,13 +7025,13 @@ var $author$project$GameState$initialState = {
 	rounds: _List_Nil,
 	userInput: _List_Nil
 };
-var $author$project$Sprites$BackgroundPlanet = {$: 'BackgroundPlanet'};
-var $author$project$Sprites$BackgroundStars = {$: 'BackgroundStars'};
-var $author$project$Sprites$Enemy1 = {$: 'Enemy1'};
-var $author$project$Sprites$Enemy2 = {$: 'Enemy2'};
-var $author$project$Sprites$User1 = {$: 'User1'};
-var $author$project$Sprites$User2 = {$: 'User2'};
-var $author$project$Sprites$User3 = {$: 'User3'};
+var $author$project$Atlas$BackgroundPlanet = {$: 'BackgroundPlanet'};
+var $author$project$Atlas$BackgroundStars = {$: 'BackgroundStars'};
+var $author$project$Atlas$Enemy1 = {$: 'Enemy1'};
+var $author$project$Atlas$Enemy2 = {$: 'Enemy2'};
+var $author$project$Atlas$User1 = {$: 'User1'};
+var $author$project$Atlas$User2 = {$: 'User2'};
+var $author$project$Atlas$User3 = {$: 'User3'};
 var $elm$core$Dict$Black = {$: 'Black'};
 var $elm$core$Dict$RBNode_elm_builtin = F5(
 	function (a, b, c, d, e) {
@@ -7153,7 +7153,7 @@ var $elm$core$Dict$fromList = function (assocs) {
 		$elm$core$Dict$empty,
 		assocs);
 };
-var $author$project$Sprites$gameObjectTypeToInt = function (typ) {
+var $author$project$Atlas$gameObjectTypeToInt = function (typ) {
 	switch (typ.$) {
 		case 'User1':
 			return 1;
@@ -7205,7 +7205,7 @@ var $elm_explorations$webgl$WebGL$Texture$Resize = function (a) {
 var $elm_explorations$webgl$WebGL$Texture$linear = $elm_explorations$webgl$WebGL$Texture$Resize(9729);
 var $elm_explorations$webgl$WebGL$Texture$nearest = $elm_explorations$webgl$WebGL$Texture$Resize(9728);
 var $elm_explorations$webgl$WebGL$Texture$nonPowerOfTwoOptions = {flipY: true, horizontalWrap: $elm_explorations$webgl$WebGL$Texture$clampToEdge, magnify: $elm_explorations$webgl$WebGL$Texture$linear, minify: $elm_explorations$webgl$WebGL$Texture$nearest, verticalWrap: $elm_explorations$webgl$WebGL$Texture$clampToEdge};
-var $author$project$Sprites$loadAtlas = A2(
+var $author$project$Atlas$loadAtlas = A2(
 	$elm$core$Task$map,
 	$elm$core$Dict$fromList,
 	$elm$core$Task$sequence(
@@ -7218,28 +7218,28 @@ var $author$project$Sprites$loadAtlas = A2(
 					$elm$core$Task$map,
 					function (tex) {
 						return _Utils_Tuple2(
-							$author$project$Sprites$gameObjectTypeToInt(typ),
+							$author$project$Atlas$gameObjectTypeToInt(typ),
 							tex);
 					},
 					A2($elm_explorations$webgl$WebGL$Texture$loadWith, $elm_explorations$webgl$WebGL$Texture$nonPowerOfTwoOptions, url));
 			},
 			_List_fromArray(
 				[
-					_Utils_Tuple2($author$project$Sprites$Enemy1, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
-					_Utils_Tuple2($author$project$Sprites$Enemy2, 'https://wg-romank.github.io/alien-attack/assets/Octo-2.png'),
-					_Utils_Tuple2($author$project$Sprites$User1, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png'),
-					_Utils_Tuple2($author$project$Sprites$User2, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png'),
-					_Utils_Tuple2($author$project$Sprites$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png'),
-					_Utils_Tuple2($author$project$Sprites$BackgroundPlanet, 'https://wg-romank.github.io/alien-attack/assets/bg_planet.png'),
-					_Utils_Tuple2($author$project$Sprites$BackgroundStars, 'https://wg-romank.github.io/alien-attack/assets/bg_stars.png')
+					_Utils_Tuple2($author$project$Atlas$Enemy1, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
+					_Utils_Tuple2($author$project$Atlas$Enemy2, 'https://wg-romank.github.io/alien-attack/assets/Octo-2.png'),
+					_Utils_Tuple2($author$project$Atlas$User1, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png'),
+					_Utils_Tuple2($author$project$Atlas$User2, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png'),
+					_Utils_Tuple2($author$project$Atlas$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png'),
+					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, 'https://wg-romank.github.io/alien-attack/assets/bg_planet.png'),
+					_Utils_Tuple2($author$project$Atlas$BackgroundStars, 'https://wg-romank.github.io/alien-attack/assets/bg_stars.png')
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{atlas: $author$project$Sprites$emptyAtlas, message: '', state: $author$project$GameState$initialState, viewportHeight: 0, viewportMultiplier: 1, viewportWidth: 0},
+		{atlas: $author$project$Atlas$emptyAtlas, message: '', state: $author$project$GameState$initialState, viewportHeight: 0, viewportMultiplier: 1, viewportWidth: 0},
 		$elm$core$Platform$Cmd$batch(
 			_List_fromArray(
 				[
-					A2($elm$core$Task$attempt, $author$project$Main$AtlasLoaded, $author$project$Sprites$loadAtlas),
+					A2($elm$core$Task$attempt, $author$project$Main$AtlasLoaded, $author$project$Atlas$loadAtlas),
 					A2($elm$core$Task$perform, $author$project$Main$ViewPortLoaded, $elm$browser$Browser$Dom$getViewport)
 				])));
 };
@@ -8360,8 +8360,6 @@ var $elm_explorations$webgl$WebGL$Internal$Alpha = function (a) {
 	return {$: 'Alpha', a: a};
 };
 var $elm_explorations$webgl$WebGL$alpha = $elm_explorations$webgl$WebGL$Internal$Alpha;
-var $elm_explorations$webgl$WebGL$Internal$Antialias = {$: 'Antialias'};
-var $elm_explorations$webgl$WebGL$antialias = $elm_explorations$webgl$WebGL$Internal$Antialias;
 var $elm_explorations$webgl$WebGL$Internal$Depth = function (a) {
 	return {$: 'Depth', a: a};
 };
@@ -8421,6 +8419,11 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
+var $author$project$Atlas$get = F2(
+	function (atlas, objTyp) {
+		var objKey = $author$project$Atlas$gameObjectTypeToInt(objTyp);
+		return A2($elm$core$Dict$get, objKey, atlas);
+	});
 var $author$project$Sprites$roundPos = function (pos) {
 	return A2(
 		$elm_explorations$linear_algebra$Math$Vector2$vec2,
@@ -8446,8 +8449,6 @@ var $author$project$Sprites$backgroundSprite = F2(
 		var yScroll = h - ((3 * state.bgOffset) / 1000.0);
 		var pos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll);
 		var skyPos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, h + yScroll);
-		var bgStars = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$BackgroundStars);
-		var bgPlanet = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$BackgroundPlanet);
 		return $elm$core$List$concat(
 			_List_fromArray(
 				[
@@ -8477,7 +8478,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 						};
 					},
 					$elm_community$maybe_extra$Maybe$Extra$toList(
-						A2($elm$core$Dict$get, bgStars, atlas))),
+						A2($author$project$Atlas$get, atlas, $author$project$Atlas$BackgroundStars))),
 					A2(
 					$elm$core$List$map,
 					function (t) {
@@ -8491,7 +8492,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 						};
 					},
 					$elm_community$maybe_extra$Maybe$Extra$toList(
-						A2($elm$core$Dict$get, bgPlanet, atlas))),
+						A2($author$project$Atlas$get, atlas, $author$project$Atlas$BackgroundPlanet))),
 					_List_fromArray(
 					[
 						{
@@ -8782,13 +8783,11 @@ var $elm$core$List$concatMap = F2(
 	});
 var $author$project$Sprites$enemySprite = F2(
 	function (atlas, state) {
-		var enemyTexture2 = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$Enemy2);
-		var enemyTexture1 = $author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$Enemy1);
 		return A2(
 			$elm$core$List$concatMap,
 			function (enemy) {
-				var textureKey = (!enemy.frameId) ? enemyTexture1 : enemyTexture2;
-				var maybeTexture = A2($elm$core$Dict$get, textureKey, atlas);
+				var textureKey = (!enemy.frameId) ? $author$project$Atlas$Enemy1 : $author$project$Atlas$Enemy2;
+				var maybeTexture = A2($author$project$Atlas$get, atlas, textureKey);
 				if (maybeTexture.$ === 'Just') {
 					var t = maybeTexture.a;
 					return _List_fromArray(
@@ -8811,10 +8810,7 @@ var $author$project$Sprites$enemySprite = F2(
 var $author$project$Sprites$playerSprite = F2(
 	function (atlas, state) {
 		var userTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
-			A2(
-				$elm$core$Dict$get,
-				$author$project$Sprites$gameObjectTypeToInt($author$project$Sprites$User1),
-				atlas));
+			A2($author$project$Atlas$get, atlas, $author$project$Atlas$User1));
 		return A2(
 			$elm$core$List$map,
 			function (texture) {
@@ -9043,8 +9039,7 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[
 						$elm_explorations$webgl$WebGL$alpha(true),
-						$elm_explorations$webgl$WebGL$depth(1),
-						$elm_explorations$webgl$WebGL$antialias
+						$elm_explorations$webgl$WebGL$depth(1)
 					]),
 				_List_fromArray(
 					[

@@ -17,6 +17,7 @@ import Json.Decode as Decode
 import Graphics exposing (RectDisplay(..))
 import GameState exposing (..)
 import Sprites exposing (..)
+import Atlas exposing (..)
 
 type alias Model = {
     viewportHeight: Int,
