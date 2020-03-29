@@ -8,4 +8,4 @@
 - [ ] Music
 - [ ] Taptic feedback
 - [ ] Layout that does not suck
-- [ ] Scrolling background ?
+- [x] Scrolling background ?
