@@ -19,6 +19,7 @@ import Sprites exposing (..)
 import Atlas exposing (..)
 
 type alias Model = {
+    paused: Bool,
     viewportHeight: Int,
     viewportWidth: Int,
     viewportMultiplier: Float,
@@ -30,6 +31,7 @@ type alias Model = {
 
 init: () -> (Model, Cmd Msg)
 init _ = ( {
+    paused = False,
     viewportWidth = 0,
     viewportHeight = 0,
     viewportMultiplier = 1,
@@ -50,6 +52,8 @@ type Msg
     | Delta Float
     | AtlasLoaded (Result Error Atlas)
     | ViewPortLoaded (Viewport)
+    | Pause
+    | Resume
     | Left
     | Right
     | Fire
@@ -123,6 +127,8 @@ computeViewportSize viewport model =
 update: Msg -> Model -> (Model, Cmd Msg)
 update event model =
     case event of
+        Pause -> ({ model | paused = True }, Cmd.none)
+        Resume -> ({ model | paused = False}, Cmd.none)
         -- Start (x, y) -> ({ model | from = vec2 x y }, Cmd.none)
         Move (x, y) -> let vm = model.viewportMultiplier in
             ({ model | state = registerUserInput (PlayerMove(x / vm, y / vm)) model.state }, Cmd.none)
@@ -153,8 +159,15 @@ update event model =
 main: Program() Model Msg
 main = Browser.element {
        init = init,
-       subscriptions = \_ -> Sub.batch [ onAnimationFrameDelta Delta,
-              onKeyDown keyDecoder],
+       subscriptions = \model ->
+        Sub.batch [
+          if model.paused then Sub.none else onAnimationFrameDelta Delta,
+          onKeyDown keyDecoder,
+          Browser.Events.onVisibilityChange (\v ->
+            case v of
+              Browser.Events.Hidden -> Pause
+              Browser.Events.Visible -> Resume)
+          ],
        view = view,
        update = update
     }
