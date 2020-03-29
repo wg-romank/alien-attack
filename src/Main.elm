@@ -131,6 +131,7 @@ view model =
                 style "position" "absolute",
                 style "color" "#FFFFFF",
                 style "font-family" "pixelated",
+                style "font-size" "48px",
                 style "bottom" "2%",
                 style "left" "3%"
               ]
@@ -140,6 +141,7 @@ view model =
                 style "position" "absolute",
                 style "color" "#FFFFFF",
                 style "font-family" "pixelated",
+                style "font-size" "48px",
                 style "bottom" "2%",
                 style "right" "3%"
               ]
