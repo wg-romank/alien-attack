@@ -1,10 +1,10 @@
 all: build run
 
 build:
-	elm make src/Main.elm --output=main.js
+	elm make src/Main.elm
 
 opt:
-	elm make src/Main.elm --optimize --output=main.js
+	elm make src/Main.elm --optimize
 
 run:
 	firefox ${PWD}/index.html

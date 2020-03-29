@@ -42,7 +42,8 @@ rollEnemyAction: Random.Generator EnemyAction
 rollEnemyAction = Random.weighted (100, Move) [(0, Attack)]
 
 type alias GameState = {
-        fuel: Int,
+        fuel: Float,
+        course: Float,
         horizontalSpeed: Float,
         userInput: List PlayerAction,
         bgOffset: Float,
@@ -63,6 +64,7 @@ spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 |> moveX -13.0 |> moveY -3
 initialState: GameState
 initialState = {
         fuel = 1000,
+        course = 0,
         horizontalSpeed = 0,
         userInput = [],
         bgOffset = 10000,
@@ -93,20 +95,11 @@ playerMove to state =
                         ( clamp ( 2.0 * (height - playerHeight) / 3.0 ) (height - playerHeight) p.y )
             |> \q -> { state| playerPosition = moveTo state.playerPosition q }
 
--- positonFromSpeed: Vec2 -> Float -> Float -> Vec2
--- positonFromSpeed previousPos speed delta =
---     let
 
-
-playerMoveHorizontal: Int -> GameState -> GameState
-playerMoveHorizontal value state =
-    let
-        previousPosition = state.playerPosition.pos
-        newPlayerPosition = Vec2.add previousPosition (vec2 (value |> toFloat) 0)
-    in
-        playerMove newPlayerPosition { state | fuel = state.fuel - value }
+playerAdjustCourse: Float -> GameState -> GameState
+playerAdjustCourse value state =
+    { state | fuel = state.fuel - abs value, course = state.course + value  }
     
-
 
 performPlayerAction: List PlayerAction -> GameState -> GameState
 performPlayerAction action state =
@@ -116,10 +109,18 @@ performPlayerAction action state =
             case f of
                 -- TODO: move with constant speed on touch
                 PlayerMove (x, y) -> playerMove (vec2 x y)
-                PlayerMoveLeft -> playerMoveHorizontal -10
-                PlayerMoveRight -> playerMoveHorizontal 10
+                PlayerMoveLeft -> playerAdjustCourse -10
+                PlayerMoveRight -> playerAdjustCourse 10
                 PlayerFire -> playerFire
         [] -> state
+
+playerMoveFromCourse: Float -> GameState -> GameState
+playerMoveFromCourse delta state =
+    let
+        previousPosition = state.playerPosition
+        nPos = Vec2.add previousPosition.pos (vec2 (state.course * delta / 1000) 0) 
+    in
+        { state | playerPosition = { previousPosition | pos = nPos } }
 
 
 modFloat: Float -> Float -> Float -> Float
@@ -229,6 +230,7 @@ step timeDelta state =
             |> moveEnemyRounds timeDelta
             |> updateTimesSinceSpawned timeDelta
             |> moveBackground timeDelta
+            |> playerMoveFromCourse timeDelta
 
             -- TODO: enemy spawn
             -- let enemySpawn = List.map

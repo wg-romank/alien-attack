@@ -6949,7 +6949,7 @@ var $elm$core$Task$perform = F2(
 			$elm$core$Task$Perform(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
-var $elm$browser$Browser$document = _Browser_document;
+var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$AtlasLoaded = function (a) {
 	return {$: 'AtlasLoaded', a: a};
 };
@@ -8499,20 +8499,6 @@ var $author$project$Sprites$backgroundSprite = F2(
 					},
 					$elm_community$maybe_extra$Maybe$Extra$toList(
 						A2($author$project$Atlas$get, atlas, $author$project$Atlas$BackgroundStars))),
-					A2(
-					$elm$core$List$map,
-					function (t) {
-						return {
-							display: $author$project$Shaders$RectTexture(t),
-							far: 0.8,
-							height: 69.0,
-							near: 0.7,
-							pos: $author$project$Sprites$roundPos(pos),
-							width: w
-						};
-					},
-					$elm_community$maybe_extra$Maybe$Extra$toList(
-						A2($author$project$Atlas$get, atlas, $author$project$Atlas$BackgroundPlanet))),
 					_List_fromArray(
 					[
 						{
@@ -9053,107 +9039,101 @@ var $elm$html$Html$Attributes$width = function (n) {
 		$elm$core$String$fromInt(n));
 };
 var $author$project$Main$view = function (model) {
-	return {
-		body: _List_fromArray(
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
 			[
+				$elm$html$Html$Attributes$align('center'),
+				A2($elm$html$Html$Attributes$style, 'position', 'relative')
+			]),
+		_List_fromArray(
+			[
+				A3(
+				$elm_explorations$webgl$WebGL$toHtmlWith,
+				_List_fromArray(
+					[
+						$elm_explorations$webgl$WebGL$alpha(true),
+						$elm_explorations$webgl$WebGL$depth(1)
+					]),
+				_List_fromArray(
+					[
+						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart(
+						A2($elm$core$Basics$composeL, $author$project$Main$Start, $author$project$Main$touchCoordinates)),
+						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove(
+						A2($elm$core$Basics$composeL, $author$project$Main$Move, $author$project$Main$touchCoordinates)),
+						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd(
+						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
+						$elm$html$Html$Attributes$width(model.state.boardSize.width),
+						$elm$html$Html$Attributes$height(model.state.boardSize.height),
+						A2($elm$html$Html$Attributes$style, 'top', '0'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'left',
+						$elm$core$String$fromInt(model.offset) + 'px'),
+						A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
+						A2($elm$html$Html$Attributes$style, 'display', 'block')
+					]),
+				A2($author$project$Sprites$objectsToDraw, model.atlas, model.state)),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$align('center'),
-						A2($elm$html$Html$Attributes$style, 'position', 'relative')
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2($elm$html$Html$Attributes$style, 'top', '0'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'left',
+						$elm$core$String$fromInt(model.offset) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromInt(model.viewportWidth) + 'px')
 					]),
 				_List_fromArray(
 					[
-						A3(
-						$elm_explorations$webgl$WebGL$toHtmlWith,
-						_List_fromArray(
-							[
-								$elm_explorations$webgl$WebGL$alpha(true),
-								$elm_explorations$webgl$WebGL$depth(1)
-							]),
-						_List_fromArray(
-							[
-								$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart(
-								A2($elm$core$Basics$composeL, $author$project$Main$Start, $author$project$Main$touchCoordinates)),
-								$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove(
-								A2($elm$core$Basics$composeL, $author$project$Main$Move, $author$project$Main$touchCoordinates)),
-								$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd(
-								A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
-								$elm$html$Html$Attributes$width(model.state.boardSize.width),
-								$elm$html$Html$Attributes$height(model.state.boardSize.height),
-								A2($elm$html$Html$Attributes$style, 'top', '0'),
-								A2(
-								$elm$html$Html$Attributes$style,
-								'left',
-								$elm$core$String$fromInt(model.offset) + 'px'),
-								A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
-								A2(
-								$elm$html$Html$Attributes$style,
-								'height',
-								$elm$core$String$fromInt(model.viewportHeight) + 'px'),
-								A2($elm$html$Html$Attributes$style, 'display', 'block')
-							]),
-						A2($author$project$Sprites$objectsToDraw, model.atlas, model.state)),
 						A2(
-						$elm$html$Html$div,
+						$elm$html$Html$p,
 						_List_fromArray(
 							[
 								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'top', '0'),
-								A2(
-								$elm$html$Html$Attributes$style,
-								'left',
-								$elm$core$String$fromInt(model.offset) + 'px'),
-								A2(
-								$elm$html$Html$Attributes$style,
-								'height',
-								$elm$core$String$fromInt(model.viewportHeight) + 'px'),
-								A2(
-								$elm$html$Html$Attributes$style,
-								'width',
-								$elm$core$String$fromInt(model.viewportWidth) + 'px')
+								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+								A2($elm$html$Html$Attributes$style, 'bottom', '2%'),
+								A2($elm$html$Html$Attributes$style, 'left', '3%')
 							]),
 						_List_fromArray(
 							[
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-										A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-										A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-										A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-										A2($elm$html$Html$Attributes$style, 'bottom', '2%'),
-										A2($elm$html$Html$Attributes$style, 'left', '3%')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text(
-										'FUEL: ' + $elm$core$String$fromInt(model.state.fuel))
-									])),
-								A2(
-								$elm$html$Html$p,
-								_List_fromArray(
-									[
-										A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-										A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-										A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-										A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-										A2($elm$html$Html$Attributes$style, 'bottom', '6%'),
-										A2($elm$html$Html$Attributes$style, 'left', '3%')
-									]),
-								_List_fromArray(
-									[
-										$elm$html$Html$text('COURSE')
-									]))
+								$elm$html$Html$text(
+								'FUEL: ' + $elm$core$String$fromInt(model.state.fuel))
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+								A2($elm$html$Html$Attributes$style, 'bottom', '6%'),
+								A2($elm$html$Html$Attributes$style, 'left', '3%')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('COURSE')
 							]))
 					]))
-			]),
-		title: 'Main'
-	};
+			]));
 };
-var $author$project$Main$main = $elm$browser$Browser$document(
+var $author$project$Main$main = $elm$browser$Browser$element(
 	{
 		init: $author$project$Main$init,
 		subscriptions: function (model) {

@@ -87,15 +87,13 @@ toDirection string =
     other ->
       Other other
 
-type alias Document msg =
-    { title : String
-    , body : List (Html msg)
-    }
-view: Model -> Document Msg
+-- type alias Document msg =
+--     { title : String
+--     , body : List (Html msg)
+--     }
+view: Model -> Html Msg
 view model =
-        {
-          title = "Main",
-        body = [div [
+        div [
             Html.Attributes.align "center",
             style "position" "relative"
         ]
@@ -135,7 +133,7 @@ view model =
                 style "bottom" "2%",
                 style "left" "3%"
               ]
-              [ text ("FUEL: " ++ String.fromInt model.state.fuel) ],
+              [ text ("FUEL: " ++ String.fromFloat model.state.fuel) ],
             p
               [
                 style "position" "absolute",
@@ -145,10 +143,9 @@ view model =
                 style "bottom" "6%",
                 style "left" "3%"
               ]
-              [ text "COURSE" ]
+              [ text ("COURSE: " ++ String.fromFloat model.state.course) ]
             ]
-        ] ]
-        }
+        ]
 
 
 computeViewportSize: Viewport -> Model -> Model
@@ -200,7 +197,7 @@ update event model =
         _ -> (model, Cmd.none)
 
 main: Program() Model Msg
-main = Browser.document {
+main = Browser.element {
        init = init,
        subscriptions = \model ->
         Sub.batch [
