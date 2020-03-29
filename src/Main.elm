@@ -89,11 +89,12 @@ toDirection string =
 
 view: Model -> Html Msg
 view model =
-  if model.atlas |> loaded then simulationScreen model
-  else loadingScreen model
+  if model.atlas |> loaded |> not then loadingScreen model
+  else if isOver model.state then gameOverScreen model
+  else simulationScreen model
 
-loadingScreen: Model -> Html Msg
-loadingScreen model =
+messageScreen: String -> Model -> Html Msg
+messageScreen message model =
   div [
       style "position" "absolute",
       style "backgroundColor" "#000000",
@@ -114,9 +115,15 @@ loadingScreen model =
         style "width" (String.fromInt model.viewportWidth ++ "px")
         -- Html.Attributes.align "center"
       ]
-      [ text "LOADING..." ]
+      [ text message ]
   ]
 
+
+loadingScreen: Model -> Html Msg
+loadingScreen model = messageScreen "LOADING..." model
+
+gameOverScreen: Model -> Html Msg
+gameOverScreen model = messageScreen "GAME OVER" model
 
 -- TODO: fix layout for Browser.Document
 -- type alias Document msg =
@@ -233,7 +240,7 @@ main = Browser.element {
        init = init,
        subscriptions = \model ->
         Sub.batch [
-          if model.paused then Sub.none else onAnimationFrameDelta Delta,
+          if model.paused || isOver model.state then Sub.none else onAnimationFrameDelta Delta,
           onKeyDown keyDecoder,
           Browser.Events.onVisibilityChange (\v ->
             case v of

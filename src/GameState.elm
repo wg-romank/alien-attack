@@ -1,4 +1,4 @@
-module GameState exposing (GameState, Position, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, EnemyAction(..))
+module GameState exposing (GameState, Position, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, EnemyAction(..), isOver)
 
 import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
@@ -75,6 +75,9 @@ initialState = {
         enemyRounds = [],
         enemyRoll = []
     }
+
+isOver: GameState -> Bool
+isOver state = state.bgOffset >= 70 * 1000
 
 playerFire: GameState -> GameState
 playerFire state = { state | rounds = state.rounds ++ [spawnRound state.playerPosition] }

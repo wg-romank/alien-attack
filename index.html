@@ -7246,6 +7246,10 @@ var $author$project$Main$init = function (_v0) {
 					A2($elm$core$Task$perform, $author$project$Main$ViewPortLoaded, $elm$browser$Browser$Dom$getViewport)
 				])));
 };
+var $elm$core$Basics$ge = _Utils_ge;
+var $author$project$GameState$isOver = function (state) {
+	return _Utils_cmp(state.bgOffset, 70 * 1000) > -1;
+};
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Main$Fire = {$: 'Fire'};
@@ -8127,7 +8131,6 @@ var $author$project$GameState$performEnemiesActions = F2(
 			state,
 			enemiesWithActions);
 	});
-var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$GameState$playerAdjustCourse = F2(
 	function (value, state) {
 		var budget = $elm$core$Basics$abs(value);
@@ -8385,16 +8388,6 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $elm$core$Dict$isEmpty = function (dict) {
-	if (dict.$ === 'RBEmpty_elm_builtin') {
-		return true;
-	} else {
-		return false;
-	}
-};
-var $author$project$Atlas$loaded = function (atlas) {
-	return !$elm$core$Dict$isEmpty(atlas);
-};
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
@@ -8410,50 +8403,67 @@ var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$messageScreen = F2(
+	function (message, model) {
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+					A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
+					$elm$html$Html$Attributes$align('center'),
+					A2($elm$html$Html$Attributes$style, 'top', '0'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'left',
+					$elm$core$String$fromInt(model.offset) + 'px'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'height',
+					$elm$core$String$fromInt(model.viewportHeight) + 'px'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'width',
+					$elm$core$String$fromInt(model.viewportWidth) + 'px')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$p,
+					_List_fromArray(
+						[
+							A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+							A2($elm$html$Html$Attributes$style, 'top', '50%'),
+							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+							A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+							A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+							A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+							A2(
+							$elm$html$Html$Attributes$style,
+							'width',
+							$elm$core$String$fromInt(model.viewportWidth) + 'px')
+						]),
+					_List_fromArray(
+						[
+							$elm$html$Html$text(message)
+						]))
+				]));
+	});
+var $author$project$Main$gameOverScreen = function (model) {
+	return A2($author$project$Main$messageScreen, 'GAME OVER', model);
+};
+var $elm$core$Dict$isEmpty = function (dict) {
+	if (dict.$ === 'RBEmpty_elm_builtin') {
+		return true;
+	} else {
+		return false;
+	}
+};
+var $author$project$Atlas$loaded = function (atlas) {
+	return !$elm$core$Dict$isEmpty(atlas);
+};
 var $author$project$Main$loadingScreen = function (model) {
-	return A2(
-		$elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-				A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
-				$elm$html$Html$Attributes$align('center'),
-				A2($elm$html$Html$Attributes$style, 'top', '0'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'left',
-				$elm$core$String$fromInt(model.offset) + 'px'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'height',
-				$elm$core$String$fromInt(model.viewportHeight) + 'px'),
-				A2(
-				$elm$html$Html$Attributes$style,
-				'width',
-				$elm$core$String$fromInt(model.viewportWidth) + 'px')
-			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$p,
-				_List_fromArray(
-					[
-						A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-						A2($elm$html$Html$Attributes$style, 'top', '50%'),
-						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-						A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-						A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-						A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'width',
-						$elm$core$String$fromInt(model.viewportWidth) + 'px')
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('LOADING...')
-					]))
-			]));
+	return A2($author$project$Main$messageScreen, 'LOADING...', model);
 };
 var $author$project$Main$End = function (a) {
 	return {$: 'End', a: a};
@@ -9232,7 +9242,7 @@ var $author$project$Main$simulationScreen = function (model) {
 			]));
 };
 var $author$project$Main$view = function (model) {
-	return $author$project$Atlas$loaded(model.atlas) ? $author$project$Main$simulationScreen(model) : $author$project$Main$loadingScreen(model);
+	return (!$author$project$Atlas$loaded(model.atlas)) ? $author$project$Main$loadingScreen(model) : ($author$project$GameState$isOver(model.state) ? $author$project$Main$gameOverScreen(model) : $author$project$Main$simulationScreen(model));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{
@@ -9241,7 +9251,7 @@ var $author$project$Main$main = $elm$browser$Browser$element(
 			return $elm$core$Platform$Sub$batch(
 				_List_fromArray(
 					[
-						model.paused ? $elm$core$Platform$Sub$none : $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$Delta),
+						(model.paused || $author$project$GameState$isOver(model.state)) ? $elm$core$Platform$Sub$none : $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$Delta),
 						$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder),
 						$elm$browser$Browser$Events$onVisibilityChange(
 						function (v) {
