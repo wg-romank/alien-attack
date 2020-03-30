@@ -8451,7 +8451,7 @@ var $author$project$Main$update = F2(
 						{
 							state: A2(
 								$author$project$GameState$registerUserTap,
-								_Utils_Tuple2(x / vm, y / vm),
+								_Utils_Tuple2((x - model.offset) / vm, y / vm),
 								model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -9296,7 +9296,6 @@ var $author$project$Main$simulationScreen = function (model) {
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$align('center'),
-				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart(
 				A2($elm$core$Basics$composeL, $author$project$Main$Start, $author$project$Main$touchCoordinates)),
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove(
@@ -9317,12 +9316,14 @@ var $author$project$Main$simulationScreen = function (model) {
 					[
 						$elm$html$Html$Attributes$width(model.state.boardSize.width),
 						$elm$html$Html$Attributes$height(model.state.boardSize.height),
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 						A2($elm$html$Html$Attributes$style, 'top', '0'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'left',
 						$elm$core$String$fromInt(model.offset) + 'px'),
 						A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
+						A2($elm$html$Html$Attributes$style, 'image-rendering', 'pixelated'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',

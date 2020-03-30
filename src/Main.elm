@@ -139,7 +139,6 @@ simulationScreen: Model -> Html Msg
 simulationScreen model =
         div [
             Html.Attributes.align "center",
-            style "position" "relative",
             Touch.onStart (Start << touchCoordinates),
             Touch.onMove (Move << touchCoordinates),
             Touch.onEnd (End << touchCoordinates)
@@ -150,10 +149,11 @@ simulationScreen model =
             width model.state.boardSize.width,
             height model.state.boardSize.height,
             -- style "image-rendering" "-webkit-optimize-contrast",
-            -- style "position" "absolute",
+            style "position" "absolute",
             style "top" "0",
             style "left" ((String.fromInt model.offset) ++ "px"),
             style "image-rendering" "crisp-edges",
+            style "image-rendering" "pixelated",
           --   style "width" (String.fromInt model.viewportWidth ++ "px"),
             style "height" (String.fromInt model.viewportHeight ++ "px"),
             -- style "backgroundColor" "#000000",
@@ -226,7 +226,7 @@ update event model =
         End (x, y) ->
           -- ({model | message = "Touch" ++ (String.fromFloat x) ++ (String.fromFloat y)}, Cmd.none)
           let vm = model.viewportMultiplier in
-            ({ model | state = registerUserTap (x /vm , y / vm) model.state }, Cmd.none)
+            ({ model | state = registerUserTap ((x - toFloat model.offset) /vm , y / vm) model.state }, Cmd.none)
         Left -> ({ model | state = registerUserInput PlayerMoveLeft model.state }, Cmd.none)
         Right -> ({ model | state = registerUserInput PlayerMoveRight model.state }, Cmd.none)
         Fire -> ({model | state = registerUserInput PlayerFire model.state }, Cmd.none)
