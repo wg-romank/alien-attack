@@ -261,7 +261,8 @@ main = Browser.element {
        init = init,
        subscriptions = \model ->
         Sub.batch [
-          if model.paused || isOver model.state then Sub.none else onAnimationFrameDelta Delta,
+          if model.paused || isOver model.state || Atlas.loaded model.atlas |> not then
+          Sub.none else onAnimationFrameDelta Delta,
           onKeyDown keyDecoder,
           Browser.Events.onVisibilityChange (\v ->
             case v of
