@@ -122,7 +122,7 @@ playerMoveFromCourse delta state =
         width = widthFloat state.boardSize
         playerDeorbited = Vec2.getX nPos |> (\x -> x < 0 || x > width - state.playerPosition.width)
     in
-        { state | playerPosition = { previousPosition | pos = nPos }, playerDead = playerDeorbited }
+        { state | playerPosition = { previousPosition | pos = nPos }, playerDead = state.playerDead || playerDeorbited }
 
 
 enemyMove: Float -> Position -> GameState -> GameState
@@ -143,7 +143,7 @@ enemyMove delta enemy state =
             List.map (\e -> intersect e state.playerPosition) enemiesMoved
              |> List.filter identity
     in
-        { state | enemies = enemiesMoved, playerDead = enemiesHitPlayer |> List.isEmpty |> not }
+        { state | enemies = enemiesMoved, playerDead = state.playerDead || (enemiesHitPlayer |> List.isEmpty |> not) }
 
 enemyAttack: Position -> GameState -> GameState
 enemyAttack enemy state = { state | enemyRounds = state.enemyRounds ++ [spawnEnemyRound enemy] }
@@ -203,7 +203,7 @@ moveEnemyRounds delta state =
                 else Just (r |> moveY (-delta / 20.0)) ) state.enemyRounds
         playerHitByRound = List.filter (\r -> intersect r state.playerPosition) newRounds |> List.isEmpty |> not
     in
-    { state | enemyRounds = newRounds, playerDead = playerHitByRound }
+    { state | enemyRounds = newRounds, playerDead = state.playerDead || playerHitByRound }
 
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
@@ -270,10 +270,20 @@ inVicinity: Position -> Position -> Bool
 inVicinity a b =
     let
         centerA = Vec2.add a.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
-        centerB = Vec2.add b.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
+        centerB = Vec2.add b.pos (vec2 (b.width / 2.0) (b.height / 2.0) )
     in
         (Vec2.sub centerA centerB |> Vec2.length) <= (max b.height (max a.height (max a.width b.width))) + 2.0
 
+
 intersect: Position -> Position -> Bool
-intersect a b = abs (Vec2.getX a.pos + a.width / 2.0 - Vec2.getX b.pos + b.width / 2.0) <= (max a.width b.width) / 2.0 &&
-        abs (Vec2.getY a.pos + a.height / 2.0 - Vec2.getY b.pos + b.width / 2.0) <= (max a.height b.height) / 2.0
+intersect a b =
+    let
+        centerA = Vec2.add a.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
+        centerB = Vec2.add b.pos (vec2 (b.width / 2.0) (b.height / 2.0) )
+    in
+        Vec2.distanceSquared centerA centerB <=
+            (min (a.width / 2.0) (a.height / 2.0) ) ^ 2 + (min (b.width / 2.0) (b.height / 2.0)) ^ 2
+
+-- intersect: Position -> Position -> Bool
+-- intersect a b = abs (Vec2.getX a.pos + a.width / 2.0 - Vec2.getX b.pos + b.width / 2.0) <= (max a.width b.width) / 2.0 &&
+--         abs (Vec2.getY a.pos + a.height / 2.0 - Vec2.getY b.pos + b.width / 2.0) <= (max a.height b.height) / 2.0
