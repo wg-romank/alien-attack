@@ -92,9 +92,7 @@ backgroundSprite atlas state =
     let
         w = widthFloat state.boardSize
         h = heightFloat state.boardSize
-        -- TODO: should not be linear
-        z = 10000
-        yScroll = h - (3 * z / 1000.0)
+        yScroll = h - (3 * state.bgOffset / 1000.0)
         pos = vec2 0 yScroll
     in
         List.concat

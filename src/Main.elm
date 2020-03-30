@@ -8,6 +8,8 @@ import Html exposing (Html, div, text, p)
 import Html.Attributes exposing (width, height, style)
 import Task
 
+import Math.Vector2 as Vec2 exposing (Vec2)
+
 import Html.Events.Extra.Touch as Touch
 import WebGL
 import WebGL.Texture exposing (Error)
@@ -60,6 +62,7 @@ type Msg
     | Right
     | Fire
     | EnemiesRoll (List EnemyAction)
+    | EnemiesSpawnRoll (List Vec2)
     | Other (String)
 
 touchCoordinates : Touch.Event -> ( Float, Float )
@@ -192,7 +195,7 @@ simulationScreen model =
                 style "top" "1%",
                 style "left" "3%"
               ]
-              [ text ("SCORE: " ++ String.fromInt model.state.score) ]
+              [ text ("SCORE: " ++ String.fromInt (List.length model.state.enemySpawnRoll) ) ]
             ]
         ]
 
@@ -230,13 +233,24 @@ update event model =
             let
               newState = step delta model.state
             in
-              ({ model | state = newState }, Random.generate EnemiesRoll (enemiesRoll newState) )
+              ({ model | state = newState },
+                Cmd.batch [
+                  Random.generate EnemiesRoll (enemiesRoll newState),
+                  Random.generate EnemiesSpawnRoll (enemySpawnRoll newState)
+                ] )
         EnemiesRoll rolls ->
           let
             state = model.state
             newState = { state | enemyRoll = rolls }
           in
             ({ model | state = newState }, Cmd.none)
+
+        EnemiesSpawnRoll spawnRoll ->
+          let
+            state = model.state
+            newState = { state | enemySpawnRoll = spawnRoll }
+          in
+            ({model | state = newState}, Cmd.none)
         AtlasLoaded result ->
             case result of
                 Result.Ok atlas -> ({model | atlas = atlas}, Cmd.none)

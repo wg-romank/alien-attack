@@ -1,4 +1,4 @@
-module GameState exposing (GameState, Position, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, EnemyAction(..), isOver)
+module GameState exposing (GameState, Position, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, enemySpawnRoll, EnemyAction(..), isOver)
 
 import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
@@ -10,8 +10,8 @@ type alias Position = {
         sinceSpawned: Float
     }
 
-newPosition: Vec2 -> Float -> Float -> Position
-newPosition pos width height = { pos = pos, width = width, height = height, sinceSpawned = 0.0 }
+newPosition: Float -> Float -> Vec2 -> Position
+newPosition width height pos = { pos = pos, width = width, height = height, sinceSpawned = 0.0 }
 
 moveX: Float -> Position -> Position
 moveX amount p = { p | pos = Vec2.sub p.pos (vec2 amount 0.0) }
@@ -53,15 +53,17 @@ type alias GameState = {
         playerPosition: Position,
         enemies: List Position,
         rounds: List Position,
+        maxEnemiesToSpawn: Int,
         enemyRounds: List Position,
-        enemyRoll: List (EnemyAction)
+        enemyRoll: List (EnemyAction),
+        enemySpawnRoll: List (Vec2)
     }
 
 spawnRound: Position -> Position
-spawnRound player = newPosition player.pos 2.0 4.0 |> moveX -7.0
+spawnRound player = newPosition 2.0 4.0 player.pos |> moveX -7.0
 
 spawnEnemyRound: Position -> Position
-spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 |> moveX -13.0 |> moveY -32.0
+spawnEnemyRound enemy = newPosition 4.0 4.0 enemy.pos |> moveX -13.0 |> moveY -32.0
 
 initialState: GameState
 initialState = {
@@ -74,11 +76,13 @@ initialState = {
         userInput = [],
         bgOffset = 10000,
         boardSize = { width = 160, height = 240 },
-        playerPosition = newPosition (vec2 72 222) 16.0 16.0,
-        enemies = [ newPosition (vec2 56 24) 32.0 32.0 ],
+        playerPosition = newPosition 16.0 16.0 (vec2 72 222),
+        enemies = [ newPosition 32.0 32.0 (vec2 56 24) ],
+        maxEnemiesToSpawn = 5,
         rounds = [],
         enemyRounds = [],
-        enemyRoll = []
+        enemyRoll = [],
+        enemySpawnRoll = []
     }
 
 isOver: GameState -> Bool
@@ -169,6 +173,15 @@ performEnemiesActions delta state =
 enemiesRoll: GameState -> Random.Generator (List EnemyAction)
 enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
 
+enemySpawnRoll: GameState -> Random.Generator (List Vec2)
+enemySpawnRoll state =
+    let
+        nEnemies = Random.int 1 state.maxEnemiesToSpawn
+        -- TODO: fix hardcoded
+        enemyCoordinates = Random.int 1 (state.boardSize.width - 16) |> Random.map (\v -> vec2 (toFloat v) 24)
+    in
+        nEnemies |> Random.andThen (\len -> Random.list len enemyCoordinates)
+
 
 moveRound: Float -> Position -> GameState -> GameState
 moveRound delta round state =
@@ -209,8 +222,17 @@ updateTimesSinceSpawned delta state = {
             rounds = List.map (updateTimeSinceSpawned delta) state.rounds
     }
 
--- enemySpawn: GameState -> GameState
--- enemySpawn state =
+enemySpawn: GameState -> GameState
+enemySpawn state =
+    -- let 
+    --     spawnedEnemies = List.map (newPosition 32.0 32.0) state.enemySpawnRoll
+    --         |> List.filter
+    --             (\newEnemy -> List.map
+    --                 (\oldEnemy -> intersect newEnemy oldEnemy) state.enemies
+    --              |> List.foldl (||) False )
+    -- in
+    --     { state | enemies = state.enemies ++ spawnedEnemies}
+        { state | enemies = state.enemies ++ List.map (newPosition 32.0 32.0) state.enemySpawnRoll }
 
 
 moveBackground: Float -> GameState -> GameState
@@ -225,8 +247,9 @@ step timeDelta state =
             |> performEnemiesActions timeDelta
             |> moveEnemyRounds timeDelta
             |> updateTimesSinceSpawned timeDelta
-            |> moveBackground timeDelta
+            -- |> moveBackground timeDelta
             |> playerMoveFromCourse timeDelta
+            |> enemySpawn
 
             -- TODO: enemy spawn
             -- let enemySpawn = List.map

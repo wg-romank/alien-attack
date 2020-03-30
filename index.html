@@ -7000,7 +7000,7 @@ var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
 var $author$project$GameState$newPosition = F3(
-	function (pos, width, height) {
+	function (width, height, pos) {
 		return {height: height, pos: pos, sinceSpawned: 0.0, width: width};
 	});
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
@@ -7012,20 +7012,22 @@ var $author$project$GameState$initialState = {
 		[
 			A3(
 			$author$project$GameState$newPosition,
-			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24),
 			32.0,
-			32.0)
+			32.0,
+			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24))
 		]),
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
+	enemySpawnRoll: _List_Nil,
 	fuel: 40,
 	horizontalSpeed: 0,
+	maxEnemiesToSpawn: 5,
 	playerDead: false,
 	playerPosition: A3(
 		$author$project$GameState$newPosition,
-		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222),
 		16.0,
-		16.0),
+		16.0,
+		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222)),
 	playerWon: false,
 	rounds: _List_Nil,
 	score: 0,
@@ -7710,6 +7712,9 @@ var $elm$browser$Browser$Events$onVisibilityChange = function (func) {
 var $author$project$Main$EnemiesRoll = function (a) {
 	return {$: 'EnemiesRoll', a: a};
 };
+var $author$project$Main$EnemiesSpawnRoll = function (a) {
+	return {$: 'EnemiesSpawnRoll', a: a};
+};
 var $author$project$GameState$PlayerFire = {$: 'PlayerFire'};
 var $author$project$GameState$PlayerMoveLeft = {$: 'PlayerMoveLeft'};
 var $author$project$GameState$PlayerMoveRight = {$: 'PlayerMoveRight'};
@@ -7874,6 +7879,66 @@ var $author$project$GameState$enemiesRoll = function (state) {
 		$elm$core$List$length(state.enemies),
 		$author$project$GameState$rollEnemyAction);
 };
+var $elm$random$Random$andThen = F2(
+	function (callback, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed) {
+				var _v1 = genA(seed);
+				var result = _v1.a;
+				var newSeed = _v1.b;
+				var _v2 = callback(result);
+				var genB = _v2.a;
+				return genB(newSeed);
+			});
+	});
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $author$project$GameState$enemySpawnRoll = function (state) {
+	var nEnemies = A2($elm$random$Random$int, 1, state.maxEnemiesToSpawn);
+	var enemyCoordinates = A2(
+		$elm$random$Random$map,
+		function (v) {
+			return A2($elm_explorations$linear_algebra$Math$Vector2$vec2, v, 24);
+		},
+		A2($elm$random$Random$int, 1, state.boardSize.width - 16));
+	return A2(
+		$elm$random$Random$andThen,
+		function (len) {
+			return A2($elm$random$Random$list, len, enemyCoordinates);
+		},
+		nEnemies);
+};
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
 };
@@ -7963,12 +8028,18 @@ var $author$project$GameState$registerUserInput = F2(
 						[action]))
 			});
 	});
-var $author$project$GameState$moveBackground = F2(
-	function (delta, state) {
-		return _Utils_update(
-			state,
-			{bgOffset: state.bgOffset + delta});
-	});
+var $author$project$GameState$enemySpawn = function (state) {
+	return _Utils_update(
+		state,
+		{
+			enemies: _Utils_ap(
+				state.enemies,
+				A2(
+					$elm$core$List$map,
+					A2($author$project$GameState$newPosition, 32.0, 32.0),
+					state.enemySpawnRoll))
+		});
+};
 var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
 var $author$project$GameState$heightFloat = function (size) {
 	return size.height;
@@ -8086,7 +8157,7 @@ var $author$project$GameState$spawnEnemyRound = function (enemy) {
 		A2(
 			$author$project$GameState$moveX,
 			-13.0,
-			A3($author$project$GameState$newPosition, enemy.pos, 4.0, 4.0)));
+			A3($author$project$GameState$newPosition, 4.0, 4.0, enemy.pos)));
 };
 var $author$project$GameState$enemyAttack = F2(
 	function (enemy, state) {
@@ -8177,7 +8248,7 @@ var $author$project$GameState$spawnRound = function (player) {
 	return A2(
 		$author$project$GameState$moveX,
 		-7.0,
-		A3($author$project$GameState$newPosition, player.pos, 2.0, 4.0));
+		A3($author$project$GameState$newPosition, 2.0, 4.0, player.pos));
 };
 var $author$project$GameState$playerFire = function (state) {
 	return _Utils_update(
@@ -8261,11 +8332,9 @@ var $author$project$GameState$updateTimesSinceSpawned = F2(
 	});
 var $author$project$GameState$step = F2(
 	function (timeDelta, state) {
-		return A2(
-			$author$project$GameState$playerMoveFromCourse,
-			timeDelta,
+		return $author$project$GameState$enemySpawn(
 			A2(
-				$author$project$GameState$moveBackground,
+				$author$project$GameState$playerMoveFromCourse,
 				timeDelta,
 				A2(
 					$author$project$GameState$updateTimesSinceSpawned,
@@ -8338,16 +8407,35 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{state: newState}),
-					A2(
-						$elm$random$Random$generate,
-						$author$project$Main$EnemiesRoll,
-						$author$project$GameState$enemiesRoll(newState)));
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								A2(
+								$elm$random$Random$generate,
+								$author$project$Main$EnemiesRoll,
+								$author$project$GameState$enemiesRoll(newState)),
+								A2(
+								$elm$random$Random$generate,
+								$author$project$Main$EnemiesSpawnRoll,
+								$author$project$GameState$enemySpawnRoll(newState))
+							])));
 			case 'EnemiesRoll':
 				var rolls = event.a;
 				var state = model.state;
 				var newState = _Utils_update(
 					state,
 					{enemyRoll: rolls});
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{state: newState}),
+					$elm$core$Platform$Cmd$none);
+			case 'EnemiesSpawnRoll':
+				var spawnRoll = event.a;
+				var state = model.state;
+				var newState = _Utils_update(
+					state,
+					{enemySpawnRoll: spawnRoll});
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8548,10 +8636,9 @@ var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
 var $author$project$Sprites$backgroundSprite = F2(
 	function (atlas, state) {
-		var z = 10000;
 		var w = $author$project$GameState$widthFloat(state.boardSize);
 		var h = $author$project$GameState$heightFloat(state.boardSize);
-		var yScroll = h - ((3 * z) / 1000.0);
+		var yScroll = h - ((3 * state.bgOffset) / 1000.0);
 		var pos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll);
 		return $elm$core$List$concat(
 			_List_fromArray(
@@ -9238,7 +9325,8 @@ var $author$project$Main$simulationScreen = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								'SCORE: ' + $elm$core$String$fromInt(model.state.score))
+								'SCORE: ' + $elm$core$String$fromInt(
+									$elm$core$List$length(model.state.enemySpawnRoll)))
 							]))
 					]))
 			]));
