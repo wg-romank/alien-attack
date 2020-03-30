@@ -8034,17 +8034,29 @@ var $author$project$GameState$registerUserInput = F2(
 						[action]))
 			});
 	});
-var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
-var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
-var $author$project$GameState$intersect = F2(
+var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
+var $elm_explorations$linear_algebra$Math$Vector2$length = _MJS_v2length;
+var $elm_explorations$linear_algebra$Math$Vector2$sub = _MJS_v2sub;
+var $author$project$GameState$inVicinity = F2(
 	function (a, b) {
-		return (_Utils_cmp(
-			$elm$core$Basics$abs(
-				(($elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) + (a.width / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos)) + (b.width / 2.0)),
-			A2($elm$core$Basics$max, a.width, b.width) / 2.0) < 1) && (_Utils_cmp(
-			$elm$core$Basics$abs(
-				(($elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) + (a.height / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos)) + (b.width / 2.0)),
-			A2($elm$core$Basics$max, a.height, b.height) / 2.0) < 1);
+		var centerB = A2(
+			$elm_explorations$linear_algebra$Math$Vector2$add,
+			b.pos,
+			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, a.width / 2.0, a.height / 2.0));
+		var centerA = A2(
+			$elm_explorations$linear_algebra$Math$Vector2$add,
+			a.pos,
+			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, a.width / 2.0, a.height / 2.0));
+		return _Utils_cmp(
+			$elm_explorations$linear_algebra$Math$Vector2$length(
+				A2($elm_explorations$linear_algebra$Math$Vector2$sub, centerA, centerB)),
+			A2(
+				$elm$core$Basics$max,
+				b.height,
+				A2(
+					$elm$core$Basics$max,
+					a.height,
+					A2($elm$core$Basics$max, a.width, b.width))) + 2.0) < 1;
 	});
 var $elm$core$Basics$not = _Basics_not;
 var $author$project$GameState$doNotIntersect = F2(
@@ -8056,7 +8068,7 @@ var $author$project$GameState$doNotIntersect = F2(
 			A2(
 				$elm$core$List$map,
 				function (existing) {
-					return !A2($author$project$GameState$intersect, element, existing);
+					return !A2($author$project$GameState$inVicinity, element, existing);
 				},
 				listOfElements));
 	});
@@ -8081,10 +8093,39 @@ var $author$project$GameState$enemySpawn = function (state) {
 		state,
 		{enemies: newEnemies});
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
 var $author$project$GameState$heightFloat = function (size) {
 	return size.height;
 };
-var $elm_explorations$linear_algebra$Math$Vector2$sub = _MJS_v2sub;
+var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
+var $author$project$GameState$intersect = F2(
+	function (a, b) {
+		return (_Utils_cmp(
+			$elm$core$Basics$abs(
+				(($elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) + (a.width / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos)) + (b.width / 2.0)),
+			A2($elm$core$Basics$max, a.width, b.width) / 2.0) < 1) && (_Utils_cmp(
+			$elm$core$Basics$abs(
+				(($elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) + (a.height / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos)) + (b.width / 2.0)),
+			A2($elm$core$Basics$max, a.height, b.height) / 2.0) < 1);
+	});
+var $elm$core$List$isEmpty = function (xs) {
+	if (!xs.b) {
+		return true;
+	} else {
+		return false;
+	}
+};
 var $author$project$GameState$moveY = F2(
 	function (amount, p) {
 		return _Utils_update(
@@ -8098,38 +8139,26 @@ var $author$project$GameState$moveY = F2(
 	});
 var $author$project$GameState$moveEnemyRounds = F2(
 	function (delta, state) {
+		var newRounds = A2(
+			$elm$core$List$filterMap,
+			function (r) {
+				return (_Utils_cmp(
+					$elm_explorations$linear_algebra$Math$Vector2$getY(r.pos),
+					$author$project$GameState$heightFloat(state.boardSize)) > 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+					A2($author$project$GameState$moveY, (-delta) / 20.0, r));
+			},
+			state.enemyRounds);
+		var playerHitByRound = !$elm$core$List$isEmpty(
+			A2(
+				$elm$core$List$filter,
+				function (r) {
+					return A2($author$project$GameState$intersect, r, state.playerPosition);
+				},
+				newRounds));
 		return _Utils_update(
 			state,
-			{
-				enemyRounds: A2(
-					$elm$core$List$filterMap,
-					function (r) {
-						return (_Utils_cmp(
-							$elm_explorations$linear_algebra$Math$Vector2$getY(r.pos),
-							$author$project$GameState$heightFloat(state.boardSize)) > 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
-							A2($author$project$GameState$moveY, (-delta) / 20.0, r));
-					},
-					state.enemyRounds)
-			});
+			{enemyRounds: newRounds, playerDead: playerHitByRound});
 	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$List$isEmpty = function (xs) {
-	if (!xs.b) {
-		return true;
-	} else {
-		return false;
-	}
-};
 var $author$project$GameState$moveRound = F3(
 	function (delta, round, state) {
 		var enemiesHit = A2(
@@ -8219,20 +8248,20 @@ var $author$project$GameState$enemyMove = F3(
 				}
 			},
 			state.enemies);
+		var enemiesHitPlayer = A2(
+			$elm$core$List$filter,
+			$elm$core$Basics$identity,
+			A2(
+				$elm$core$List$map,
+				function (e) {
+					return A2($author$project$GameState$intersect, e, state.playerPosition);
+				},
+				enemiesMoved));
 		return _Utils_update(
 			state,
 			{
 				enemies: enemiesMoved,
-				playerDead: !$elm$core$List$isEmpty(
-					A2(
-						$elm$core$List$filter,
-						$elm$core$Basics$identity,
-						A2(
-							$elm$core$List$map,
-							function (e) {
-								return A2($author$project$GameState$intersect, e, state.playerPosition);
-							},
-							enemiesMoved)))
+				playerDead: !$elm$core$List$isEmpty(enemiesHitPlayer)
 			});
 	});
 var $author$project$GameState$performEnemyAction = F4(
@@ -8312,7 +8341,6 @@ var $author$project$GameState$performPlayerAction = F2(
 			return state;
 		}
 	});
-var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $author$project$GameState$widthFloat = function (size) {
 	return size.width;
 };
@@ -8324,13 +8352,14 @@ var $author$project$GameState$playerMoveFromCourse = F2(
 			$elm_explorations$linear_algebra$Math$Vector2$add,
 			previousPosition.pos,
 			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, (state.course * delta) / 1000, 0));
+		var playerDeorbited = function (x) {
+			return (x < 0) || (_Utils_cmp(x, width - state.playerPosition.width) > 0);
+		}(
+			$elm_explorations$linear_algebra$Math$Vector2$getX(nPos));
 		return _Utils_update(
 			state,
 			{
-				playerDead: function (x) {
-					return (x < 0) || (_Utils_cmp(x, width - state.playerPosition.width) > 0);
-				}(
-					$elm_explorations$linear_algebra$Math$Vector2$getX(nPos)),
+				playerDead: playerDeorbited,
 				playerPosition: _Utils_update(
 					previousPosition,
 					{pos: nPos})
@@ -9353,8 +9382,7 @@ var $author$project$Main$simulationScreen = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								'SCORE: ' + $elm$core$String$fromInt(
-									$elm$core$List$length(model.state.enemySpawnRoll)))
+								'SCORE: ' + $elm$core$String$fromInt(model.state.score))
 							]))
 					]))
 			]));

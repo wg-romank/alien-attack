@@ -70,7 +70,7 @@ initialState = {
         score = 0,
         playerDead = False,
         playerWon = False,
-        fuel = 40,
+        fuel = 100,
         course = 0,
         horizontalSpeed = 0,
         userInput = [],
@@ -97,9 +97,9 @@ playerAdjustCourse value state =
     let
         budget = abs value
     in
-    if state.fuel >= budget then
-    { state | fuel = state.fuel - budget, course = state.course + value  }
-    else state
+        if state.fuel >= budget then
+        { state | fuel = state.fuel - budget, course = state.course + value  }
+        else state
     
 
 performPlayerAction: List PlayerAction -> GameState -> GameState
@@ -120,11 +120,9 @@ playerMoveFromCourse delta state =
         previousPosition = state.playerPosition
         nPos = Vec2.add previousPosition.pos (vec2 (state.course * delta / 1000) 0) 
         width = widthFloat state.boardSize
+        playerDeorbited = Vec2.getX nPos |> (\x -> x < 0 || x > width - state.playerPosition.width)
     in
-        { state |
-            playerPosition = { previousPosition | pos = nPos },
-            playerDead = Vec2.getX nPos |> (\x -> x < 0 || x > width - state.playerPosition.width)
-        }
+        { state | playerPosition = { previousPosition | pos = nPos }, playerDead = playerDeorbited }
 
 
 enemyMove: Float -> Position -> GameState -> GameState
@@ -141,15 +139,11 @@ enemyMove delta enemy state =
                         else Just { enemy | pos = nPos }
                 else Just e
             ) state.enemies
+        enemiesHitPlayer =
+            List.map (\e -> intersect e state.playerPosition) enemiesMoved
+             |> List.filter identity
     in
-        { state | 
-            enemies = enemiesMoved,
-            playerDead =
-                List.map (\e -> intersect e state.playerPosition) enemiesMoved
-                 |> List.filter identity
-                 |> List.isEmpty
-                 |> not
-        }
+        { state | enemies = enemiesMoved, playerDead = enemiesHitPlayer |> List.isEmpty |> not }
 
 enemyAttack: Position -> GameState -> GameState
 enemyAttack enemy state = { state | enemyRounds = state.enemyRounds ++ [spawnEnemyRound enemy] }
@@ -201,12 +195,15 @@ moveRounds: Float -> GameState -> GameState
 moveRounds delta state = List.foldl (moveRound delta) state state.rounds
 
 moveEnemyRounds: Float -> GameState -> GameState
-moveEnemyRounds delta state = {
-        state | enemyRounds =
+moveEnemyRounds delta state =
+    let
+        newRounds =
             List.filterMap (\r ->
                 if Vec2.getY r.pos > heightFloat state.boardSize then Nothing
                 else Just (r |> moveY (-delta / 20.0)) ) state.enemyRounds
-    }
+        playerHitByRound = List.filter (\r -> intersect r state.playerPosition) newRounds |> List.isEmpty |> not
+    in
+    { state | enemyRounds = newRounds, playerDead = playerHitByRound }
 
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
@@ -224,7 +221,7 @@ updateTimesSinceSpawned delta state = {
 
 doNotIntersect: Position -> List Position -> Bool
 doNotIntersect element listOfElements = 
-        List.map (\existing -> intersect element existing |> not) listOfElements
+        List.map (\existing -> inVicinity element existing |> not) listOfElements
         |> List.foldl (&&) True
 
 enemySpawn: GameState -> GameState
@@ -237,7 +234,7 @@ enemySpawn state =
                         noIntersections = doNotIntersect l acc
                     in
                         if noIntersections then acc ++ [l]
-                        else acc)
+                        else acc )
             state.enemies
             enemySpawns
     in
@@ -260,19 +257,13 @@ step timeDelta state =
             |> playerMoveFromCourse timeDelta
             |> enemySpawn
 
-            -- TODO: enemy spawn
-            -- let enemySpawn = List.map
-            --         (\t -> newEnemy (vec2 x y) t)
-            --         (ME.toList (Dict.get (gameObjectTypeToInt Enemy) model.atlas))
-            -- in
-            --     if model.from == vec2 x y then
-            --         ({
-            --             model |
-            --             message = "Detecetd Tap" ++ (Debug.toString (vec2 x y)),
-            --             objects = model.objects ++ enemySpawn
-            --         }, Cmd.none)
-            --     else (model, Cmd.none)
-
+inVicinity: Position -> Position -> Bool
+inVicinity a b =
+    let
+        centerA = Vec2.add a.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
+        centerB = Vec2.add b.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
+    in
+        (Vec2.sub centerA centerB |> Vec2.length) <= (max b.height (max a.height (max a.width b.width))) + 2.0
 
 intersect: Position -> Position -> Bool
 intersect a b = abs (Vec2.getX a.pos + a.width / 2.0 - Vec2.getX b.pos + b.width / 2.0) <= (max a.width b.width) / 2.0 &&

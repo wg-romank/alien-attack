@@ -195,7 +195,7 @@ simulationScreen model =
                 style "top" "1%",
                 style "left" "3%"
               ]
-              [ text ("SCORE: " ++ String.fromInt (List.length model.state.enemySpawnRoll) ) ]
+              [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
             ]
         ]
 
