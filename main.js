@@ -6985,8 +6985,8 @@ var $author$project$GameState$newPosition = F3(
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
 	ak: 10000,
-	J: {i: 240, f: 160},
-	S: 0,
+	K: {i: 240, f: 160},
+	T: 0,
 	h: _List_fromArray(
 		[
 			A3(
@@ -6996,9 +6996,9 @@ var $author$project$GameState$initialState = {
 			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24))
 		]),
 	aI: _List_Nil,
-	L: _List_Nil,
+	M: _List_Nil,
 	aJ: _List_Nil,
-	V: 100,
+	y: 100,
 	a3: 0,
 	ar: 5,
 	r: false,
@@ -7010,7 +7010,7 @@ var $author$project$GameState$initialState = {
 	aN: false,
 	s: _List_Nil,
 	aA: 0,
-	N: _List_Nil
+	O: _List_Nil
 };
 var $author$project$Atlas$BackgroundPlanet = 6;
 var $author$project$Atlas$BackgroundStars = 7;
@@ -7218,7 +7218,7 @@ var $author$project$Atlas$loadAtlas = A2(
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{I: $author$project$Atlas$emptyAtlas, bo: '', E: 0, Y: false, a: $author$project$GameState$initialState, P: 0, aF: 1, Q: 0},
+		{J: $author$project$Atlas$emptyAtlas, bo: '', F: 0, Y: false, a: $author$project$GameState$initialState, Q: 0, aF: 1, R: 0},
 		$elm$core$Platform$Cmd$batch(
 			_List_fromArray(
 				[
@@ -7703,18 +7703,18 @@ var $author$project$GameState$PlayerMoveRight = 2;
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$computeViewportSize = F2(
 	function (viewport, model) {
-		var vpm = viewport.aT.i / model.a.J.i;
+		var vpm = viewport.aT.i / model.a.K.i;
 		var vph = viewport.aT.i;
-		var ratio = model.a.J.i / model.a.J.f;
+		var ratio = model.a.K.i / model.a.K.f;
 		var vpw = vph / ratio;
 		var offset = $elm$core$Basics$round((viewport.aT.f - vpw) / 2.0);
 		return _Utils_update(
 			model,
 			{
-				E: offset,
-				P: $elm$core$Basics$round(vph),
+				F: offset,
+				Q: $elm$core$Basics$round(vph),
 				aF: vpm,
-				Q: $elm$core$Basics$round(vpw)
+				R: $elm$core$Basics$round(vpw)
 			});
 	});
 var $elm$random$Random$Generator = $elm$core$Basics$identity;
@@ -7912,7 +7912,7 @@ var $author$project$GameState$enemySpawnRoll = function (state) {
 		function (v) {
 			return A2($elm_explorations$linear_algebra$Math$Vector2$vec2, v, 24);
 		},
-		A2($elm$random$Random$int, 1, state.J.f - 16));
+		A2($elm$random$Random$int, 1, state.K.f - 16));
 	return A2(
 		$elm$random$Random$andThen,
 		function (len) {
@@ -7999,8 +7999,8 @@ var $author$project$GameState$registerUserInput = F2(
 		return _Utils_update(
 			state,
 			{
-				N: _Utils_ap(
-					state.N,
+				O: _Utils_ap(
+					state.O,
 					_List_fromArray(
 						[action]))
 			});
@@ -8138,10 +8138,10 @@ var $author$project$GameState$moveEnemyRounds = F2(
 			function (r) {
 				return (_Utils_cmp(
 					$elm_explorations$linear_algebra$Math$Vector2$getY(r.b),
-					$author$project$GameState$heightFloat(state.J)) > 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+					$author$project$GameState$heightFloat(state.K)) > 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 					A2($author$project$GameState$moveY, (-delta) / 20.0, r));
 			},
-			state.L);
+			state.M);
 		var playerHitByRound = !$elm$core$List$isEmpty(
 			A2(
 				$elm$core$List$filter,
@@ -8151,7 +8151,7 @@ var $author$project$GameState$moveEnemyRounds = F2(
 				newRounds));
 		return _Utils_update(
 			state,
-			{L: newRounds, r: state.r || playerHitByRound});
+			{M: newRounds, r: state.r || playerHitByRound});
 	});
 var $author$project$GameState$moveRound = F3(
 	function (delta, round, state) {
@@ -8178,6 +8178,7 @@ var $author$project$GameState$moveRound = F3(
 			state,
 			{
 				h: enemiesAlive,
+				y: state.y + ($elm$core$List$length(enemiesHit) * 10),
 				s: rounds,
 				aA: state.aA + $elm$core$List$length(enemiesHit)
 			});
@@ -8215,8 +8216,8 @@ var $author$project$GameState$enemyAttack = F2(
 		return _Utils_update(
 			state,
 			{
-				L: _Utils_ap(
-					state.L,
+				M: _Utils_ap(
+					state.M,
 					_List_fromArray(
 						[
 							$author$project$GameState$spawnEnemyRound(enemy)
@@ -8225,7 +8226,7 @@ var $author$project$GameState$enemyAttack = F2(
 	});
 var $author$project$GameState$enemyMove = F3(
 	function (delta, enemy, state) {
-		var height = $author$project$GameState$heightFloat(state.J);
+		var height = $author$project$GameState$heightFloat(state.K);
 		var enemiesMoved = A2(
 			$elm$core$List$filterMap,
 			function (e) {
@@ -8291,9 +8292,9 @@ var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$GameState$playerAdjustCourse = F2(
 	function (value, state) {
 		var budget = $elm$core$Basics$abs(value);
-		return (_Utils_cmp(state.V, budget) > -1) ? _Utils_update(
+		return (_Utils_cmp(state.y, budget) > -1) ? _Utils_update(
 			state,
-			{S: state.S + value, V: state.V - budget}) : state;
+			{T: state.T + value, y: state.y - budget}) : state;
 	});
 var $author$project$GameState$spawnRound = function (player) {
 	return A2(
@@ -8330,7 +8331,7 @@ var $author$project$GameState$performPlayerAction = F2(
 			}()(
 				_Utils_update(
 					state,
-					{N: rest}));
+					{O: rest}));
 		} else {
 			return state;
 		}
@@ -8340,12 +8341,12 @@ var $author$project$GameState$widthFloat = function (size) {
 };
 var $author$project$GameState$playerMoveFromCourse = F2(
 	function (delta, state) {
-		var width = $author$project$GameState$widthFloat(state.J);
+		var width = $author$project$GameState$widthFloat(state.K);
 		var previousPosition = state.k;
 		var nPos = A2(
 			$elm_explorations$linear_algebra$Math$Vector2$add,
 			previousPosition.b,
-			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, (state.S * delta) / 1000, 0));
+			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, (state.T * delta) / 1000, 0));
 		var playerDeorbited = function (x) {
 			return (x < 0) || (_Utils_cmp(x, width - state.k.f) > 0);
 		}(
@@ -8399,7 +8400,7 @@ var $author$project$GameState$step = F2(
 							A2(
 								$author$project$GameState$moveRounds,
 								timeDelta,
-								A2($author$project$GameState$performPlayerAction, state.N, state)))))));
+								A2($author$project$GameState$performPlayerAction, state.O, state)))))));
 	});
 var $author$project$Main$update = F2(
 	function (event, model) {
@@ -8427,7 +8428,7 @@ var $author$project$Main$update = F2(
 						{
 							a: A2(
 								$author$project$GameState$registerUserTap,
-								_Utils_Tuple2((x - model.E) / vm, y / vm),
+								_Utils_Tuple2((x - model.F) / vm, y / vm),
 								model.a)
 						}),
 					$elm$core$Platform$Cmd$none);
@@ -8503,7 +8504,7 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{I: atlas}),
+							{J: atlas}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -8545,15 +8546,15 @@ var $author$project$Main$messageScreen = F2(
 					A2(
 					$elm$html$Html$Attributes$style,
 					'left',
-					$elm$core$String$fromInt(model.E) + 'px'),
+					$elm$core$String$fromInt(model.F) + 'px'),
 					A2(
 					$elm$html$Html$Attributes$style,
 					'height',
-					$elm$core$String$fromInt(model.P) + 'px'),
+					$elm$core$String$fromInt(model.Q) + 'px'),
 					A2(
 					$elm$html$Html$Attributes$style,
 					'width',
-					$elm$core$String$fromInt(model.Q) + 'px')
+					$elm$core$String$fromInt(model.R) + 'px')
 				]),
 			_List_fromArray(
 				[
@@ -8570,7 +8571,7 @@ var $author$project$Main$messageScreen = F2(
 							A2(
 							$elm$html$Html$Attributes$style,
 							'width',
-							$elm$core$String$fromInt(model.Q) + 'px')
+							$elm$core$String$fromInt(model.R) + 'px')
 						]),
 					_List_fromArray(
 						[
@@ -8684,8 +8685,8 @@ var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
 var $author$project$Sprites$backgroundSprite = F2(
 	function (atlas, state) {
-		var w = $author$project$GameState$widthFloat(state.J);
-		var h = $author$project$GameState$heightFloat(state.J);
+		var w = $author$project$GameState$widthFloat(state.K);
+		var h = $author$project$GameState$heightFloat(state.K);
 		var yScroll = h - ((3 * state.ak) / 1000.0);
 		var pos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll);
 		return $elm$core$List$concat(
@@ -8696,7 +8697,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 						{
 						a_: $author$project$Shaders$RectColor(
 							A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 40.0 / 255.0, 53.0 / 255.0, 31.0 / 255.0, 1.0)),
-						U: 1.0,
+						V: 1.0,
 						i: h,
 						X: 0.9,
 						b: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0),
@@ -8708,7 +8709,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 					function (t) {
 						return {
 							a_: $author$project$Shaders$RectTexture(t),
-							U: 0.9,
+							V: 0.9,
 							i: h,
 							X: 0.8,
 							b: $author$project$Sprites$roundPos(
@@ -8723,7 +8724,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 					function (t) {
 						return {
 							a_: $author$project$Shaders$RectTexture(t),
-							U: 0.8,
+							V: 0.8,
 							i: 69.0,
 							X: 0.7,
 							b: $author$project$Sprites$roundPos(pos),
@@ -8737,7 +8738,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 						{
 						a_: $author$project$Shaders$RectColor(
 							A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 88.0 / 255.0, 140.0 / 255.0, 126.0 / 255.0, 1.0)),
-						U: 0.7,
+						V: 0.7,
 						i: h,
 						X: 0.6,
 						b: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll + 68.0),
@@ -8753,7 +8754,7 @@ var $author$project$Sprites$bulletSprite = function (state) {
 			return {
 				a_: $author$project$Shaders$RectColor(
 					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
-				U: 0.1,
+				V: 0.1,
 				i: bullet.i,
 				X: 0,
 				b: $author$project$Sprites$roundPos(bullet.b),
@@ -8905,7 +8906,7 @@ var $elm_explorations$webgl$WebGL$Internal$DepthTest = F4(
 var $elm_explorations$webgl$WebGL$Settings$DepthTest$less = function (_v0) {
 	var write = _v0.bK;
 	var near = _v0.X;
-	var far = _v0.U;
+	var far = _v0.V;
 	return A4($elm_explorations$webgl$WebGL$Internal$DepthTest, 513, write, near, far);
 };
 var $elm_explorations$webgl$WebGL$Settings$Blend$Factor = $elm$core$Basics$identity;
@@ -8975,7 +8976,7 @@ var $author$project$Shaders$drawRectangle = F2(
 					[
 						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha),
 						$elm_explorations$webgl$WebGL$Settings$DepthTest$less(
-						{U: rec.U, X: rec.X, bK: true})
+						{V: rec.V, X: rec.X, bK: true})
 					]),
 				$author$project$Shaders$vertexShader,
 				$author$project$Shaders$fragmentColorShader,
@@ -8989,7 +8990,7 @@ var $author$project$Shaders$drawRectangle = F2(
 					[
 						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha),
 						$elm_explorations$webgl$WebGL$Settings$DepthTest$less(
-						{U: rec.U, X: rec.X, bK: true})
+						{V: rec.V, X: rec.X, bK: true})
 					]),
 				$author$project$Shaders$vertexShader,
 				$author$project$Shaders$fragmentTextureShader,
@@ -9004,14 +9005,14 @@ var $author$project$Sprites$enemyBulletSprite = function (state) {
 			return {
 				a_: $author$project$Shaders$RectColor(
 					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 0.5, 1.0, 1.0)),
-				U: 0.1,
+				V: 0.1,
 				i: bullet.i,
 				X: 0,
 				b: $author$project$Sprites$roundPos(bullet.b),
 				f: bullet.f
 			};
 		},
-		state.L);
+		state.M);
 };
 var $elm$core$List$concatMap = F2(
 	function (f, list) {
@@ -9036,7 +9037,7 @@ var $author$project$Sprites$enemySprite = F2(
 						[
 							{
 							a_: $author$project$Shaders$RectTexture(t),
-							U: 0.2,
+							V: 0.2,
 							i: enemy.i,
 							X: 0.1,
 							b: $author$project$Sprites$roundPos(enemy.b),
@@ -9058,7 +9059,7 @@ var $author$project$Sprites$playerSprite = F2(
 			function (texture) {
 				return {
 					a_: $author$project$Shaders$RectTexture(texture),
-					U: 0.2,
+					V: 0.2,
 					i: state.k.i,
 					X: 0.1,
 					b: $author$project$Sprites$roundPos(state.k.b),
@@ -9076,8 +9077,8 @@ var $author$project$Sprites$objectsToDraw = F2(
 					$author$project$Shaders$drawRectangle,
 					A2(
 						$elm_explorations$linear_algebra$Math$Vector2$vec2,
-						$author$project$GameState$widthFloat(state.J),
-						$author$project$GameState$heightFloat(state.J)),
+						$author$project$GameState$widthFloat(state.K),
+						$author$project$GameState$heightFloat(state.K)),
 					rect);
 			},
 			$elm$core$List$concat(
@@ -9288,23 +9289,23 @@ var $author$project$Main$simulationScreen = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$width(model.a.J.f),
-						$elm$html$Html$Attributes$height(model.a.J.i),
+						$elm$html$Html$Attributes$width(model.a.K.f),
+						$elm$html$Html$Attributes$height(model.a.K.i),
 						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 						A2($elm$html$Html$Attributes$style, 'top', '0'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'left',
-						$elm$core$String$fromInt(model.E) + 'px'),
+						$elm$core$String$fromInt(model.F) + 'px'),
 						A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
 						A2($elm$html$Html$Attributes$style, 'image-rendering', 'pixelated'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',
-						$elm$core$String$fromInt(model.P) + 'px'),
+						$elm$core$String$fromInt(model.Q) + 'px'),
 						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
-				A2($author$project$Sprites$objectsToDraw, model.I, model.a)),
+				A2($author$project$Sprites$objectsToDraw, model.J, model.a)),
 				A2(
 				$elm$html$Html$div,
 				_List_fromArray(
@@ -9314,15 +9315,15 @@ var $author$project$Main$simulationScreen = function (model) {
 						A2(
 						$elm$html$Html$Attributes$style,
 						'left',
-						$elm$core$String$fromInt(model.E) + 'px'),
+						$elm$core$String$fromInt(model.F) + 'px'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',
-						$elm$core$String$fromInt(model.P) + 'px'),
+						$elm$core$String$fromInt(model.Q) + 'px'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'width',
-						$elm$core$String$fromInt(model.Q) + 'px')
+						$elm$core$String$fromInt(model.R) + 'px')
 					]),
 				_List_fromArray(
 					[
@@ -9340,7 +9341,7 @@ var $author$project$Main$simulationScreen = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								'FUEL: ' + $elm$core$String$fromFloat(model.a.V))
+								'FUEL: ' + $elm$core$String$fromFloat(model.a.y))
 							])),
 						A2(
 						$elm$html$Html$p,
@@ -9356,7 +9357,7 @@ var $author$project$Main$simulationScreen = function (model) {
 						_List_fromArray(
 							[
 								$elm$html$Html$text(
-								'COURSE: ' + $elm$core$String$fromFloat(model.a.S))
+								'COURSE: ' + $elm$core$String$fromFloat(model.a.T))
 							])),
 						A2(
 						$elm$html$Html$p,
@@ -9381,7 +9382,7 @@ var $author$project$Main$view = function (model) {
 	return {
 		aW: _List_fromArray(
 			[
-				(!$author$project$Atlas$loaded(model.I)) ? $author$project$Main$loadingScreen(model) : ($author$project$GameState$isOver(model.a) ? $author$project$Main$gameOverScreen(model) : $author$project$Main$simulationScreen(model))
+				(!$author$project$Atlas$loaded(model.J)) ? $author$project$Main$loadingScreen(model) : ($author$project$GameState$isOver(model.a) ? $author$project$Main$gameOverScreen(model) : $author$project$Main$simulationScreen(model))
 			]),
 		bH: 'Main'
 	};
@@ -9393,7 +9394,7 @@ var $author$project$Main$main = $elm$browser$Browser$document(
 			return $elm$core$Platform$Sub$batch(
 				_List_fromArray(
 					[
-						(!(model.Y || ($author$project$GameState$isOver(model.a) || $author$project$Atlas$loaded(model.I)))) ? $elm$core$Platform$Sub$none : $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$Delta),
+						(!(model.Y || ($author$project$GameState$isOver(model.a) || $author$project$Atlas$loaded(model.J)))) ? $elm$core$Platform$Sub$none : $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$Delta),
 						$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder),
 						$elm$browser$Browser$Events$onVisibilityChange(
 						function (v) {

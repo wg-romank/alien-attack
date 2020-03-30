@@ -189,7 +189,7 @@ moveRound delta round state =
                 else Nothing
             else Just rr) state.rounds
     in
-        { state | rounds = rounds, enemies = enemiesAlive, score = state.score + List.length enemiesHit }
+        { state | rounds = rounds, enemies = enemiesAlive, score = state.score + List.length enemiesHit, fuel = state.fuel + toFloat (List.length enemiesHit) * 10 }
 
 moveRounds: Float -> GameState -> GameState
 moveRounds delta state = List.foldl (moveRound delta) state state.rounds
