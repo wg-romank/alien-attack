@@ -89,11 +89,19 @@ toDirection string =
     other ->
       Other other
 
-view: Model -> Html Msg
+type alias Document msg =
+    { title : String
+    , body : List (Html msg)
+    }
+view: Model -> Document Msg
 view model =
-  if model.atlas |> loaded |> not then loadingScreen model
-  else if isOver model.state then gameOverScreen model
-  else simulationScreen model
+  { title = "Main",
+    body = [
+      if model.atlas |> loaded |> not then loadingScreen model
+      else if isOver model.state then gameOverScreen model
+      else simulationScreen model
+    ]
+  }
 
 messageScreen: String -> Model -> Html Msg
 messageScreen message model =
@@ -111,7 +119,7 @@ messageScreen message model =
         style "color" "#FFFFFF",
         style "top" "50%",
         style "position" "absolute",
-        style "font-family" "pixelated",
+        style "font-family" "arcadeclassic",
         style "font-size" "2em",
         style "text-align" "center",
         style "width" (String.fromInt model.viewportWidth ++ "px")
@@ -127,11 +135,6 @@ loadingScreen model = messageScreen "LOADING..." model
 gameOverScreen: Model -> Html Msg
 gameOverScreen model = messageScreen ("GAME OVER, YOUR SCORE: " ++ String.fromInt model.state.score) model
 
--- TODO: fix layout for Browser.Document
--- type alias Document msg =
---     { title : String
---     , body : List (Html msg)
---     }
 simulationScreen: Model -> Html Msg
 simulationScreen model =
         div [
@@ -169,7 +172,7 @@ simulationScreen model =
               [
                 style "position" "absolute",
                 style "color" "#FFFFFF",
-                style "font-family" "pixelated",
+                style "font-family" "arcadeclassic",
                 style "font-size" "2em",
                 style "bottom" "2%",
                 style "left" "3%"
@@ -179,7 +182,7 @@ simulationScreen model =
               [
                 style "position" "absolute",
                 style "color" "#FFFFFF",
-                style "font-family" "pixelated",
+                style "font-family" "arcadeclassic",
                 style "font-size" "2em",
                 style "bottom" "6%",
                 style "left" "3%"
@@ -189,7 +192,7 @@ simulationScreen model =
               [
                 style "position" "absolute",
                 style "color" "#FFFFFF",
-                style "font-family" "pixelated",
+                style "font-family" "arcadeclassic",
                 style "font-size" "2em",
                 style "top" "1%",
                 style "left" "3%"
@@ -257,7 +260,7 @@ update event model =
         _ -> (model, Cmd.none)
 
 main: Program() Model Msg
-main = Browser.element {
+main = Browser.document {
        init = init,
        subscriptions = \model ->
         Sub.batch [
