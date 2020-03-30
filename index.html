@@ -7019,7 +7019,7 @@ var $author$project$GameState$initialState = {
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
 	enemySpawnRoll: _List_Nil,
-	fuel: 40,
+	fuel: 100,
 	horizontalSpeed: 0,
 	maxEnemiesToSpawn: 5,
 	playerDead: false,
@@ -9047,9 +9047,9 @@ var $author$project$Sprites$enemySprite = F2(
 						[
 							{
 							display: $author$project$Shaders$RectTexture(t),
-							far: 0.1,
+							far: 0.2,
 							height: enemy.height,
-							near: 0,
+							near: 0.1,
 							pos: $author$project$Sprites$roundPos(enemy.pos),
 							width: enemy.width
 						}
@@ -9069,9 +9069,9 @@ var $author$project$Sprites$playerSprite = F2(
 			function (texture) {
 				return {
 					display: $author$project$Shaders$RectTexture(texture),
-					far: 0.1,
+					far: 0.2,
 					height: state.playerPosition.height,
-					near: 0,
+					near: 0.1,
 					pos: $author$project$Sprites$roundPos(state.playerPosition.pos),
 					width: state.playerPosition.width
 				};

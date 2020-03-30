@@ -42,8 +42,8 @@ playerSprite atlas state =
             width = state.playerPosition.width,
             height = state.playerPosition.height,
             display = RectTexture texture,
-            near = 0,
-            far = 0.1
+            near = 0.1,
+            far = 0.2
         }) userTexture
 
 enemySprite: Atlas -> GameState -> List Rectangle
@@ -58,7 +58,7 @@ enemySprite atlas state =
                 maybeTexture = Atlas.get atlas textureKey
             in
                 case maybeTexture of
-                   Just t -> [{ pos = roundPos enemy.pos, width = enemy.width, height = enemy.height, display = RectTexture t, near = 0, far = 0.1 }]
+                   Just t -> [{ pos = roundPos enemy.pos, width = enemy.width, height = enemy.height, display = RectTexture t, near = 0.1, far = 0.2 }]
                    Nothing -> []
         ) state.enemies
     
