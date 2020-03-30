@@ -242,7 +242,7 @@ enemySpawn state =
                     let
                         noIntersections = doNotIntersect l acc
                     in
-                        if noIntersections then acc ++ [l]
+                        if noIntersections && List.length acc < state.maxEnemiesToSpawn  then acc ++ [l]
                         else acc )
             state.enemies
             enemySpawns

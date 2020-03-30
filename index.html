@@ -8087,7 +8087,9 @@ var $author$project$GameState$enemySpawn = function (state) {
 		F2(
 			function (l, acc) {
 				var noIntersections = A2($author$project$GameState$doNotIntersect, l, acc);
-				return noIntersections ? _Utils_ap(
+				return (noIntersections && (_Utils_cmp(
+					$elm$core$List$length(acc),
+					state.maxEnemiesToSpawn) < 0)) ? _Utils_ap(
 					acc,
 					_List_fromArray(
 						[l])) : acc;
@@ -9375,40 +9377,6 @@ var $author$project$Main$simulationScreen = function (model) {
 							[
 								$elm$html$Html$text(
 								'COURSE: ' + $elm$core$String$fromFloat(model.state.course))
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-								A2($elm$html$Html$Attributes$style, 'top', '1%'),
-								A2($elm$html$Html$Attributes$style, 'left', '3%')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'ENEMIES: ' + $elm$core$String$fromInt(
-									$elm$core$List$length(model.state.enemies)))
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-								A2($elm$html$Html$Attributes$style, 'top', '6%'),
-								A2($elm$html$Html$Attributes$style, 'left', '3%')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'ROUNDS: ' + $elm$core$String$fromInt(
-									$elm$core$List$length(model.state.enemyRounds)))
 							])),
 						A2(
 						$elm$html$Html$p,
