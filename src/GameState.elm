@@ -33,15 +33,17 @@ widthFloat size = toFloat size.width
 heightFloat: Size -> Float
 heightFloat size = toFloat size.height
 
-type PlayerAction =
-    PlayerMove (Float, Float) | PlayerFire | PlayerMoveLeft | PlayerMoveRight
+type PlayerAction = PlayerFire | PlayerMoveLeft | PlayerMoveRight
 
 type EnemyAction = Move | Attack
 
 rollEnemyAction: Random.Generator EnemyAction
-rollEnemyAction = Random.weighted (100, Move) [(0, Attack)]
+rollEnemyAction = Random.weighted (99, Move) [(1, Attack)]
 
 type alias GameState = {
+        score: Int,
+        playerDead: Bool,
+        playerWon: Bool,
         fuel: Float,
         course: Float,
         horizontalSpeed: Float,
@@ -63,7 +65,10 @@ spawnEnemyRound enemy = newPosition enemy.pos 4.0 4.0 |> moveX -13.0 |> moveY -3
 
 initialState: GameState
 initialState = {
-        fuel = 10,
+        score = 0,
+        playerDead = False,
+        playerWon = False,
+        fuel = 40,
         course = 0,
         horizontalSpeed = 0,
         userInput = [],
@@ -77,26 +82,10 @@ initialState = {
     }
 
 isOver: GameState -> Bool
-isOver state = state.bgOffset >= 70 * 1000
+isOver state = state.playerDead || state.playerWon
 
 playerFire: GameState -> GameState
 playerFire state = { state | rounds = state.rounds ++ [spawnRound state.playerPosition] }
-
-
--- TODO: FIX
-playerMove: Vec2 -> GameState -> GameState
-playerMove to state =
-        let
-            width = widthFloat state.boardSize
-            height = heightFloat state.boardSize
-            playerWidth = state.playerPosition.width
-            playerHeight = state.playerPosition.height
-        in
-            Vec2.toRecord to
-            |> \p -> vec2
-                        ( clamp 0.0 (width - playerWidth) p.x )
-                        ( clamp ( 2.0 * (height - playerHeight) / 3.0 ) (height - playerHeight) p.y )
-            |> \q -> { state| playerPosition = moveTo state.playerPosition q }
 
 
 playerAdjustCourse: Float -> GameState -> GameState
@@ -116,7 +105,6 @@ performPlayerAction action state =
             { state | userInput = rest } |>
             case f of
                 -- TODO: move with constant speed on touch
-                PlayerMove (x, y) -> playerMove (vec2 x y)
                 PlayerMoveLeft -> playerAdjustCourse -10
                 PlayerMoveRight -> playerAdjustCourse 10
                 PlayerFire -> playerFire
@@ -127,37 +115,37 @@ playerMoveFromCourse delta state =
     let
         previousPosition = state.playerPosition
         nPos = Vec2.add previousPosition.pos (vec2 (state.course * delta / 1000) 0) 
+        width = widthFloat state.boardSize
     in
-        { state | playerPosition = { previousPosition | pos = nPos } }
+        { state |
+            playerPosition = { previousPosition | pos = nPos },
+            playerDead = Vec2.getX nPos |> (\x -> x < 0 || x > width - state.playerPosition.width)
+        }
 
-
-modFloat: Float -> Float -> Float -> Float
-modFloat from to n =
-    if n > to then from + (n - to)
-    else if n < from then to - n
-        else n
-
-warpCoordinates: Float -> Float -> Vec2 -> Vec2
-warpCoordinates w h v =
-    vec2 
-        (Vec2.getX v |> modFloat 0 w)
-        (Vec2.getY v |> modFloat 0 h)
 
 enemyMove: Float -> Position -> GameState -> GameState
-enemyMove delta enemy state = state
-    -- let
-    --     width = widthFloat state.boardSize
-    --     height = heightFloat state.boardSize
-    -- in
-    --     { state | 
-    --         enemies = List.map (\e -> 
-    --             if e == enemy then
-    --                 { enemy | pos = 
-    --                     ( enemy |> moveY -(delta / 200.0) ).pos
-    --                     |> warpCoordinates (width - enemy.width) (height - enemy.height) }
-    --             else e
-    --         ) state.enemies
-    --     }
+enemyMove delta enemy state =
+    let
+        height = heightFloat state.boardSize
+        enemiesMoved = 
+            List.filterMap (\e -> 
+                if e == enemy then
+                    let
+                        nPos = ( enemy |> moveY -(delta / 200.0) ).pos
+                    in
+                        if Vec2.getY nPos < height then Nothing
+                        else Just { enemy | pos = nPos }
+                else Just e
+            ) state.enemies
+    in
+        { state | 
+            enemies = enemiesMoved,
+            playerDead =
+                List.map (\e -> intersect e state.playerPosition) enemiesMoved
+                 |> List.filter identity
+                 |> List.isEmpty
+                 |> not
+        }
 
 enemyAttack: Position -> GameState -> GameState
 enemyAttack enemy state = { state | enemyRounds = state.enemyRounds ++ [spawnEnemyRound enemy] }
@@ -194,7 +182,7 @@ moveRound delta round state =
                 else Nothing
             else Just rr) state.rounds
     in
-        { state | rounds = rounds, enemies = enemiesAlive }
+        { state | rounds = rounds, enemies = enemiesAlive, score = state.score + List.length enemiesHit }
 
 moveRounds: Float -> GameState -> GameState
 moveRounds delta state = List.foldl (moveRound delta) state state.rounds

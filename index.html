@@ -7018,14 +7018,17 @@ var $author$project$GameState$initialState = {
 		]),
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
-	fuel: 10,
+	fuel: 40,
 	horizontalSpeed: 0,
+	playerDead: false,
 	playerPosition: A3(
 		$author$project$GameState$newPosition,
 		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222),
 		16.0,
 		16.0),
+	playerWon: false,
 	rounds: _List_Nil,
+	score: 0,
 	userInput: _List_Nil
 };
 var $author$project$Atlas$BackgroundPlanet = {$: 'BackgroundPlanet'};
@@ -7246,9 +7249,8 @@ var $author$project$Main$init = function (_v0) {
 					A2($elm$core$Task$perform, $author$project$Main$ViewPortLoaded, $elm$browser$Browser$Dom$getViewport)
 				])));
 };
-var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$GameState$isOver = function (state) {
-	return _Utils_cmp(state.bgOffset, 70 * 1000) > -1;
+	return state.playerDead || state.playerWon;
 };
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
@@ -7709,9 +7711,6 @@ var $author$project$Main$EnemiesRoll = function (a) {
 	return {$: 'EnemiesRoll', a: a};
 };
 var $author$project$GameState$PlayerFire = {$: 'PlayerFire'};
-var $author$project$GameState$PlayerMove = function (a) {
-	return {$: 'PlayerMove', a: a};
-};
 var $author$project$GameState$PlayerMoveLeft = {$: 'PlayerMoveLeft'};
 var $author$project$GameState$PlayerMoveRight = {$: 'PlayerMoveRight'};
 var $elm$core$Basics$round = _Basics_round;
@@ -7864,10 +7863,10 @@ var $elm$random$Random$weighted = F2(
 	});
 var $author$project$GameState$rollEnemyAction = A2(
 	$elm$random$Random$weighted,
-	_Utils_Tuple2(100, $author$project$GameState$Move),
+	_Utils_Tuple2(99, $author$project$GameState$Move),
 	_List_fromArray(
 		[
-			_Utils_Tuple2(0, $author$project$GameState$Attack)
+			_Utils_Tuple2(1, $author$project$GameState$Attack)
 		]));
 var $author$project$GameState$enemiesRoll = function (state) {
 	return A2(
@@ -8055,7 +8054,11 @@ var $author$project$GameState$moveRound = F3(
 			state.enemies);
 		return _Utils_update(
 			state,
-			{enemies: enemiesAlive, rounds: rounds});
+			{
+				enemies: enemiesAlive,
+				rounds: rounds,
+				score: state.score + $elm$core$List$length(enemiesHit)
+			});
 	});
 var $author$project$GameState$moveRounds = F2(
 	function (delta, state) {
@@ -8100,7 +8103,38 @@ var $author$project$GameState$enemyAttack = F2(
 	});
 var $author$project$GameState$enemyMove = F3(
 	function (delta, enemy, state) {
-		return state;
+		var height = $author$project$GameState$heightFloat(state.boardSize);
+		var enemiesMoved = A2(
+			$elm$core$List$filterMap,
+			function (e) {
+				if (_Utils_eq(e, enemy)) {
+					var nPos = A2($author$project$GameState$moveY, -(delta / 200.0), enemy).pos;
+					return (_Utils_cmp(
+						$elm_explorations$linear_algebra$Math$Vector2$getY(nPos),
+						height) < 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+						_Utils_update(
+							enemy,
+							{pos: nPos}));
+				} else {
+					return $elm$core$Maybe$Just(e);
+				}
+			},
+			state.enemies);
+		return _Utils_update(
+			state,
+			{
+				enemies: enemiesMoved,
+				playerDead: !$elm$core$List$isEmpty(
+					A2(
+						$elm$core$List$filter,
+						$elm$core$Basics$identity,
+						A2(
+							$elm$core$List$map,
+							function (e) {
+								return A2($author$project$GameState$intersect, e, state.playerPosition);
+							},
+							enemiesMoved)))
+			});
 	});
 var $author$project$GameState$performEnemyAction = F4(
 	function (delta, enemy, action, state) {
@@ -8131,6 +8165,7 @@ var $author$project$GameState$performEnemiesActions = F2(
 			state,
 			enemiesWithActions);
 	});
+var $elm$core$Basics$ge = _Utils_ge;
 var $author$project$GameState$playerAdjustCourse = F2(
 	function (value, state) {
 		var budget = $elm$core$Basics$abs(value);
@@ -8156,41 +8191,6 @@ var $author$project$GameState$playerFire = function (state) {
 					]))
 		});
 };
-var $elm$core$Basics$clamp = F3(
-	function (low, high, number) {
-		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
-	});
-var $author$project$GameState$moveTo = F2(
-	function (p, to) {
-		return _Utils_update(
-			p,
-			{pos: to});
-	});
-var $elm_explorations$linear_algebra$Math$Vector2$toRecord = _MJS_v2toRecord;
-var $author$project$GameState$widthFloat = function (size) {
-	return size.width;
-};
-var $author$project$GameState$playerMove = F2(
-	function (to, state) {
-		var width = $author$project$GameState$widthFloat(state.boardSize);
-		var playerWidth = state.playerPosition.width;
-		var playerHeight = state.playerPosition.height;
-		var height = $author$project$GameState$heightFloat(state.boardSize);
-		return function (p) {
-			return function (q) {
-				return _Utils_update(
-					state,
-					{
-						playerPosition: A2($author$project$GameState$moveTo, state.playerPosition, q)
-					});
-			}(
-				A2(
-					$elm_explorations$linear_algebra$Math$Vector2$vec2,
-					A3($elm$core$Basics$clamp, 0.0, width - playerWidth, p.x),
-					A3($elm$core$Basics$clamp, (2.0 * (height - playerHeight)) / 3.0, height - playerHeight, p.y)));
-		}(
-			$elm_explorations$linear_algebra$Math$Vector2$toRecord(to));
-	});
 var $author$project$GameState$performPlayerAction = F2(
 	function (action, state) {
 		if (action.b) {
@@ -8198,12 +8198,6 @@ var $author$project$GameState$performPlayerAction = F2(
 			var rest = action.b;
 			return function () {
 				switch (f.$) {
-					case 'PlayerMove':
-						var _v2 = f.a;
-						var x = _v2.a;
-						var y = _v2.b;
-						return $author$project$GameState$playerMove(
-							A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y));
 					case 'PlayerMoveLeft':
 						return $author$project$GameState$playerAdjustCourse(-10);
 					case 'PlayerMoveRight':
@@ -8220,8 +8214,12 @@ var $author$project$GameState$performPlayerAction = F2(
 		}
 	});
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
+var $author$project$GameState$widthFloat = function (size) {
+	return size.width;
+};
 var $author$project$GameState$playerMoveFromCourse = F2(
 	function (delta, state) {
+		var width = $author$project$GameState$widthFloat(state.boardSize);
 		var previousPosition = state.playerPosition;
 		var nPos = A2(
 			$elm_explorations$linear_algebra$Math$Vector2$add,
@@ -8230,6 +8228,10 @@ var $author$project$GameState$playerMoveFromCourse = F2(
 		return _Utils_update(
 			state,
 			{
+				playerDead: function (x) {
+					return (x < 0) || (_Utils_cmp(x, width - state.playerPosition.width) > 0);
+				}(
+					$elm_explorations$linear_algebra$Math$Vector2$getX(nPos)),
 				playerPosition: _Utils_update(
 					previousPosition,
 					{pos: nPos})
@@ -8294,22 +8296,6 @@ var $author$project$Main$update = F2(
 						model,
 						{paused: false}),
 					$elm$core$Platform$Cmd$none);
-			case 'Move':
-				var _v1 = event.a;
-				var x = _v1.a;
-				var y = _v1.b;
-				var vm = model.viewportMultiplier;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							state: A2(
-								$author$project$GameState$registerUserInput,
-								$author$project$GameState$PlayerMove(
-									_Utils_Tuple2(x / vm, y / vm)),
-								model.state)
-						}),
-					$elm$core$Platform$Cmd$none);
 			case 'Left':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -8335,9 +8321,9 @@ var $author$project$Main$update = F2(
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'End':
-				var _v2 = event.a;
-				var x = _v2.a;
-				var y = _v2.b;
+				var _v1 = event.a;
+				var x = _v1.a;
+				var y = _v1.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8562,11 +8548,11 @@ var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
 var $author$project$Sprites$backgroundSprite = F2(
 	function (atlas, state) {
+		var z = 10000;
 		var w = $author$project$GameState$widthFloat(state.boardSize);
 		var h = $author$project$GameState$heightFloat(state.boardSize);
-		var yScroll = h - ((3 * state.bgOffset) / 1000.0);
+		var yScroll = h - ((3 * z) / 1000.0);
 		var pos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll);
-		var skyPos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, h + yScroll);
 		return $elm$core$List$concat(
 			_List_fromArray(
 				[
@@ -9237,6 +9223,22 @@ var $author$project$Main$simulationScreen = function (model) {
 							[
 								$elm$html$Html$text(
 								'COURSE: ' + $elm$core$String$fromFloat(model.state.course))
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+								A2($elm$html$Html$Attributes$style, 'top', '1%'),
+								A2($elm$html$Html$Attributes$style, 'left', '3%')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								'SCORE: ' + $elm$core$String$fromInt(model.state.score))
 							]))
 					]))
 			]));

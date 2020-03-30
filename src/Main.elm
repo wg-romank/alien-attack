@@ -182,7 +182,17 @@ simulationScreen model =
                 style "bottom" "6%",
                 style "left" "3%"
               ]
-              [ text ("COURSE: " ++ String.fromFloat model.state.course) ]
+              [ text ("COURSE: " ++ String.fromFloat model.state.course) ],
+            p
+              [
+                style "position" "absolute",
+                style "color" "#FFFFFF",
+                style "font-family" "pixelated",
+                style "font-size" "2em",
+                style "top" "1%",
+                style "left" "3%"
+              ]
+              [ text ("SCORE: " ++ String.fromInt model.state.score) ]
             ]
         ]
 
@@ -209,8 +219,8 @@ update event model =
         Pause -> ({ model | paused = True }, Cmd.none)
         Resume -> ({ model | paused = False}, Cmd.none)
         -- Start (x, y) -> ({ model | from = vec2 x y }, Cmd.none)
-        Move (x, y) -> let vm = model.viewportMultiplier in
-            ({ model | state = registerUserInput (PlayerMove(x / vm, y / vm)) model.state }, Cmd.none)
+        -- Move (x, y) -> let vm = model.viewportMultiplier in
+        --     ({ model | state = registerUserInput (PlayerMove(x / vm, y / vm)) model.state }, Cmd.none)
         Left -> ({ model | state = registerUserInput PlayerMoveLeft model.state }, Cmd.none)
         Right -> ({ model | state = registerUserInput PlayerMoveRight model.state }, Cmd.none)
         Fire -> ({model | state = registerUserInput PlayerFire model.state }, Cmd.none)

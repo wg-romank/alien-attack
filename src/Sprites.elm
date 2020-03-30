@@ -93,9 +93,9 @@ backgroundSprite atlas state =
         w = widthFloat state.boardSize
         h = heightFloat state.boardSize
         -- TODO: should not be linear
-        yScroll = h - (3 * state.bgOffset / 1000.0)
+        z = 10000
+        yScroll = h - (3 * z / 1000.0)
         pos = vec2 0 yScroll
-        skyPos = vec2 0 (h + yScroll)
     in
         List.concat
         [
