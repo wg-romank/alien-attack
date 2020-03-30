@@ -8591,7 +8591,10 @@ var $author$project$Main$messageScreen = F2(
 				]));
 	});
 var $author$project$Main$gameOverScreen = function (model) {
-	return A2($author$project$Main$messageScreen, 'GAME OVER', model);
+	return A2(
+		$author$project$Main$messageScreen,
+		'GAME OVER\n YOUR SCORE: ' + $elm$core$String$fromInt(model.state.score),
+		model);
 };
 var $elm$core$Dict$isEmpty = function (dict) {
 	if (dict.$ === 'RBEmpty_elm_builtin') {
@@ -9386,7 +9389,7 @@ var $author$project$Main$simulationScreen = function (model) {
 								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
 								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
 								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-								A2($elm$html$Html$Attributes$style, 'top', '9%'),
+								A2($elm$html$Html$Attributes$style, 'top', '1%'),
 								A2($elm$html$Html$Attributes$style, 'left', '3%')
 							]),
 						_List_fromArray(

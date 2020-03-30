@@ -125,7 +125,7 @@ loadingScreen: Model -> Html Msg
 loadingScreen model = messageScreen "LOADING..." model
 
 gameOverScreen: Model -> Html Msg
-gameOverScreen model = messageScreen "GAME OVER" model
+gameOverScreen model = messageScreen ("GAME OVER, YOUR SCORE: " ++ String.fromInt model.state.score) model
 
 -- TODO: fix layout for Browser.Document
 -- type alias Document msg =
@@ -191,7 +191,7 @@ simulationScreen model =
                 style "color" "#FFFFFF",
                 style "font-family" "pixelated",
                 style "font-size" "2em",
-                style "top" "9%",
+                style "top" "1%",
                 style "left" "3%"
               ]
               [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
