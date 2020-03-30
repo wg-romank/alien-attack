@@ -6,7 +6,7 @@ Game is hosted as static page at the url in the barcode.
 <img src="https://wg-romank.github.io/alien-attack/assets/alien-attack-url-barcode.png" width="64" height="64"/>
 
 ## TODOS
-- [ ] Enemy spawn
+- [x] Enemy spawn
 - [x] Arcadish controls (sort of: added inertia)
 - [ ] Music
 - [ ] Taptic feedback
