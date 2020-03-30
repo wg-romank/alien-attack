@@ -137,7 +137,7 @@ enemyMove delta enemy state =
                     let
                         nPos = ( enemy |> moveY -(delta / 200.0) ).pos
                     in
-                        if Vec2.getY nPos < height then Nothing
+                        if Vec2.getY nPos > height then Nothing
                         else Just { enemy | pos = nPos }
                 else Just e
             ) state.enemies
@@ -176,7 +176,7 @@ enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
 enemySpawnRoll: GameState -> Random.Generator (List Vec2)
 enemySpawnRoll state =
     let
-        nEnemies = Random.int 1 state.maxEnemiesToSpawn
+        nEnemies = Random.weighted (99, 0) [(1, state.maxEnemiesToSpawn)]
         -- TODO: fix hardcoded
         enemyCoordinates = Random.int 1 (state.boardSize.width - 16) |> Random.map (\v -> vec2 (toFloat v) 24)
     in
@@ -222,17 +222,26 @@ updateTimesSinceSpawned delta state = {
             rounds = List.map (updateTimeSinceSpawned delta) state.rounds
     }
 
+doNotIntersect: Position -> List Position -> Bool
+doNotIntersect element listOfElements = 
+        List.map (\existing -> intersect element existing |> not) listOfElements
+        |> List.foldl (&&) True
+
 enemySpawn: GameState -> GameState
 enemySpawn state =
-    -- let 
-    --     spawnedEnemies = List.map (newPosition 32.0 32.0) state.enemySpawnRoll
-    --         |> List.filter
-    --             (\newEnemy -> List.map
-    --                 (\oldEnemy -> intersect newEnemy oldEnemy) state.enemies
-    --              |> List.foldl (||) False )
-    -- in
-    --     { state | enemies = state.enemies ++ spawnedEnemies}
-        { state | enemies = state.enemies ++ List.map (newPosition 32.0 32.0) state.enemySpawnRoll }
+    let 
+        enemySpawns = List.map (newPosition 32.0 32.0) state.enemySpawnRoll
+        newEnemies = List.foldl
+            ( \l acc ->
+                    let
+                        noIntersections = doNotIntersect l acc
+                    in
+                        if noIntersections then acc ++ [l]
+                        else acc)
+            state.enemies
+            enemySpawns
+    in
+        { state | enemies = newEnemies }
 
 
 moveBackground: Float -> GameState -> GameState

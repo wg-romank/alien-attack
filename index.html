@@ -7925,7 +7925,13 @@ var $elm$random$Random$int = F2(
 			});
 	});
 var $author$project$GameState$enemySpawnRoll = function (state) {
-	var nEnemies = A2($elm$random$Random$int, 1, state.maxEnemiesToSpawn);
+	var nEnemies = A2(
+		$elm$random$Random$weighted,
+		_Utils_Tuple2(99, 0),
+		_List_fromArray(
+			[
+				_Utils_Tuple2(1, state.maxEnemiesToSpawn)
+			]));
 	var enemyCoordinates = A2(
 		$elm$random$Random$map,
 		function (v) {
@@ -8028,19 +8034,53 @@ var $author$project$GameState$registerUserInput = F2(
 						[action]))
 			});
 	});
+var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
+var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
+var $author$project$GameState$intersect = F2(
+	function (a, b) {
+		return (_Utils_cmp(
+			$elm$core$Basics$abs(
+				(($elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) + (a.width / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos)) + (b.width / 2.0)),
+			A2($elm$core$Basics$max, a.width, b.width) / 2.0) < 1) && (_Utils_cmp(
+			$elm$core$Basics$abs(
+				(($elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) + (a.height / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos)) + (b.width / 2.0)),
+			A2($elm$core$Basics$max, a.height, b.height) / 2.0) < 1);
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $author$project$GameState$doNotIntersect = F2(
+	function (element, listOfElements) {
+		return A3(
+			$elm$core$List$foldl,
+			$elm$core$Basics$and,
+			true,
+			A2(
+				$elm$core$List$map,
+				function (existing) {
+					return !A2($author$project$GameState$intersect, element, existing);
+				},
+				listOfElements));
+	});
 var $author$project$GameState$enemySpawn = function (state) {
+	var enemySpawns = A2(
+		$elm$core$List$map,
+		A2($author$project$GameState$newPosition, 32.0, 32.0),
+		state.enemySpawnRoll);
+	var newEnemies = A3(
+		$elm$core$List$foldl,
+		F2(
+			function (l, acc) {
+				var noIntersections = A2($author$project$GameState$doNotIntersect, l, acc);
+				return noIntersections ? _Utils_ap(
+					acc,
+					_List_fromArray(
+						[l])) : acc;
+			}),
+		state.enemies,
+		enemySpawns);
 	return _Utils_update(
 		state,
-		{
-			enemies: _Utils_ap(
-				state.enemies,
-				A2(
-					$elm$core$List$map,
-					A2($author$project$GameState$newPosition, 32.0, 32.0),
-					state.enemySpawnRoll))
-		});
+		{enemies: newEnemies});
 };
-var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
 var $author$project$GameState$heightFloat = function (size) {
 	return size.height;
 };
@@ -8083,17 +8123,6 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
-var $author$project$GameState$intersect = F2(
-	function (a, b) {
-		return (_Utils_cmp(
-			$elm$core$Basics$abs(
-				(($elm_explorations$linear_algebra$Math$Vector2$getX(a.pos) + (a.width / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getX(b.pos)) + (b.width / 2.0)),
-			A2($elm$core$Basics$max, a.width, b.width) / 2.0) < 1) && (_Utils_cmp(
-			$elm$core$Basics$abs(
-				(($elm_explorations$linear_algebra$Math$Vector2$getY(a.pos) + (a.height / 2.0)) - $elm_explorations$linear_algebra$Math$Vector2$getY(b.pos)) + (b.width / 2.0)),
-			A2($elm$core$Basics$max, a.height, b.height) / 2.0) < 1);
-	});
 var $elm$core$List$isEmpty = function (xs) {
 	if (!xs.b) {
 		return true;
@@ -8101,7 +8130,6 @@ var $elm$core$List$isEmpty = function (xs) {
 		return false;
 	}
 };
-var $elm$core$Basics$not = _Basics_not;
 var $author$project$GameState$moveRound = F3(
 	function (delta, round, state) {
 		var enemiesHit = A2(
@@ -8182,7 +8210,7 @@ var $author$project$GameState$enemyMove = F3(
 					var nPos = A2($author$project$GameState$moveY, -(delta / 200.0), enemy).pos;
 					return (_Utils_cmp(
 						$elm_explorations$linear_algebra$Math$Vector2$getY(nPos),
-						height) < 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
+						height) > 0) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(
 						_Utils_update(
 							enemy,
 							{pos: nPos}));
