@@ -1,4 +1,4 @@
-module GameState exposing (GameState, Position, initialState, PlayerAction(..), registerUserInput, step, widthFloat, heightFloat, enemiesRoll, enemySpawnRoll, EnemyAction(..), isOver)
+module GameState exposing (..)
 
 import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
@@ -207,6 +207,15 @@ moveEnemyRounds delta state =
 
 registerUserInput: PlayerAction -> GameState -> GameState
 registerUserInput action state = { state | userInput = state.userInput ++ [action] }
+
+registerUserTap: (Float, Float) -> GameState -> GameState
+registerUserTap (x, _) state =
+    let
+        posX = Vec2.getX state.playerPosition.pos
+    in
+        if x < posX - state.playerPosition.width then registerUserInput PlayerMoveLeft state
+        else if x < posX + state.playerPosition.width * 2 then registerUserInput PlayerFire state
+        else registerUserInput PlayerMoveRight state
 
 updateTimeSinceSpawned: Float -> Position -> Position
 updateTimeSinceSpawned delta pos = { pos | sinceSpawned = pos.sinceSpawned + delta }

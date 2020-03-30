@@ -7268,8 +7268,6 @@ var $author$project$Main$toDirection = function (string) {
 			return $author$project$Main$Left;
 		case 'ArrowRight':
 			return $author$project$Main$Right;
-		case 'f':
-			return $author$project$Main$Fire;
 		case ' ':
 			return $author$project$Main$Fire;
 		default:
@@ -8034,6 +8032,13 @@ var $author$project$GameState$registerUserInput = F2(
 						[action]))
 			});
 	});
+var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
+var $author$project$GameState$registerUserTap = F2(
+	function (_v0, state) {
+		var x = _v0.a;
+		var posX = $elm_explorations$linear_algebra$Math$Vector2$getX(state.playerPosition.pos);
+		return (_Utils_cmp(x, posX - state.playerPosition.width) < 0) ? A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveLeft, state) : ((_Utils_cmp(x, posX + (state.playerPosition.width * 2)) < 0) ? A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerFire, state) : A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveRight, state));
+	});
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm_explorations$linear_algebra$Math$Vector2$length = _MJS_v2length;
 var $elm_explorations$linear_algebra$Math$Vector2$sub = _MJS_v2sub;
@@ -8108,7 +8113,6 @@ var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
 var $author$project$GameState$heightFloat = function (size) {
 	return size.height;
 };
-var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
 var $author$project$GameState$intersect = F2(
 	function (a, b) {
 		return (_Utils_cmp(
@@ -8422,6 +8426,21 @@ var $author$project$Main$update = F2(
 						model,
 						{paused: false}),
 					$elm$core$Platform$Cmd$none);
+			case 'End':
+				var _v1 = event.a;
+				var x = _v1.a;
+				var y = _v1.b;
+				var vm = model.viewportMultiplier;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							state: A2(
+								$author$project$GameState$registerUserTap,
+								_Utils_Tuple2(x / vm, y / vm),
+								model.state)
+						}),
+					$elm$core$Platform$Cmd$none);
 			case 'Left':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -8439,17 +8458,6 @@ var $author$project$Main$update = F2(
 						}),
 					$elm$core$Platform$Cmd$none);
 			case 'Fire':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							state: A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerFire, model.state)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'End':
-				var _v1 = event.a;
-				var x = _v1.a;
-				var y = _v1.b;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -9281,7 +9289,13 @@ var $author$project$Main$simulationScreen = function (model) {
 		_List_fromArray(
 			[
 				$elm$html$Html$Attributes$align('center'),
-				A2($elm$html$Html$Attributes$style, 'position', 'relative')
+				A2($elm$html$Html$Attributes$style, 'position', 'relative'),
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart(
+				A2($elm$core$Basics$composeL, $author$project$Main$Start, $author$project$Main$touchCoordinates)),
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove(
+				A2($elm$core$Basics$composeL, $author$project$Main$Move, $author$project$Main$touchCoordinates)),
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd(
+				A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates))
 			]),
 		_List_fromArray(
 			[
@@ -9294,12 +9308,6 @@ var $author$project$Main$simulationScreen = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onStart(
-						A2($elm$core$Basics$composeL, $author$project$Main$Start, $author$project$Main$touchCoordinates)),
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove(
-						A2($elm$core$Basics$composeL, $author$project$Main$Move, $author$project$Main$touchCoordinates)),
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd(
-						A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates)),
 						$elm$html$Html$Attributes$width(model.state.boardSize.width),
 						$elm$html$Html$Attributes$height(model.state.boardSize.height),
 						A2($elm$html$Html$Attributes$style, 'top', '0'),
@@ -9381,8 +9389,7 @@ var $author$project$Main$simulationScreen = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(
-								'SCORE: ' + $elm$core$String$fromInt(model.state.score))
+								$elm$html$Html$text('SCORE: ' + model.message)
 							]))
 					]))
 			]));

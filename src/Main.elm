@@ -50,7 +50,8 @@ init _ = ( {
     
 
 type Msg
-    = Start (Float, Float)
+    =
+    Start (Float, Float)
     | Move (Float, Float)
     | End (Float, Float)
     | Delta Float
@@ -83,8 +84,6 @@ toDirection string =
       Left
     "ArrowRight" ->
       Right
-    "f" ->
-      Fire
     " " ->
       Fire
     other ->
@@ -103,7 +102,7 @@ messageScreen message model =
       style "backgroundColor" "#000000",
       Html.Attributes.align "center",
       style "top" "0",
-      style "left" ((String.fromInt model.offset) ++ "px"),
+      style "left" (String.fromInt model.offset ++ "px"),
       style "height" (String.fromInt model.viewportHeight ++ "px"),
       style "width" (String.fromInt model.viewportWidth ++ "px")
   ] [
@@ -137,14 +136,14 @@ simulationScreen: Model -> Html Msg
 simulationScreen model =
         div [
             Html.Attributes.align "center",
-            style "position" "relative"
+            style "position" "relative",
+            Touch.onStart (Start << touchCoordinates),
+            Touch.onMove (Move << touchCoordinates),
+            Touch.onEnd (End << touchCoordinates)
         ]
         [
           WebGL.toHtmlWith [ WebGL.alpha True, WebGL.depth 1 ]
           [
-            Touch.onStart (Start << touchCoordinates),
-            Touch.onMove (Move << touchCoordinates),
-            Touch.onEnd (End << touchCoordinates),
             width model.state.boardSize.width,
             height model.state.boardSize.height,
             -- style "image-rendering" "-webkit-optimize-contrast",
@@ -195,7 +194,9 @@ simulationScreen model =
                 style "top" "1%",
                 style "left" "3%"
               ]
-              [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
+              -- [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
+              [ text ("SCORE: " ++ model.message) ]
+              -- [ text ("SCORE: " ++ String.fromInt (List.length model.state.userInput) ) ]
             ]
         ]
 
@@ -221,14 +222,13 @@ update event model =
     case event of
         Pause -> ({ model | paused = True }, Cmd.none)
         Resume -> ({ model | paused = False}, Cmd.none)
-        -- Start (x, y) -> ({ model | from = vec2 x y }, Cmd.none)
-        -- Move (x, y) -> let vm = model.viewportMultiplier in
-        --     ({ model | state = registerUserInput (PlayerMove(x / vm, y / vm)) model.state }, Cmd.none)
+        End (x, y) ->
+          -- ({model | message = "Touch" ++ (String.fromFloat x) ++ (String.fromFloat y)}, Cmd.none)
+          let vm = model.viewportMultiplier in
+            ({ model | state = registerUserTap (x /vm , y / vm) model.state }, Cmd.none)
         Left -> ({ model | state = registerUserInput PlayerMoveLeft model.state }, Cmd.none)
         Right -> ({ model | state = registerUserInput PlayerMoveRight model.state }, Cmd.none)
         Fire -> ({model | state = registerUserInput PlayerFire model.state }, Cmd.none)
-        End (x, y) ->
-            ({ model | state = registerUserInput PlayerFire model.state }, Cmd.none)
         Delta delta -> 
             let
               newState = step delta model.state
