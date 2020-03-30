@@ -9389,7 +9389,42 @@ var $author$project$Main$simulationScreen = function (model) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('SCORE: ' + model.message)
+								$elm$html$Html$text(
+								'ENEMIES: ' + $elm$core$String$fromInt(
+									$elm$core$List$length(model.state.enemies)))
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+								A2($elm$html$Html$Attributes$style, 'top', '6%'),
+								A2($elm$html$Html$Attributes$style, 'left', '3%')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								'ROUNDS: ' + $elm$core$String$fromInt(
+									$elm$core$List$length(model.state.enemyRounds)))
+							])),
+						A2(
+						$elm$html$Html$p,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+								A2($elm$html$Html$Attributes$style, 'font-family', 'pixelated'),
+								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+								A2($elm$html$Html$Attributes$style, 'top', '9%'),
+								A2($elm$html$Html$Attributes$style, 'left', '3%')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(
+								'SCORE: ' + $elm$core$String$fromInt(model.state.score))
 							]))
 					]))
 			]));

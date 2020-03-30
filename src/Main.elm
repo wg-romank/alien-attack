@@ -195,8 +195,30 @@ simulationScreen model =
                 style "left" "3%"
               ]
               -- [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
-              [ text ("SCORE: " ++ model.message) ]
+              [ text ("ENEMIES: " ++ String.fromInt (List.length model.state.enemies)) ],
               -- [ text ("SCORE: " ++ String.fromInt (List.length model.state.userInput) ) ]
+            p
+              [
+                style "position" "absolute",
+                style "color" "#FFFFFF",
+                style "font-family" "pixelated",
+                style "font-size" "2em",
+                style "top" "6%",
+                style "left" "3%"
+              ]
+              -- [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
+              [ text ("ROUNDS: " ++ String.fromInt (List.length model.state.enemyRounds)) ],
+              -- [ text ("SCORE: " ++ String.fromInt (List.length model.state.userInput) ) ]
+            p
+              [
+                style "position" "absolute",
+                style "color" "#FFFFFF",
+                style "font-family" "pixelated",
+                style "font-size" "2em",
+                style "top" "9%",
+                style "left" "3%"
+              ]
+              [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
             ]
         ]
 
