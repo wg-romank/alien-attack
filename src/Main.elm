@@ -98,7 +98,8 @@ view model =
   { title = "Main",
     body = [
       if model.atlas |> loaded |> not then loadingScreen model
-      else if isOver model.state then gameOverScreen model
+      else if model.state.playerDead then gameOverScreen model
+      else if model.state.playerDeorbited then messageScreen "DEORBITED" model
       else simulationScreen model
     ]
   }
@@ -133,7 +134,7 @@ loadingScreen: Model -> Html Msg
 loadingScreen model = messageScreen "LOADING..." model
 
 gameOverScreen: Model -> Html Msg
-gameOverScreen model = messageScreen ("GAME OVER, YOUR SCORE: " ++ String.fromInt model.state.score) model
+gameOverScreen model = messageScreen ("YOUR SCORE: " ++ String.fromInt model.state.score) model
 
 simulationScreen: Model -> Html Msg
 simulationScreen model =

@@ -6992,7 +6992,7 @@ var $author$project$GameState$newPosition = F3(
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
 	bgOffset: 10000,
-	bgOffsetMax: 30000,
+	bgOffsetMax: 20000,
 	bgOffsetMin: 10000,
 	boardSize: {height: 240, width: 160},
 	course: 0,
@@ -7240,7 +7240,7 @@ var $author$project$Main$init = function (_v0) {
 				])));
 };
 var $author$project$GameState$isOver = function (state) {
-	return state.playerDead || state.playerDeorbited;
+	return state.playerDead;
 };
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
@@ -8098,14 +8098,15 @@ var $author$project$GameState$enemySpawn = function (state) {
 		state,
 		{enemies: newEnemies});
 };
+var $elm$core$Basics$pow = _Basics_pow;
 var $author$project$GameState$widthFloat = function (size) {
 	return size.width;
 };
 var $author$project$GameState$moveBackground = function (state) {
-	var widthHalf = $author$project$GameState$widthFloat(state.boardSize) / 2;
+	var widthHalf = ($author$project$GameState$widthFloat(state.boardSize) - state.playerPosition.width) / 2;
 	var playerPosX = $elm_explorations$linear_algebra$Math$Vector2$getX(state.playerPosition.pos);
-	var playerPosXLerped = ($elm$core$Basics$abs(playerPosX) - widthHalf) / widthHalf;
-	var newBgOffset = state.bgOffsetMin + ((state.bgOffsetMax - state.bgOffsetMin) * playerPosXLerped);
+	var playerPosXLerped = $elm$core$Basics$abs(playerPosX - widthHalf) / widthHalf;
+	var newBgOffset = state.bgOffsetMin + ((state.bgOffsetMax - state.bgOffsetMin) * A2($elm$core$Basics$pow, playerPosXLerped, 2));
 	return _Utils_update(
 		state,
 		{bgOffset: newBgOffset});
@@ -8130,7 +8131,6 @@ var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
-var $elm$core$Basics$pow = _Basics_pow;
 var $author$project$GameState$intersect = F2(
 	function (a, b) {
 		var centerB = A2(
@@ -8618,7 +8618,7 @@ var $author$project$Main$messageScreen = F2(
 var $author$project$Main$gameOverScreen = function (model) {
 	return A2(
 		$author$project$Main$messageScreen,
-		'GAME OVER, YOUR SCORE: ' + $elm$core$String$fromInt(model.state.score),
+		'YOUR SCORE: ' + $elm$core$String$fromInt(model.state.score),
 		model);
 };
 var $author$project$Main$loadingScreen = function (model) {
@@ -9420,7 +9420,7 @@ var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
-				(!$author$project$Atlas$loaded(model.atlas)) ? $author$project$Main$loadingScreen(model) : ($author$project$GameState$isOver(model.state) ? $author$project$Main$gameOverScreen(model) : $author$project$Main$simulationScreen(model))
+				(!$author$project$Atlas$loaded(model.atlas)) ? $author$project$Main$loadingScreen(model) : (model.state.playerDead ? $author$project$Main$gameOverScreen(model) : (model.state.playerDeorbited ? A2($author$project$Main$messageScreen, 'DEORBITED', model) : $author$project$Main$simulationScreen(model)))
 			]),
 		title: 'Main'
 	};

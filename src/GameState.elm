@@ -78,7 +78,7 @@ initialState = {
         userInput = [],
         bgOffset = 10000,
         bgOffsetMin = 10000,
-        bgOffsetMax = 30000,
+        bgOffsetMax = 20000,
         boardSize = { width = 160, height = 240 },
         playerPosition = newPosition 16.0 16.0 (vec2 72 222),
         enemies = [ newPosition 32.0 32.0 (vec2 56 24) ],
@@ -90,7 +90,7 @@ initialState = {
     }
 
 isOver: GameState -> Bool
-isOver state = state.playerDead || state.playerDeorbited
+isOver state = state.playerDead
 
 playerFire: GameState -> GameState
 playerFire state = { state | rounds = state.rounds ++ [spawnRound state.playerPosition] }
@@ -258,9 +258,9 @@ moveBackground: GameState -> GameState
 moveBackground state =
     let
         playerPosX = Vec2.getX state.playerPosition.pos
-        widthHalf = widthFloat state.boardSize / 2
-        playerPosXLerped = (abs playerPosX - widthHalf) / widthHalf
-        newBgOffset = state.bgOffsetMin + (state.bgOffsetMax - state.bgOffsetMin) * playerPosXLerped
+        widthHalf = (widthFloat state.boardSize - state.playerPosition.width) / 2
+        playerPosXLerped = (abs (playerPosX - widthHalf)) / widthHalf
+        newBgOffset = state.bgOffsetMin + (state.bgOffsetMax - state.bgOffsetMin) * playerPosXLerped ^ 2
     in
         { state | bgOffset = newBgOffset }
 
