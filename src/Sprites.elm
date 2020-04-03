@@ -61,13 +61,10 @@ playerSprite atlas state =
 
 enemySprite: Atlas -> GameState -> List Rectangle
 enemySprite atlas state =
-    let
-        frameSwitch = 2
-    in
     List.concatMap
         (\enemy ->
             let
-                textureKey = if (enemy.sinceSpawned / 1000.0 |> round |> modBy frameSwitch) == 0 then Enemy1 else Enemy2
+                textureKey = if (enemy.sinceSpawned / 1000.0 |> round |> modBy 2) == 0 then Enemy1 else Enemy2
                 maybeTexture = Atlas.get atlas textureKey
             in
                 case maybeTexture of
