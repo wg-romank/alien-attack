@@ -40,7 +40,11 @@ objectsToDraw atlas state = List.concat
 playerSprite: Atlas -> GameState -> List Rectangle
 playerSprite atlas state =
     let
-        userTexture = ME.toList (Atlas.get atlas User1)
+        userTexture1 = ME.toList (Atlas.get atlas User1)
+        userTexture2 = ME.toList (Atlas.get atlas User2)
+        userTexture3 = ME.toList (Atlas.get atlas User3)
+        animationPeriod = 5
+        frameId = (state.playerPosition.sinceSpawned / 1000.0 |> round |> modBy animationPeriod) |> modBy 3
     in
     List.map
         (\texture -> {
@@ -49,7 +53,11 @@ playerSprite atlas state =
             height = state.playerPosition.height,
             display = RectTexture texture,
             depthLayer = depthLayerCharacters
-        }) userTexture
+        }) (case frameId of
+                0 -> userTexture1
+                1 -> userTexture2
+                2 -> userTexture3
+                _ -> userTexture1 )
 
 enemySprite: Atlas -> GameState -> List Rectangle
 enemySprite atlas state =

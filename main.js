@@ -7935,105 +7935,6 @@ var $author$project$GameState$enemySpawnRoll = function (state) {
 		},
 		nEnemies);
 };
-var $elm$random$Random$Generate = function (a) {
-	return {$: 'Generate', a: a};
-};
-var $elm$random$Random$initialSeed = function (x) {
-	var _v0 = $elm$random$Random$next(
-		A2($elm$random$Random$Seed, 0, 1013904223));
-	var state1 = _v0.a;
-	var incr = _v0.b;
-	var state2 = (state1 + x) >>> 0;
-	return $elm$random$Random$next(
-		A2($elm$random$Random$Seed, state2, incr));
-};
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$time$Time$posixToMillis = function (_v0) {
-	var millis = _v0.a;
-	return millis;
-};
-var $elm$random$Random$init = A2(
-	$elm$core$Task$andThen,
-	function (time) {
-		return $elm$core$Task$succeed(
-			$elm$random$Random$initialSeed(
-				$elm$time$Time$posixToMillis(time)));
-	},
-	$elm$time$Time$now);
-var $elm$random$Random$step = F2(
-	function (_v0, seed) {
-		var generator = _v0.a;
-		return generator(seed);
-	});
-var $elm$random$Random$onEffects = F3(
-	function (router, commands, seed) {
-		if (!commands.b) {
-			return $elm$core$Task$succeed(seed);
-		} else {
-			var generator = commands.a.a;
-			var rest = commands.b;
-			var _v1 = A2($elm$random$Random$step, generator, seed);
-			var value = _v1.a;
-			var newSeed = _v1.b;
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$random$Random$onEffects, router, rest, newSeed);
-				},
-				A2($elm$core$Platform$sendToApp, router, value));
-		}
-	});
-var $elm$random$Random$onSelfMsg = F3(
-	function (_v0, _v1, seed) {
-		return $elm$core$Task$succeed(seed);
-	});
-var $elm$random$Random$cmdMap = F2(
-	function (func, _v0) {
-		var generator = _v0.a;
-		return $elm$random$Random$Generate(
-			A2($elm$random$Random$map, func, generator));
-	});
-_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
-var $elm$random$Random$command = _Platform_leaf('Random');
-var $elm$random$Random$generate = F2(
-	function (tagger, generator) {
-		return $elm$random$Random$command(
-			$elm$random$Random$Generate(
-				A2($elm$random$Random$map, tagger, generator)));
-	});
-var $author$project$GameState$isOver = function (state) {
-	return state.playerDead || state.playerDeorbited;
-};
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$GameState$registerUserInput = F2(
-	function (action, state) {
-		return _Utils_update(
-			state,
-			{
-				userInput: _Utils_ap(
-					state.userInput,
-					_List_fromArray(
-						[action]))
-			});
-	});
-var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
-var $author$project$GameState$registerUserTap = F2(
-	function (_v0, state) {
-		var x = _v0.a;
-		var posX = $elm_explorations$linear_algebra$Math$Vector2$getX(state.playerPosition.pos);
-		return (_Utils_cmp(x, posX - state.playerPosition.width) < 0) ? A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveLeft, state) : ((_Utils_cmp(x, posX + (state.playerPosition.width * 2)) < 0) ? A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerFire, state) : A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveRight, state));
-	});
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm_explorations$linear_algebra$Math$Vector2$length = _MJS_v2length;
 var $elm_explorations$linear_algebra$Math$Vector2$sub = _MJS_v2sub;
@@ -8096,6 +7997,7 @@ var $author$project$GameState$enemySpawn = function (state) {
 };
 var $author$project$GameState$bgOffsetMax = 20;
 var $author$project$GameState$bgOffsetMin = 10;
+var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
 var $elm$core$Basics$pow = _Basics_pow;
 var $author$project$GameState$widthFloat = function (size) {
 	return size.width;
@@ -8419,7 +8321,7 @@ var $author$project$GameState$updateTimesSinceSpawned = F2(
 					state.rounds)
 			});
 	});
-var $author$project$GameState$step = F2(
+var $author$project$GameState$gameLoop = F2(
 	function (timeDelta, state) {
 		return $author$project$GameState$enemySpawn(
 			$author$project$GameState$moveBackground(
@@ -8439,6 +8341,104 @@ var $author$project$GameState$step = F2(
 									$author$project$GameState$moveRounds,
 									timeDelta,
 									A2($author$project$GameState$performPlayerAction, state.userInput, state))))))));
+	});
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$time$Time$posixToMillis = function (_v0) {
+	var millis = _v0.a;
+	return millis;
+};
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $author$project$GameState$isOver = function (state) {
+	return state.playerDead || state.playerDeorbited;
+};
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$GameState$registerUserInput = F2(
+	function (action, state) {
+		return _Utils_update(
+			state,
+			{
+				userInput: _Utils_ap(
+					state.userInput,
+					_List_fromArray(
+						[action]))
+			});
+	});
+var $author$project$GameState$registerUserTap = F2(
+	function (_v0, state) {
+		var x = _v0.a;
+		var posX = $elm_explorations$linear_algebra$Math$Vector2$getX(state.playerPosition.pos);
+		return (_Utils_cmp(x, posX - state.playerPosition.width) < 0) ? A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveLeft, state) : ((_Utils_cmp(x, posX + (state.playerPosition.width * 2)) < 0) ? A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerFire, state) : A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveRight, state));
 	});
 var $author$project$Main$update = F2(
 	function (event, model) {
@@ -8535,7 +8535,7 @@ var $author$project$Main$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'Delta':
 				var delta = event.a;
-				var newState = A2($author$project$GameState$step, delta, model.state);
+				var newState = A2($author$project$GameState$gameLoop, delta, model.state);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -9103,8 +9103,20 @@ var $author$project$Sprites$enemySprite = F2(
 	});
 var $author$project$Sprites$playerSprite = F2(
 	function (atlas, state) {
-		var userTexture = $elm_community$maybe_extra$Maybe$Extra$toList(
+		var userTexture3 = $elm_community$maybe_extra$Maybe$Extra$toList(
+			A2($author$project$Atlas$get, atlas, $author$project$Atlas$User3));
+		var userTexture2 = $elm_community$maybe_extra$Maybe$Extra$toList(
+			A2($author$project$Atlas$get, atlas, $author$project$Atlas$User2));
+		var userTexture1 = $elm_community$maybe_extra$Maybe$Extra$toList(
 			A2($author$project$Atlas$get, atlas, $author$project$Atlas$User1));
+		var animationPeriod = 5;
+		var frameId = A2(
+			$elm$core$Basics$modBy,
+			3,
+			A2(
+				$elm$core$Basics$modBy,
+				animationPeriod,
+				$elm$core$Basics$round(state.playerPosition.sinceSpawned / 1000.0)));
 		return A2(
 			$elm$core$List$map,
 			function (texture) {
@@ -9116,7 +9128,18 @@ var $author$project$Sprites$playerSprite = F2(
 					width: state.playerPosition.width
 				};
 			},
-			userTexture);
+			function () {
+				switch (frameId) {
+					case 0:
+						return userTexture1;
+					case 1:
+						return userTexture2;
+					case 2:
+						return userTexture3;
+					default:
+						return userTexture1;
+				}
+			}());
 	});
 var $author$project$Sprites$objectsToDraw = F2(
 	function (atlas, state) {
