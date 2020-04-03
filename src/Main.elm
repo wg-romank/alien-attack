@@ -8,7 +8,7 @@ import Html exposing (Html, div, text, p)
 import Html.Attributes exposing (width, height, style)
 import Task
 
-import Math.Vector2 as Vec2 exposing (Vec2)
+import Math.Vector2 exposing (Vec2)
 
 import Html.Events.Extra.Touch as Touch
 import WebGL
@@ -53,25 +53,18 @@ type Msg
     =
     Start (Float, Float)
     | Move (Float, Float)
-    | End (Float, Float)
+    | TouchEnd (Float, Float)
     | Delta Float
     | AtlasLoaded (Result Error Atlas)
     | ViewPortLoaded (Viewport)
     | Pause
     | Resume
-    | Left
-    | Right
-    | Fire
+    | KeyboardLeft
+    | KeyboardRight
+    | KeyboardFire
     | EnemiesRoll (List EnemyAction)
     | EnemiesSpawnRoll (List Vec2)
     | Other (String)
-
-touchCoordinates : Touch.Event -> ( Float, Float )
-touchCoordinates touchEvent =
-    List.head touchEvent.changedTouches
-        |> Maybe.map .clientPos
-        |> Maybe.withDefault ( 0, 0 )
-
 
 keyDecoder : Decode.Decoder Msg
 keyDecoder =
@@ -81,11 +74,11 @@ toDirection : String -> Msg
 toDirection string =
   case string of
     "ArrowLeft" ->
-      Left
+      KeyboardLeft
     "ArrowRight" ->
-      Right
+      KeyboardRight
     " " ->
-      Fire
+      KeyboardFire
     other ->
       Other other
 
@@ -97,24 +90,26 @@ view: Model -> Document Msg
 view model =
   { title = "Main",
     body = [
-      if model.atlas |> loaded |> not then loadingScreen model
-      else if model.state.playerDead then gameOverScreen model
+      if model.atlas |> loaded |> not then messageScreen "LOADING..." model
+      else if model.state.playerDead then messageScreen ("YOUR SCORE: " ++ String.fromInt model.state.score) model
       else if model.state.playerDeorbited then messageScreen "DEORBITED" model
       else simulationScreen model
     ]
   }
 
-messageScreen: String -> Model -> Html Msg
-messageScreen message model =
-  div [
+container: Model -> List (Html.Attribute html) -> List (Html html) -> Html html
+container model attrs msgs =
+  div (attrs ++ [
       style "position" "absolute",
-      style "backgroundColor" "#000000",
-      Html.Attributes.align "center",
       style "top" "0",
       style "left" (String.fromInt model.offset ++ "px"),
       style "height" (String.fromInt model.viewportHeight ++ "px"),
       style "width" (String.fromInt model.viewportWidth ++ "px")
-  ] [
+  ]) msgs
+
+messageScreen: String -> Model -> Html Msg
+messageScreen message model =
+  container model [ style "backgroundColor" "#000000" ] [
     p
       [
         style "color" "#FFFFFF",
@@ -124,17 +119,30 @@ messageScreen message model =
         style "font-size" "2em",
         style "text-align" "center",
         style "width" (String.fromInt model.viewportWidth ++ "px")
-        -- Html.Attributes.align "center"
       ]
       [ text message ]
   ]
 
+touchCoordinates : Touch.Event -> ( Float, Float )
+touchCoordinates touchEvent =
+    List.head touchEvent.changedTouches
+        |> Maybe.map .clientPos
+        |> Maybe.withDefault ( 0, 0 )
 
-loadingScreen: Model -> Html Msg
-loadingScreen model = messageScreen "LOADING..." model
 
-gameOverScreen: Model -> Html Msg
-gameOverScreen model = messageScreen ("YOUR SCORE: " ++ String.fromInt model.state.score) model
+hudText: String -> String -> String -> String -> String -> Html msg
+hudText margin1 margin1Amount margin2 margin2Amount t =
+  p
+    [
+      style "position" "absolute",
+      style "color" "#FFFFFF",
+      style "font-family" "arcadeclassic",
+      style "font-size" "2em",
+      style margin1 margin1Amount,
+      style margin2 margin2Amount
+    ]
+    [ text t ]
+
 
 simulationScreen: Model -> Html Msg
 simulationScreen model =
@@ -142,64 +150,23 @@ simulationScreen model =
             Html.Attributes.align "center",
             Touch.onStart (Start << touchCoordinates),
             Touch.onMove (Move << touchCoordinates),
-            Touch.onEnd (End << touchCoordinates)
+            Touch.onEnd (TouchEnd << touchCoordinates)
         ]
         [
           WebGL.toHtmlWith [ WebGL.alpha True, WebGL.depth 1 ]
           [
             width model.state.boardSize.width,
             height model.state.boardSize.height,
-            -- style "image-rendering" "-webkit-optimize-contrast",
             style "position" "absolute",
             style "top" "0",
-            style "left" ((String.fromInt model.offset) ++ "px"),
-            style "image-rendering" "crisp-edges",
-            style "image-rendering" "pixelated",
-          --   style "width" (String.fromInt model.viewportWidth ++ "px"),
+            style "left" (String.fromInt model.offset ++ "px"),
             style "height" (String.fromInt model.viewportHeight ++ "px"),
-            -- style "backgroundColor" "#000000",
-            -- style "backgroundColor" "#283531",
             style "display" "block" ]
             (objectsToDraw model.atlas model.state),
-          -- text <| Debug.toString model
-          div [
-              style "position" "absolute",
-              style "top" "0",
-              style "left" (String.fromInt model.offset ++ "px"),
-              style "height" (String.fromInt model.viewportHeight ++ "px"),
-              style "width" (String.fromInt model.viewportWidth ++ "px")
-          ] [
-            p
-              [
-                style "position" "absolute",
-                style "color" "#FFFFFF",
-                style "font-family" "arcadeclassic",
-                style "font-size" "2em",
-                style "bottom" "2%",
-                style "left" "3%"
-              ]
-              [ text ("FUEL: " ++ String.fromFloat model.state.fuel) ],
-            p
-              [
-                style "position" "absolute",
-                style "color" "#FFFFFF",
-                style "font-family" "arcadeclassic",
-                style "font-size" "2em",
-                style "bottom" "6%",
-                style "left" "3%"
-              ]
-              [ text ("COURSE: " ++ String.fromFloat model.state.course) ],
-            p
-              [
-                style "position" "absolute",
-                style "color" "#FFFFFF",
-                style "font-family" "arcadeclassic",
-                style "font-size" "2em",
-                style "top" "1%",
-                style "left" "3%"
-              ]
-              [ text ("SCORE: " ++ String.fromInt model.state.score ) ]
-            ]
+          container model [] [
+            hudText "bottom" "2%" "left" "3%" ("FUEL: " ++ String.fromFloat model.state.fuel),
+            hudText "bottom" "6%" "left" "3%" ("COURSE: " ++ String.fromFloat model.state.course),
+            hudText "top" "1%" "left" "3%" ("SCORE: " ++ String.fromInt model.state.score ) ]
         ]
 
 
@@ -207,8 +174,8 @@ computeViewportSize: Viewport -> Model -> Model
 computeViewportSize viewport model =
     let
         vph = viewport.viewport.height
-        vpm = viewport.viewport.height / (toFloat model.state.boardSize.height)
-        ratio = (toFloat model.state.boardSize.height) / (toFloat model.state.boardSize.width)
+        vpm = viewport.viewport.height / toFloat model.state.boardSize.height
+        ratio = toFloat model.state.boardSize.height / toFloat model.state.boardSize.width
         vpw = vph / ratio
         offset = (viewport.viewport.width - vpw) / 2.0 |> round
     in 
@@ -224,22 +191,16 @@ update event model =
     case event of
         Pause -> ({ model | paused = True }, Cmd.none)
         Resume -> ({ model | paused = False}, Cmd.none)
-        End (x, y) ->
-          -- ({model | message = "Touch" ++ (String.fromFloat x) ++ (String.fromFloat y)}, Cmd.none)
-          let vm = model.viewportMultiplier in
+        TouchEnd (x, y) ->
+          let
+            vm = model.viewportMultiplier
+          in
             ({ model | state = registerUserTap ((x - toFloat model.offset) /vm , y / vm) model.state }, Cmd.none)
-        Left -> ({ model | state = registerUserInput PlayerMoveLeft model.state }, Cmd.none)
-        Right -> ({ model | state = registerUserInput PlayerMoveRight model.state }, Cmd.none)
-        Fire -> ({model | state = registerUserInput PlayerFire model.state }, Cmd.none)
-        Delta delta -> 
-            let
-              newState = step delta model.state
-            in
-              ({ model | state = newState },
-                Cmd.batch [
-                  Random.generate EnemiesRoll (enemiesRoll newState),
-                  Random.generate EnemiesSpawnRoll (enemySpawnRoll newState)
-                ] )
+
+        KeyboardLeft -> ({ model | state = registerUserInput PlayerMoveLeft model.state }, Cmd.none)
+        KeyboardRight -> ({ model | state = registerUserInput PlayerMoveRight model.state }, Cmd.none)
+        KeyboardFire -> ({model | state = registerUserInput PlayerFire model.state }, Cmd.none)
+
         EnemiesRoll rolls ->
           let
             state = model.state
@@ -253,11 +214,23 @@ update event model =
             newState = { state | enemySpawnRoll = spawnRoll }
           in
             ({model | state = newState}, Cmd.none)
+
         AtlasLoaded result ->
             case result of
                 Result.Ok atlas -> ({model | atlas = atlas}, Cmd.none)
                 Result.Err _ -> (model, Cmd.none)
+
         ViewPortLoaded viewport -> (computeViewportSize viewport model, Cmd.none)
+
+        Delta delta -> 
+            let
+              newState = step delta model.state
+            in
+              ({ model | state = newState, paused = isOver newState },
+                Cmd.batch [
+                  Random.generate EnemiesRoll (enemiesRoll newState),
+                  Random.generate EnemiesSpawnRoll (enemySpawnRoll newState)
+                ] )
         _ -> (model, Cmd.none)
 
 main: Program() Model Msg
@@ -265,8 +238,7 @@ main = Browser.document {
        init = init,
        subscriptions = \model ->
         Sub.batch [
-          if model.paused || isOver model.state || Atlas.loaded model.atlas |> not then
-          Sub.none else onAnimationFrameDelta Delta,
+          if model.paused || Atlas.loaded model.atlas |> not then Sub.none else onAnimationFrameDelta Delta,
           onKeyDown keyDecoder,
           Browser.Events.onVisibilityChange (\v ->
             case v of

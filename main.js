@@ -7241,25 +7241,22 @@ var $author$project$Main$init = function (_v0) {
 					A2($elm$core$Task$perform, $author$project$Main$ViewPortLoaded, $elm$browser$Browser$Dom$getViewport)
 				])));
 };
-var $author$project$GameState$isOver = function (state) {
-	return state.playerDead || state.playerDeorbited;
-};
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$Fire = {$: 'Fire'};
-var $author$project$Main$Left = {$: 'Left'};
+var $author$project$Main$KeyboardFire = {$: 'KeyboardFire'};
+var $author$project$Main$KeyboardLeft = {$: 'KeyboardLeft'};
+var $author$project$Main$KeyboardRight = {$: 'KeyboardRight'};
 var $author$project$Main$Other = function (a) {
 	return {$: 'Other', a: a};
 };
-var $author$project$Main$Right = {$: 'Right'};
 var $author$project$Main$toDirection = function (string) {
 	switch (string) {
 		case 'ArrowLeft':
-			return $author$project$Main$Left;
+			return $author$project$Main$KeyboardLeft;
 		case 'ArrowRight':
-			return $author$project$Main$Right;
+			return $author$project$Main$KeyboardRight;
 		case ' ':
-			return $author$project$Main$Fire;
+			return $author$project$Main$KeyboardFire;
 		default:
 			var other = string;
 			return $author$project$Main$Other(other);
@@ -8024,6 +8021,9 @@ var $elm$random$Random$generate = F2(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
 	});
+var $author$project$GameState$isOver = function (state) {
+	return state.playerDead || state.playerDeorbited;
+};
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$GameState$registerUserInput = F2(
 	function (action, state) {
@@ -8462,7 +8462,7 @@ var $author$project$Main$update = F2(
 						model,
 						{paused: false}),
 					$elm$core$Platform$Cmd$none);
-			case 'End':
+			case 'TouchEnd':
 				var _v1 = event.a;
 				var x = _v1.a;
 				var y = _v1.b;
@@ -8477,7 +8477,7 @@ var $author$project$Main$update = F2(
 								model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'Left':
+			case 'KeyboardLeft':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8485,7 +8485,7 @@ var $author$project$Main$update = F2(
 							state: A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveLeft, model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'Right':
+			case 'KeyboardRight':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8493,7 +8493,7 @@ var $author$project$Main$update = F2(
 							state: A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerMoveRight, model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'Fire':
+			case 'KeyboardFire':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -8501,25 +8501,6 @@ var $author$project$Main$update = F2(
 							state: A2($author$project$GameState$registerUserInput, $author$project$GameState$PlayerFire, model.state)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'Delta':
-				var delta = event.a;
-				var newState = A2($author$project$GameState$step, delta, model.state);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{state: newState}),
-					$elm$core$Platform$Cmd$batch(
-						_List_fromArray(
-							[
-								A2(
-								$elm$random$Random$generate,
-								$author$project$Main$EnemiesRoll,
-								$author$project$GameState$enemiesRoll(newState)),
-								A2(
-								$elm$random$Random$generate,
-								$author$project$Main$EnemiesSpawnRoll,
-								$author$project$GameState$enemySpawnRoll(newState))
-							])));
 			case 'EnemiesRoll':
 				var rolls = event.a;
 				var state = model.state;
@@ -8559,47 +8540,71 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$computeViewportSize, viewport, model),
 					$elm$core$Platform$Cmd$none);
+			case 'Delta':
+				var delta = event.a;
+				var newState = A2($author$project$GameState$step, delta, model.state);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							paused: $author$project$GameState$isOver(newState),
+							state: newState
+						}),
+					$elm$core$Platform$Cmd$batch(
+						_List_fromArray(
+							[
+								A2(
+								$elm$random$Random$generate,
+								$author$project$Main$EnemiesRoll,
+								$author$project$GameState$enemiesRoll(newState)),
+								A2(
+								$elm$random$Random$generate,
+								$author$project$Main$EnemiesSpawnRoll,
+								$author$project$GameState$enemySpawnRoll(newState))
+							])));
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $elm$html$Html$Attributes$stringProperty = F2(
-	function (key, string) {
-		return A2(
-			_VirtualDom_property,
-			key,
-			$elm$json$Json$Encode$string(string));
-	});
-var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $author$project$Main$container = F3(
+	function (model, attrs, msgs) {
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				attrs,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+						A2($elm$html$Html$Attributes$style, 'top', '0'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'left',
+						$elm$core$String$fromInt(model.offset) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'height',
+						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
+						A2(
+						$elm$html$Html$Attributes$style,
+						'width',
+						$elm$core$String$fromInt(model.viewportWidth) + 'px')
+					])),
+			msgs);
+	});
+var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
 var $author$project$Main$messageScreen = F2(
 	function (message, model) {
-		return A2(
-			$elm$html$Html$div,
+		return A3(
+			$author$project$Main$container,
+			model,
 			_List_fromArray(
 				[
-					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-					A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000'),
-					$elm$html$Html$Attributes$align('center'),
-					A2($elm$html$Html$Attributes$style, 'top', '0'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'left',
-					$elm$core$String$fromInt(model.offset) + 'px'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'height',
-					$elm$core$String$fromInt(model.viewportHeight) + 'px'),
-					A2(
-					$elm$html$Html$Attributes$style,
-					'width',
-					$elm$core$String$fromInt(model.viewportWidth) + 'px')
+					A2($elm$html$Html$Attributes$style, 'backgroundColor', '#000000')
 				]),
 			_List_fromArray(
 				[
@@ -8624,24 +8629,24 @@ var $author$project$Main$messageScreen = F2(
 						]))
 				]));
 	});
-var $author$project$Main$gameOverScreen = function (model) {
-	return A2(
-		$author$project$Main$messageScreen,
-		'YOUR SCORE: ' + $elm$core$String$fromInt(model.state.score),
-		model);
-};
-var $author$project$Main$loadingScreen = function (model) {
-	return A2($author$project$Main$messageScreen, 'LOADING...', model);
-};
-var $author$project$Main$End = function (a) {
-	return {$: 'End', a: a};
-};
 var $author$project$Main$Move = function (a) {
 	return {$: 'Move', a: a};
 };
 var $author$project$Main$Start = function (a) {
 	return {$: 'Start', a: a};
 };
+var $author$project$Main$TouchEnd = function (a) {
+	return {$: 'TouchEnd', a: a};
+};
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm_explorations$webgl$WebGL$Internal$Alpha = function (a) {
 	return {$: 'Alpha', a: a};
 };
@@ -8657,6 +8662,24 @@ var $elm$html$Html$Attributes$height = function (n) {
 		'height',
 		$elm$core$String$fromInt(n));
 };
+var $author$project$Main$hudText = F5(
+	function (margin1, margin1Amount, margin2, margin2Amount, t) {
+		return A2(
+			$elm$html$Html$p,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+					A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+					A2($elm$html$Html$Attributes$style, 'font-family', 'arcadeclassic'),
+					A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+					A2($elm$html$Html$Attributes$style, margin1, margin1Amount),
+					A2($elm$html$Html$Attributes$style, margin2, margin2Amount)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(t)
+				]));
+	});
 var $author$project$Shaders$RectColor = function (a) {
 	return {$: 'RectColor', a: a};
 };
@@ -9323,7 +9346,7 @@ var $author$project$Main$simulationScreen = function (model) {
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onMove(
 				A2($elm$core$Basics$composeL, $author$project$Main$Move, $author$project$Main$touchCoordinates)),
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Touch$onEnd(
-				A2($elm$core$Basics$composeL, $author$project$Main$End, $author$project$Main$touchCoordinates))
+				A2($elm$core$Basics$composeL, $author$project$Main$TouchEnd, $author$project$Main$touchCoordinates))
 			]),
 		_List_fromArray(
 			[
@@ -9344,8 +9367,6 @@ var $author$project$Main$simulationScreen = function (model) {
 						$elm$html$Html$Attributes$style,
 						'left',
 						$elm$core$String$fromInt(model.offset) + 'px'),
-						A2($elm$html$Html$Attributes$style, 'image-rendering', 'crisp-edges'),
-						A2($elm$html$Html$Attributes$style, 'image-rendering', 'pixelated'),
 						A2(
 						$elm$html$Html$Attributes$style,
 						'height',
@@ -9353,75 +9374,33 @@ var $author$project$Main$simulationScreen = function (model) {
 						A2($elm$html$Html$Attributes$style, 'display', 'block')
 					]),
 				A2($author$project$Sprites$objectsToDraw, model.atlas, model.state)),
-				A2(
-				$elm$html$Html$div,
+				A3(
+				$author$project$Main$container,
+				model,
+				_List_Nil,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-						A2($elm$html$Html$Attributes$style, 'top', '0'),
-						A2(
-						$elm$html$Html$Attributes$style,
+						A5(
+						$author$project$Main$hudText,
+						'bottom',
+						'2%',
 						'left',
-						$elm$core$String$fromInt(model.offset) + 'px'),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'height',
-						$elm$core$String$fromInt(model.viewportHeight) + 'px'),
-						A2(
-						$elm$html$Html$Attributes$style,
-						'width',
-						$elm$core$String$fromInt(model.viewportWidth) + 'px')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'arcadeclassic'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-								A2($elm$html$Html$Attributes$style, 'bottom', '2%'),
-								A2($elm$html$Html$Attributes$style, 'left', '3%')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'FUEL: ' + $elm$core$String$fromFloat(model.state.fuel))
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'arcadeclassic'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-								A2($elm$html$Html$Attributes$style, 'bottom', '6%'),
-								A2($elm$html$Html$Attributes$style, 'left', '3%')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'COURSE: ' + $elm$core$String$fromFloat(model.state.course))
-							])),
-						A2(
-						$elm$html$Html$p,
-						_List_fromArray(
-							[
-								A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-								A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-								A2($elm$html$Html$Attributes$style, 'font-family', 'arcadeclassic'),
-								A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
-								A2($elm$html$Html$Attributes$style, 'top', '1%'),
-								A2($elm$html$Html$Attributes$style, 'left', '3%')
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text(
-								'SCORE: ' + $elm$core$String$fromInt(model.state.score))
-							]))
+						'3%',
+						'FUEL: ' + $elm$core$String$fromFloat(model.state.fuel)),
+						A5(
+						$author$project$Main$hudText,
+						'bottom',
+						'6%',
+						'left',
+						'3%',
+						'COURSE: ' + $elm$core$String$fromFloat(model.state.course)),
+						A5(
+						$author$project$Main$hudText,
+						'top',
+						'1%',
+						'left',
+						'3%',
+						'SCORE: ' + $elm$core$String$fromInt(model.state.score))
 					]))
 			]));
 };
@@ -9429,7 +9408,10 @@ var $author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
-				(!$author$project$Atlas$loaded(model.atlas)) ? $author$project$Main$loadingScreen(model) : (model.state.playerDead ? $author$project$Main$gameOverScreen(model) : (model.state.playerDeorbited ? A2($author$project$Main$messageScreen, 'DEORBITED', model) : $author$project$Main$simulationScreen(model)))
+				(!$author$project$Atlas$loaded(model.atlas)) ? A2($author$project$Main$messageScreen, 'LOADING...', model) : (model.state.playerDead ? A2(
+				$author$project$Main$messageScreen,
+				'YOUR SCORE: ' + $elm$core$String$fromInt(model.state.score),
+				model) : (model.state.playerDeorbited ? A2($author$project$Main$messageScreen, 'DEORBITED', model) : $author$project$Main$simulationScreen(model)))
 			]),
 		title: 'Main'
 	};
@@ -9441,7 +9423,7 @@ var $author$project$Main$main = $elm$browser$Browser$document(
 			return $elm$core$Platform$Sub$batch(
 				_List_fromArray(
 					[
-						(!(model.paused || ($author$project$GameState$isOver(model.state) || $author$project$Atlas$loaded(model.atlas)))) ? $elm$core$Platform$Sub$none : $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$Delta),
+						(!(model.paused || $author$project$Atlas$loaded(model.atlas))) ? $elm$core$Platform$Sub$none : $elm$browser$Browser$Events$onAnimationFrameDelta($author$project$Main$Delta),
 						$elm$browser$Browser$Events$onKeyDown($author$project$Main$keyDecoder),
 						$elm$browser$Browser$Events$onVisibilityChange(
 						function (v) {
