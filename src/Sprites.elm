@@ -2,7 +2,7 @@ module Sprites exposing (objectsToDraw)
 
 import WebGL
 import Math.Vector2 as Vec2 exposing (Vec2, vec2)
-import Math.Vector4 exposing (vec4)
+import Math.Vector4 exposing (Vec4, vec4)
 import Maybe.Extra as ME
 
 import Atlas exposing (..)
@@ -86,6 +86,9 @@ enemyBulletSprite state =
         far = 0.1
     }) state.enemyRounds
 
+rgbColor: Float -> Float -> Float -> Vec4
+rgbColor r g b = vec4 (r / 255.0) (g / 255.0) (b / 255.0) 1.0
+
 
 backgroundSprite: Atlas -> GameState -> List Rectangle
 backgroundSprite atlas state =
@@ -97,10 +100,10 @@ backgroundSprite atlas state =
     in
         List.concat
         [
-            [{ pos = vec2 0 0, width = w, height = h, display = RectColor (vec4 (40.0 / 255.0) (53.0 / 255.0) (31.0 / 255.0) 1.0), near = 0.9, far = 1.0}],
+            [{ pos = vec2 0 0, width = w, height = h, display = RectColor (rgbColor 40.0 53.0 31.0), near = 0.9, far = 1.0}],
             List.map (\t -> { pos = roundPos (vec2 0.0 0.0), width = w, height = h, display = RectTexture t, near = 0.8, far = 0.9 })
             (Atlas.get atlas BackgroundStars |> ME.toList),
             List.map (\t -> { pos = roundPos pos, width = w, height = 69.0, display = RectTexture t , near = 0.7, far = 0.8})
-            (Atlas.get atlas BackgroundPlanet |> ME.toList),
-            [{ pos = vec2 0 (yScroll + 68.0), width = w, height = h, display = RectColor (vec4 (88.0 / 255.0) (140.0 / 255.0) (126.0 / 255.0) 1.0), near = 0.6, far = 0.7}]
+            (Atlas.get atlas BackgroundPlanet |> ME.toList)
+            -- [{ pos = vec2 0 (yScroll + 68.0), width = w, height = h, display = RectColor (rgbColor 88.0 140.0 126.0), near = 0.6, far = 0.7}]
         ]

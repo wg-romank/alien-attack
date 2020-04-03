@@ -8733,6 +8733,11 @@ var $author$project$Atlas$get = F2(
 		var objKey = $author$project$Atlas$gameObjectTypeToInt(objTyp);
 		return A2($elm$core$Dict$get, objKey, atlas);
 	});
+var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
+var $author$project$Sprites$rgbColor = F3(
+	function (r, g, b) {
+		return A4($elm_explorations$linear_algebra$Math$Vector4$vec4, r / 255.0, g / 255.0, b / 255.0, 1.0);
+	});
 var $author$project$Sprites$roundPos = function (pos) {
 	return A2(
 		$elm_explorations$linear_algebra$Math$Vector2$vec2,
@@ -8750,7 +8755,6 @@ var $elm_community$maybe_extra$Maybe$Extra$toList = function (m) {
 			[x]);
 	}
 };
-var $elm_explorations$linear_algebra$Math$Vector4$vec4 = _MJS_v4;
 var $author$project$Sprites$backgroundSprite = F2(
 	function (atlas, state) {
 		var w = $author$project$GameState$widthFloat(state.boardSize);
@@ -8764,7 +8768,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 					[
 						{
 						display: $author$project$Shaders$RectColor(
-							A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 40.0 / 255.0, 53.0 / 255.0, 31.0 / 255.0, 1.0)),
+							A3($author$project$Sprites$rgbColor, 40.0, 53.0, 31.0)),
 						far: 1.0,
 						height: h,
 						near: 0.9,
@@ -8800,19 +8804,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 						};
 					},
 					$elm_community$maybe_extra$Maybe$Extra$toList(
-						A2($author$project$Atlas$get, atlas, $author$project$Atlas$BackgroundPlanet))),
-					_List_fromArray(
-					[
-						{
-						display: $author$project$Shaders$RectColor(
-							A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 88.0 / 255.0, 140.0 / 255.0, 126.0 / 255.0, 1.0)),
-						far: 0.7,
-						height: h,
-						near: 0.6,
-						pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll + 68.0),
-						width: w
-					}
-					])
+						A2($author$project$Atlas$get, atlas, $author$project$Atlas$BackgroundPlanet)))
 				]));
 	});
 var $author$project$Sprites$bulletSprite = function (state) {
