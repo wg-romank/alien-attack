@@ -6994,9 +6994,9 @@ var $author$project$GameState$newPosition = F3(
 var $author$project$GameState$playerSide = 16;
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
-	bgOffset: 10000,
-	bgOffsetMax: 20000,
-	bgOffsetMin: 10000,
+	bgOffset: 10,
+	bgOffsetMax: 20,
+	bgOffsetMin: 10,
 	boardSize: {height: 240, width: 160},
 	course: 0,
 	enemies: _List_fromArray(
@@ -8759,7 +8759,7 @@ var $author$project$Sprites$backgroundSprite = F2(
 	function (atlas, state) {
 		var w = $author$project$GameState$widthFloat(state.boardSize);
 		var h = $author$project$GameState$heightFloat(state.boardSize);
-		var yScroll = h - ((3 * state.bgOffset) / 1000.0);
+		var yScroll = h - (3 * state.bgOffset);
 		var pos = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, yScroll);
 		return $elm$core$List$concat(
 			_List_fromArray(
@@ -8767,11 +8767,10 @@ var $author$project$Sprites$backgroundSprite = F2(
 					_List_fromArray(
 					[
 						{
+						depthLayer: {far: 1.0, near: 0.9},
 						display: $author$project$Shaders$RectColor(
 							A3($author$project$Sprites$rgbColor, 40.0, 53.0, 31.0)),
-						far: 1.0,
 						height: h,
-						near: 0.9,
 						pos: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0),
 						width: w
 					}
@@ -8780,10 +8779,9 @@ var $author$project$Sprites$backgroundSprite = F2(
 					$elm$core$List$map,
 					function (t) {
 						return {
+							depthLayer: {far: 0.9, near: 0.8},
 							display: $author$project$Shaders$RectTexture(t),
-							far: 0.9,
 							height: h,
-							near: 0.8,
 							pos: $author$project$Sprites$roundPos(
 								A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0.0, 0.0)),
 							width: w
@@ -8795,10 +8793,9 @@ var $author$project$Sprites$backgroundSprite = F2(
 					$elm$core$List$map,
 					function (t) {
 						return {
+							depthLayer: {far: 0.8, near: 0.7},
 							display: $author$project$Shaders$RectTexture(t),
-							far: 0.8,
 							height: 69.0,
-							near: 0.7,
 							pos: $author$project$Sprites$roundPos(pos),
 							width: w
 						};
@@ -8807,16 +8804,16 @@ var $author$project$Sprites$backgroundSprite = F2(
 						A2($author$project$Atlas$get, atlas, $author$project$Atlas$BackgroundPlanet)))
 				]));
 	});
+var $author$project$Sprites$depthLayerProjectiles = {far: 0.1, near: 0.0};
 var $author$project$Sprites$bulletSprite = function (state) {
 	return A2(
 		$elm$core$List$map,
 		function (bullet) {
 			return {
+				depthLayer: $author$project$Sprites$depthLayerProjectiles,
 				display: $author$project$Shaders$RectColor(
 					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 1.0, 1.0, 1.0)),
-				far: 0.1,
 				height: bullet.height,
-				near: 0,
 				pos: $author$project$Sprites$roundPos(bullet.pos),
 				width: bullet.width
 			};
@@ -9038,7 +9035,7 @@ var $author$project$Shaders$drawRectangle = F2(
 					[
 						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha),
 						$elm_explorations$webgl$WebGL$Settings$DepthTest$less(
-						{far: rec.far, near: rec.near, write: true})
+						{far: rec.depthLayer.far, near: rec.depthLayer.near, write: true})
 					]),
 				$author$project$Shaders$vertexShader,
 				$author$project$Shaders$fragmentColorShader,
@@ -9052,7 +9049,7 @@ var $author$project$Shaders$drawRectangle = F2(
 					[
 						A2($elm_explorations$webgl$WebGL$Settings$Blend$add, $elm_explorations$webgl$WebGL$Settings$Blend$srcAlpha, $elm_explorations$webgl$WebGL$Settings$Blend$oneMinusSrcAlpha),
 						$elm_explorations$webgl$WebGL$Settings$DepthTest$less(
-						{far: rec.far, near: rec.near, write: true})
+						{far: rec.depthLayer.far, near: rec.depthLayer.near, write: true})
 					]),
 				$author$project$Shaders$vertexShader,
 				$author$project$Shaders$fragmentTextureShader,
@@ -9065,11 +9062,10 @@ var $author$project$Sprites$enemyBulletSprite = function (state) {
 		$elm$core$List$map,
 		function (bullet) {
 			return {
+				depthLayer: $author$project$Sprites$depthLayerProjectiles,
 				display: $author$project$Shaders$RectColor(
 					A4($elm_explorations$linear_algebra$Math$Vector4$vec4, 1.0, 0.5, 1.0, 1.0)),
-				far: 0.1,
 				height: bullet.height,
-				near: 0,
 				pos: $author$project$Sprites$roundPos(bullet.pos),
 				width: bullet.width
 			};
@@ -9081,6 +9077,7 @@ var $elm$core$List$concatMap = F2(
 		return $elm$core$List$concat(
 			A2($elm$core$List$map, f, list));
 	});
+var $author$project$Sprites$depthLayerCharacters = {far: 0.2, near: 0.1};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Sprites$enemySprite = F2(
 	function (atlas, state) {
@@ -9098,10 +9095,9 @@ var $author$project$Sprites$enemySprite = F2(
 					return _List_fromArray(
 						[
 							{
+							depthLayer: $author$project$Sprites$depthLayerCharacters,
 							display: $author$project$Shaders$RectTexture(t),
-							far: 0.2,
 							height: enemy.height,
-							near: 0.1,
 							pos: $author$project$Sprites$roundPos(enemy.pos),
 							width: enemy.width
 						}
@@ -9120,10 +9116,9 @@ var $author$project$Sprites$playerSprite = F2(
 			$elm$core$List$map,
 			function (texture) {
 				return {
+					depthLayer: $author$project$Sprites$depthLayerCharacters,
 					display: $author$project$Shaders$RectTexture(texture),
-					far: 0.2,
 					height: state.playerPosition.height,
-					near: 0.1,
 					pos: $author$project$Sprites$roundPos(state.playerPosition.pos),
 					width: state.playerPosition.width
 				};

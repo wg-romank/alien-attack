@@ -1,4 +1,4 @@
-module Shaders exposing (drawRectangle, Rectangle, RectDisplay(..))
+module Shaders exposing (drawRectangle, Rectangle, RectDisplay(..), DepthLayer)
 
 import Math.Vector4 exposing (Vec4)
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
@@ -61,8 +61,7 @@ rect point width height =
 
 
 type alias Rectangle = {
-    near: Float,
-    far: Float,
+    depthLayer: DepthLayer,
     pos: Vec2,
     width: Float,
     height: Float,
@@ -72,13 +71,18 @@ type RectDisplay =
     RectColor Vec4 |
     RectTexture Texture
 
+type alias DepthLayer = {
+        near: Float,
+        far: Float
+    }
+
 drawRectangle: Vec2 -> Rectangle -> WebGL.Entity
 drawRectangle res rec = 
     case rec.display of
         RectColor c ->
             WebGL.entityWith
                 [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha,
-                  DepthTest.less { write = True, near = rec.near, far = rec.far } ]
+                  DepthTest.less { write = True, near = rec.depthLayer.near, far = rec.depthLayer.far } ]
                 vertexShader
                 fragmentColorShader
                 (rect rec.pos rec.width rec.height)
@@ -87,7 +91,7 @@ drawRectangle res rec =
             WebGL.entityWith
                 -- ensure transparent texture blending
                 [ Blend.add Blend.srcAlpha Blend.oneMinusSrcAlpha,
-                  DepthTest.less { write = True, near = rec.near, far = rec.far } ]
+                  DepthTest.less { write = True, near = rec.depthLayer.near, far = rec.depthLayer.far } ]
                 vertexShader
                 fragmentTextureShader
                 (rect rec.pos rec.width rec.height)
