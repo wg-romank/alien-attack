@@ -43,12 +43,14 @@ rollEnemyAction = Random.weighted (99, Move) [(1, Attack)]
 type alias GameState = {
         score: Int,
         playerDead: Bool,
-        playerWon: Bool,
+        playerDeorbited: Bool,
         fuel: Float,
         course: Float,
         horizontalSpeed: Float,
         userInput: List PlayerAction,
         bgOffset: Float,
+        bgOffsetMin: Float,
+        bgOffsetMax: Float,
         boardSize: Size,
         playerPosition: Position,
         enemies: List Position,
@@ -69,12 +71,14 @@ initialState: GameState
 initialState = {
         score = 0,
         playerDead = False,
-        playerWon = False,
+        playerDeorbited = False,
         fuel = 100,
         course = 0,
         horizontalSpeed = 0,
         userInput = [],
         bgOffset = 10000,
+        bgOffsetMin = 10000,
+        bgOffsetMax = 30000,
         boardSize = { width = 160, height = 240 },
         playerPosition = newPosition 16.0 16.0 (vec2 72 222),
         enemies = [ newPosition 32.0 32.0 (vec2 56 24) ],
@@ -86,7 +90,7 @@ initialState = {
     }
 
 isOver: GameState -> Bool
-isOver state = state.playerDead || state.playerWon
+isOver state = state.playerDead || state.playerDeorbited
 
 playerFire: GameState -> GameState
 playerFire state = { state | rounds = state.rounds ++ [spawnRound state.playerPosition] }
@@ -122,7 +126,7 @@ playerMoveFromCourse delta state =
         width = widthFloat state.boardSize
         playerDeorbited = Vec2.getX nPos |> (\x -> x < 0 || x > width - state.playerPosition.width)
     in
-        { state | playerPosition = { previousPosition | pos = nPos }, playerDead = state.playerDead || playerDeorbited }
+        { state | playerPosition = { previousPosition | pos = nPos }, playerDeorbited = state.playerDeorbited || playerDeorbited }
 
 
 enemyMove: Float -> Position -> GameState -> GameState
@@ -250,8 +254,15 @@ enemySpawn state =
         { state | enemies = newEnemies }
 
 
-moveBackground: Float -> GameState -> GameState
-moveBackground delta state = { state | bgOffset = state.bgOffset + delta }
+moveBackground: GameState -> GameState
+moveBackground state =
+    let
+        playerPosX = Vec2.getX state.playerPosition.pos
+        widthHalf = widthFloat state.boardSize / 2
+        playerPosXLerped = (abs playerPosX - widthHalf) / widthHalf
+        newBgOffset = state.bgOffsetMin + (state.bgOffsetMax - state.bgOffsetMin) * playerPosXLerped
+    in
+        { state | bgOffset = newBgOffset }
 
 
 step: Float -> GameState -> GameState
@@ -262,8 +273,8 @@ step timeDelta state =
             |> performEnemiesActions timeDelta
             |> moveEnemyRounds timeDelta
             |> updateTimesSinceSpawned timeDelta
-            -- |> moveBackground timeDelta
             |> playerMoveFromCourse timeDelta
+            |> moveBackground
             |> enemySpawn
 
 inVicinity: Position -> Position -> Bool
