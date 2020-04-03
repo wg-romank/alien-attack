@@ -26,10 +26,9 @@ type alias Model = {
     viewportHeight: Int,
     viewportWidth: Int,
     viewportMultiplier: Float,
-    message: String,
     atlas: Atlas,
-    state: GameState }
-
+    state: GameState
+  }
 
 
 init: () -> (Model, Cmd Msg)
@@ -39,7 +38,6 @@ init _ = ( {
     viewportWidth = 0,
     viewportHeight = 0,
     viewportMultiplier = 1,
-    message = "",
     atlas = emptyAtlas,
     state = initialState },
         Cmd.batch [
@@ -48,7 +46,6 @@ init _ = ( {
         ]
     )
     
-
 type Msg
     =
     Start (Float, Float)
@@ -66,29 +63,14 @@ type Msg
     | EnemiesSpawnRoll (List Vec2)
     | Other (String)
 
-keyDecoder : Decode.Decoder Msg
-keyDecoder =
-  Decode.map toDirection (Decode.field "key" Decode.string)
+type alias Document msg = {
+  title : String,
+  body : List (Html msg) }
 
-toDirection : String -> Msg
-toDirection string =
-  case string of
-    "ArrowLeft" ->
-      KeyboardLeft
-    "ArrowRight" ->
-      KeyboardRight
-    " " ->
-      KeyboardFire
-    other ->
-      Other other
-
-type alias Document msg =
-    { title : String
-    , body : List (Html msg)
-    }
 view: Model -> Document Msg
 view model =
-  { title = "Main",
+  {
+    title = "Main",
     body = [
       if model.atlas |> loaded |> not then messageScreen "LOADING..." model
       else if model.state.playerDead then messageScreen ("YOUR SCORE: " ++ String.fromInt model.state.score) model
@@ -123,12 +105,6 @@ messageScreen message model =
       [ text message ]
   ]
 
-touchCoordinates : Touch.Event -> ( Float, Float )
-touchCoordinates touchEvent =
-    List.head touchEvent.changedTouches
-        |> Maybe.map .clientPos
-        |> Maybe.withDefault ( 0, 0 )
-
 
 hudText: String -> String -> String -> String -> String -> Html msg
 hudText margin1 margin1Amount margin2 margin2Amount t =
@@ -143,6 +119,12 @@ hudText margin1 margin1Amount margin2 margin2Amount t =
     ]
     [ text t ]
 
+
+touchCoordinates : Touch.Event -> ( Float, Float )
+touchCoordinates touchEvent =
+    List.head touchEvent.changedTouches
+        |> Maybe.map .clientPos
+        |> Maybe.withDefault ( 0, 0 )
 
 simulationScreen: Model -> Html Msg
 simulationScreen model =
@@ -232,6 +214,23 @@ update event model =
                   Random.generate EnemiesSpawnRoll (enemySpawnRoll newState)
                 ] )
         _ -> (model, Cmd.none)
+
+toDirection : String -> Msg
+toDirection string =
+  case string of
+    "ArrowLeft" ->
+      KeyboardLeft
+    "ArrowRight" ->
+      KeyboardRight
+    " " ->
+      KeyboardFire
+    other ->
+      Other other
+
+keyDecoder : Decode.Decoder Msg
+keyDecoder =
+  Decode.map toDirection (Decode.field "key" Decode.string)
+
 
 main: Program() Model Msg
 main = Browser.document {
