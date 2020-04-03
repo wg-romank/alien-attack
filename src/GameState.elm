@@ -3,6 +3,16 @@ module GameState exposing (..)
 import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 
+enemySpawnY: Float
+enemySpawnY = 24
+
+enemySide: Float
+enemySide = 32
+
+playerSide: Float
+playerSide = 16
+
+
 type alias Position = {
         pos: Vec2,
         width: Float,
@@ -40,13 +50,25 @@ type EnemyAction = Move | Attack
 rollEnemyAction: Random.Generator EnemyAction
 rollEnemyAction = Random.weighted (99, Move) [(1, Attack)]
 
+enemiesRoll: GameState -> Random.Generator (List EnemyAction)
+enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
+
+enemySpawnRoll: GameState -> Random.Generator (List Vec2)
+enemySpawnRoll state =
+    let
+        nEnemies = Random.weighted (99, 0) [(1, state.maxEnemiesToSpawn)]
+        enemyCoordinates =
+            Random.int 1 (state.boardSize.width - (enemySide / 2.0 |> round))
+             |> Random.map (\v -> vec2 (toFloat v) enemySpawnY)
+    in
+        nEnemies |> Random.andThen (\len -> Random.list len enemyCoordinates)
+
 type alias GameState = {
         score: Int,
         playerDead: Bool,
         playerDeorbited: Bool,
         fuel: Float,
         course: Float,
-        horizontalSpeed: Float,
         userInput: List PlayerAction,
         bgOffset: Float,
         bgOffsetMin: Float,
@@ -61,12 +83,6 @@ type alias GameState = {
         enemySpawnRoll: List (Vec2)
     }
 
-spawnRound: Position -> Position
-spawnRound player = newPosition 2.0 4.0 player.pos |> moveX -7.0
-
-spawnEnemyRound: Position -> Position
-spawnEnemyRound enemy = newPosition 4.0 4.0 enemy.pos |> moveX -13.0 |> moveY -32.0
-
 initialState: GameState
 initialState = {
         score = 0,
@@ -74,14 +90,13 @@ initialState = {
         playerDeorbited = False,
         fuel = 100,
         course = 0,
-        horizontalSpeed = 0,
         userInput = [],
         bgOffset = 10000,
         bgOffsetMin = 10000,
         bgOffsetMax = 20000,
         boardSize = { width = 160, height = 240 },
-        playerPosition = newPosition 16.0 16.0 (vec2 72 222),
-        enemies = [ newPosition 32.0 32.0 (vec2 56 24) ],
+        playerPosition = newPosition playerSide playerSide (vec2 72 222),
+        enemies = [ newPosition enemySide enemySide (vec2 56 enemySpawnY) ],
         maxEnemiesToSpawn = 5,
         rounds = [],
         enemyRounds = [],
@@ -90,7 +105,15 @@ initialState = {
     }
 
 isOver: GameState -> Bool
-isOver state = state.playerDead
+isOver state = state.playerDead || state.playerDeorbited
+
+spawnRound: Position -> Position
+spawnRound player =
+    let
+        width = 2.0
+        height = 4.0
+    in 
+        newPosition width height player.pos |> moveX -(player.width / 2 - width)
 
 playerFire: GameState -> GameState
 playerFire state = { state | rounds = state.rounds ++ [spawnRound state.playerPosition] }
@@ -112,7 +135,6 @@ performPlayerAction action state =
         f :: rest ->
             { state | userInput = rest } |>
             case f of
-                -- TODO: move with constant speed on touch
                 PlayerMoveLeft -> playerAdjustCourse -10
                 PlayerMoveRight -> playerAdjustCourse 10
                 PlayerFire -> playerFire
@@ -127,6 +149,16 @@ playerMoveFromCourse delta state =
         playerDeorbited = Vec2.getX nPos |> (\x -> x < 0 || x > width - state.playerPosition.width)
     in
         { state | playerPosition = { previousPosition | pos = nPos }, playerDeorbited = state.playerDeorbited || playerDeorbited }
+
+
+intersect: Position -> Position -> Bool
+intersect a b =
+    let
+        centerA = Vec2.add a.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
+        centerB = Vec2.add b.pos (vec2 (b.width / 2.0) (b.height / 2.0) )
+    in
+        Vec2.distanceSquared centerA centerB <=
+            min (a.width / 2.0) (a.height / 2.0) ^ 2 + min (b.width / 2.0) (b.height / 2.0) ^ 2
 
 
 enemyMove: Float -> Position -> GameState -> GameState
@@ -149,6 +181,14 @@ enemyMove delta enemy state =
     in
         { state | enemies = enemiesMoved, playerDead = state.playerDead || (enemiesHitPlayer |> List.isEmpty |> not) }
 
+spawnEnemyRound: Position -> Position
+spawnEnemyRound enemy =
+    let
+        width = 4.0
+        height = 4.0
+    in
+    newPosition width height enemy.pos |> moveX -(enemy.width / 2 - width) |> moveY -enemy.height
+
 enemyAttack: Position -> GameState -> GameState
 enemyAttack enemy state = { state | enemyRounds = state.enemyRounds ++ [spawnEnemyRound enemy] }
 
@@ -167,19 +207,6 @@ performEnemiesActions delta state =
         List.foldl (\(pos, action) ss -> performEnemyAction delta pos action ss)
         state
         enemiesWithActions
-
-enemiesRoll: GameState -> Random.Generator (List EnemyAction)
-enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
-
-enemySpawnRoll: GameState -> Random.Generator (List Vec2)
-enemySpawnRoll state =
-    let
-        nEnemies = Random.weighted (99, 0) [(1, state.maxEnemiesToSpawn)]
-        -- TODO: fix hardcoded
-        enemyCoordinates = Random.int 1 (state.boardSize.width - 16) |> Random.map (\v -> vec2 (toFloat v) 24)
-    in
-        nEnemies |> Random.andThen (\len -> Random.list len enemyCoordinates)
-
 
 moveRound: Float -> Position -> GameState -> GameState
 moveRound delta round state =
@@ -232,19 +259,29 @@ updateTimesSinceSpawned delta state = {
             rounds = List.map (updateTimeSinceSpawned delta) state.rounds
     }
 
-doNotIntersect: Position -> List Position -> Bool
-doNotIntersect element listOfElements = 
+
+inVicinity: Position -> Position -> Bool
+inVicinity a b =
+    let
+        centerA = Vec2.add a.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
+        centerB = Vec2.add b.pos (vec2 (b.width / 2.0) (b.height / 2.0) )
+    in
+        (Vec2.sub centerA centerB |> Vec2.length) <= max b.height (max a.height (max a.width b.width)) + 2.0
+
+
+doNotOverlap: Position -> List Position -> Bool
+doNotOverlap element listOfElements = 
         List.map (\existing -> inVicinity element existing |> not) listOfElements
         |> List.foldl (&&) True
 
 enemySpawn: GameState -> GameState
 enemySpawn state =
     let 
-        enemySpawns = List.map (newPosition 32.0 32.0) state.enemySpawnRoll
+        enemySpawns = List.map (newPosition enemySide enemySide) state.enemySpawnRoll
         newEnemies = List.foldl
             ( \l acc ->
                     let
-                        noIntersections = doNotIntersect l acc
+                        noIntersections = doNotOverlap l acc
                     in
                         if noIntersections && List.length acc < state.maxEnemiesToSpawn  then acc ++ [l]
                         else acc )
@@ -259,7 +296,7 @@ moveBackground state =
     let
         playerPosX = Vec2.getX state.playerPosition.pos
         widthHalf = (widthFloat state.boardSize - state.playerPosition.width) / 2
-        playerPosXLerped = (abs (playerPosX - widthHalf)) / widthHalf
+        playerPosXLerped = abs (playerPosX - widthHalf) / widthHalf
         newBgOffset = state.bgOffsetMin + (state.bgOffsetMax - state.bgOffsetMin) * playerPosXLerped ^ 2
     in
         { state | bgOffset = newBgOffset }
@@ -276,25 +313,3 @@ step timeDelta state =
             |> playerMoveFromCourse timeDelta
             |> moveBackground
             |> enemySpawn
-
-inVicinity: Position -> Position -> Bool
-inVicinity a b =
-    let
-        centerA = Vec2.add a.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
-        centerB = Vec2.add b.pos (vec2 (b.width / 2.0) (b.height / 2.0) )
-    in
-        (Vec2.sub centerA centerB |> Vec2.length) <= (max b.height (max a.height (max a.width b.width))) + 2.0
-
-
-intersect: Position -> Position -> Bool
-intersect a b =
-    let
-        centerA = Vec2.add a.pos (vec2 (a.width / 2.0) (a.height / 2.0) )
-        centerB = Vec2.add b.pos (vec2 (b.width / 2.0) (b.height / 2.0) )
-    in
-        Vec2.distanceSquared centerA centerB <=
-            (min (a.width / 2.0) (a.height / 2.0) ) ^ 2 + (min (b.width / 2.0) (b.height / 2.0)) ^ 2
-
--- intersect: Position -> Position -> Bool
--- intersect a b = abs (Vec2.getX a.pos + a.width / 2.0 - Vec2.getX b.pos + b.width / 2.0) <= (max a.width b.width) / 2.0 &&
---         abs (Vec2.getY a.pos + a.height / 2.0 - Vec2.getY b.pos + b.width / 2.0) <= (max a.height b.height) / 2.0

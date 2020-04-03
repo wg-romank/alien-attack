@@ -6985,10 +6985,13 @@ var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
+var $author$project$GameState$enemySide = 32;
+var $author$project$GameState$enemySpawnY = 24;
 var $author$project$GameState$newPosition = F3(
 	function (width, height, pos) {
 		return {height: height, pos: pos, sinceSpawned: 0.0, width: width};
 	});
+var $author$project$GameState$playerSide = 16;
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
 	bgOffset: 10000,
@@ -7000,22 +7003,21 @@ var $author$project$GameState$initialState = {
 		[
 			A3(
 			$author$project$GameState$newPosition,
-			32.0,
-			32.0,
-			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, 24))
+			$author$project$GameState$enemySide,
+			$author$project$GameState$enemySide,
+			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, $author$project$GameState$enemySpawnY))
 		]),
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
 	enemySpawnRoll: _List_Nil,
 	fuel: 100,
-	horizontalSpeed: 0,
 	maxEnemiesToSpawn: 5,
 	playerDead: false,
 	playerDeorbited: false,
 	playerPosition: A3(
 		$author$project$GameState$newPosition,
-		16.0,
-		16.0,
+		$author$project$GameState$playerSide,
+		$author$project$GameState$playerSide,
 		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222)),
 	rounds: _List_Nil,
 	score: 0,
@@ -7240,7 +7242,7 @@ var $author$project$Main$init = function (_v0) {
 				])));
 };
 var $author$project$GameState$isOver = function (state) {
-	return state.playerDead;
+	return state.playerDead || state.playerDeorbited;
 };
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$string = _Json_decodeString;
@@ -7932,9 +7934,12 @@ var $author$project$GameState$enemySpawnRoll = function (state) {
 	var enemyCoordinates = A2(
 		$elm$random$Random$map,
 		function (v) {
-			return A2($elm_explorations$linear_algebra$Math$Vector2$vec2, v, 24);
+			return A2($elm_explorations$linear_algebra$Math$Vector2$vec2, v, $author$project$GameState$enemySpawnY);
 		},
-		A2($elm$random$Random$int, 1, state.boardSize.width - 16));
+		A2(
+			$elm$random$Random$int,
+			1,
+			state.boardSize.width - $elm$core$Basics$round($author$project$GameState$enemySide / 2.0)));
 	return A2(
 		$elm$random$Random$andThen,
 		function (len) {
@@ -8062,7 +8067,7 @@ var $author$project$GameState$inVicinity = F2(
 					a.height,
 					A2($elm$core$Basics$max, a.width, b.width))) + 2.0) < 1;
 	});
-var $author$project$GameState$doNotIntersect = F2(
+var $author$project$GameState$doNotOverlap = F2(
 	function (element, listOfElements) {
 		return A3(
 			$elm$core$List$foldl,
@@ -8078,13 +8083,13 @@ var $author$project$GameState$doNotIntersect = F2(
 var $author$project$GameState$enemySpawn = function (state) {
 	var enemySpawns = A2(
 		$elm$core$List$map,
-		A2($author$project$GameState$newPosition, 32.0, 32.0),
+		A2($author$project$GameState$newPosition, $author$project$GameState$enemySide, $author$project$GameState$enemySide),
 		state.enemySpawnRoll);
 	var newEnemies = A3(
 		$elm$core$List$foldl,
 		F2(
 			function (l, acc) {
-				var noIntersections = A2($author$project$GameState$doNotIntersect, l, acc);
+				var noIntersections = A2($author$project$GameState$doNotOverlap, l, acc);
 				return (noIntersections && (_Utils_cmp(
 					$elm$core$List$length(acc),
 					state.maxEnemiesToSpawn) < 0)) ? _Utils_ap(
@@ -8241,13 +8246,15 @@ var $author$project$GameState$moveX = F2(
 			});
 	});
 var $author$project$GameState$spawnEnemyRound = function (enemy) {
+	var width = 4.0;
+	var height = 4.0;
 	return A2(
 		$author$project$GameState$moveY,
-		-32.0,
+		-enemy.height,
 		A2(
 			$author$project$GameState$moveX,
-			-13.0,
-			A3($author$project$GameState$newPosition, 4.0, 4.0, enemy.pos)));
+			-((enemy.width / 2) - width),
+			A3($author$project$GameState$newPosition, width, height, enemy.pos)));
 };
 var $author$project$GameState$enemyAttack = F2(
 	function (enemy, state) {
@@ -8335,10 +8342,12 @@ var $author$project$GameState$playerAdjustCourse = F2(
 			{course: state.course + value, fuel: state.fuel - budget}) : state;
 	});
 var $author$project$GameState$spawnRound = function (player) {
+	var width = 2.0;
+	var height = 4.0;
 	return A2(
 		$author$project$GameState$moveX,
-		-7.0,
-		A3($author$project$GameState$newPosition, 2.0, 4.0, player.pos));
+		-((player.width / 2) - width),
+		A3($author$project$GameState$newPosition, width, height, player.pos));
 };
 var $author$project$GameState$playerFire = function (state) {
 	return _Utils_update(
