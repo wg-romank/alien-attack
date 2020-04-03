@@ -305,8 +305,8 @@ moveBackground state =
         { state | bgOffset = newBgOffset }
 
 
-step: Float -> GameState -> GameState
-step timeDelta state =
+gameLoop: Float -> GameState -> GameState
+gameLoop timeDelta state =
         state
             |> performPlayerAction state.userInput
             |> moveRounds timeDelta

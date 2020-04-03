@@ -206,7 +206,7 @@ update event model =
 
         Delta delta -> 
             let
-              newState = step delta model.state
+              newState = gameLoop delta model.state
             in
               ({ model | state = newState, paused = isOver newState },
                 Cmd.batch [
