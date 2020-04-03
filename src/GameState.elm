@@ -6,11 +6,20 @@ import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 enemySpawnY: Float
 enemySpawnY = 24
 
+maxEnemiesToSpawn: Int
+maxEnemiesToSpawn = 5
+
 enemySide: Float
 enemySide = 32
 
 playerSide: Float
 playerSide = 16
+
+bgOffsetMin: Float
+bgOffsetMin = 10
+
+bgOffsetMax: Float
+bgOffsetMax = 20
 
 
 type alias Position = {
@@ -56,7 +65,7 @@ enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
 enemySpawnRoll: GameState -> Random.Generator (List Vec2)
 enemySpawnRoll state =
     let
-        nEnemies = Random.weighted (99, 0) [(1, state.maxEnemiesToSpawn)]
+        nEnemies = Random.weighted (99, 0) [(1, maxEnemiesToSpawn)]
         enemyCoordinates =
             Random.int 1 (state.boardSize.width - (enemySide / 2.0 |> round))
              |> Random.map (\v -> vec2 (toFloat v) enemySpawnY)
@@ -64,6 +73,7 @@ enemySpawnRoll state =
         nEnemies |> Random.andThen (\len -> Random.list len enemyCoordinates)
 
 type alias GameState = {
+        boardSize: Size,
         score: Int,
         playerDead: Bool,
         playerDeorbited: Bool,
@@ -71,13 +81,9 @@ type alias GameState = {
         course: Float,
         userInput: List PlayerAction,
         bgOffset: Float,
-        bgOffsetMin: Float,
-        bgOffsetMax: Float,
-        boardSize: Size,
         playerPosition: Position,
         enemies: List Position,
         rounds: List Position,
-        maxEnemiesToSpawn: Int,
         enemyRounds: List Position,
         enemyRoll: List (EnemyAction),
         enemySpawnRoll: List (Vec2)
@@ -85,6 +91,7 @@ type alias GameState = {
 
 initialState: GameState
 initialState = {
+        boardSize = { width = 160, height = 240 },
         score = 0,
         playerDead = False,
         playerDeorbited = False,
@@ -92,12 +99,8 @@ initialState = {
         course = 0,
         userInput = [],
         bgOffset = 10,
-        bgOffsetMin = 10,
-        bgOffsetMax = 20,
-        boardSize = { width = 160, height = 240 },
         playerPosition = newPosition playerSide playerSide (vec2 72 222),
-        enemies = [ newPosition enemySide enemySide (vec2 56 enemySpawnY) ],
-        maxEnemiesToSpawn = 5,
+        enemies = [],
         rounds = [],
         enemyRounds = [],
         enemyRoll = [],
@@ -283,7 +286,7 @@ enemySpawn state =
                     let
                         noIntersections = doNotOverlap l acc
                     in
-                        if noIntersections && List.length acc < state.maxEnemiesToSpawn  then acc ++ [l]
+                        if noIntersections && List.length acc < maxEnemiesToSpawn  then acc ++ [l]
                         else acc )
             state.enemies
             enemySpawns
@@ -297,7 +300,7 @@ moveBackground state =
         playerPosX = Vec2.getX state.playerPosition.pos
         widthHalf = (widthFloat state.boardSize - state.playerPosition.width) / 2
         playerPosXLerped = abs (playerPosX - widthHalf) / widthHalf
-        newBgOffset = state.bgOffsetMin + (state.bgOffsetMax - state.bgOffsetMin) * playerPosXLerped ^ 2
+        newBgOffset = bgOffsetMin + (bgOffsetMax - bgOffsetMin) * playerPosXLerped ^ 2
     in
         { state | bgOffset = newBgOffset }
 

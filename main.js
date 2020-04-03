@@ -6985,8 +6985,6 @@ var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
-var $author$project$GameState$enemySide = 32;
-var $author$project$GameState$enemySpawnY = 24;
 var $author$project$GameState$newPosition = F3(
 	function (width, height, pos) {
 		return {height: height, pos: pos, sinceSpawned: 0.0, width: width};
@@ -6995,23 +6993,13 @@ var $author$project$GameState$playerSide = 16;
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
 	bgOffset: 10,
-	bgOffsetMax: 20,
-	bgOffsetMin: 10,
 	boardSize: {height: 240, width: 160},
 	course: 0,
-	enemies: _List_fromArray(
-		[
-			A3(
-			$author$project$GameState$newPosition,
-			$author$project$GameState$enemySide,
-			$author$project$GameState$enemySide,
-			A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 56, $author$project$GameState$enemySpawnY))
-		]),
+	enemies: _List_Nil,
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
 	enemySpawnRoll: _List_Nil,
 	fuel: 100,
-	maxEnemiesToSpawn: 5,
 	playerDead: false,
 	playerDeorbited: false,
 	playerPosition: A3(
@@ -7233,7 +7221,7 @@ var $author$project$Atlas$loadAtlas = A2(
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
-		{atlas: $author$project$Atlas$emptyAtlas, message: '', offset: 0, paused: false, state: $author$project$GameState$initialState, viewportHeight: 0, viewportMultiplier: 1, viewportWidth: 0},
+		{atlas: $author$project$Atlas$emptyAtlas, offset: 0, paused: false, state: $author$project$GameState$initialState, viewportHeight: 0, viewportMultiplier: 1, viewportWidth: 0},
 		$elm$core$Platform$Cmd$batch(
 			_List_fromArray(
 				[
@@ -7888,6 +7876,8 @@ var $elm$random$Random$andThen = F2(
 				return genB(newSeed);
 			});
 	});
+var $author$project$GameState$enemySide = 32;
+var $author$project$GameState$enemySpawnY = 24;
 var $elm$random$Random$int = F2(
 	function (a, b) {
 		return $elm$random$Random$Generator(
@@ -7920,13 +7910,14 @@ var $elm$random$Random$int = F2(
 				}
 			});
 	});
+var $author$project$GameState$maxEnemiesToSpawn = 5;
 var $author$project$GameState$enemySpawnRoll = function (state) {
 	var nEnemies = A2(
 		$elm$random$Random$weighted,
 		_Utils_Tuple2(99, 0),
 		_List_fromArray(
 			[
-				_Utils_Tuple2(1, state.maxEnemiesToSpawn)
+				_Utils_Tuple2(1, $author$project$GameState$maxEnemiesToSpawn)
 			]));
 	var enemyCoordinates = A2(
 		$elm$random$Random$map,
@@ -8092,7 +8083,7 @@ var $author$project$GameState$enemySpawn = function (state) {
 				var noIntersections = A2($author$project$GameState$doNotOverlap, l, acc);
 				return (noIntersections && (_Utils_cmp(
 					$elm$core$List$length(acc),
-					state.maxEnemiesToSpawn) < 0)) ? _Utils_ap(
+					$author$project$GameState$maxEnemiesToSpawn) < 0)) ? _Utils_ap(
 					acc,
 					_List_fromArray(
 						[l])) : acc;
@@ -8103,6 +8094,8 @@ var $author$project$GameState$enemySpawn = function (state) {
 		state,
 		{enemies: newEnemies});
 };
+var $author$project$GameState$bgOffsetMax = 20;
+var $author$project$GameState$bgOffsetMin = 10;
 var $elm$core$Basics$pow = _Basics_pow;
 var $author$project$GameState$widthFloat = function (size) {
 	return size.width;
@@ -8111,7 +8104,7 @@ var $author$project$GameState$moveBackground = function (state) {
 	var widthHalf = ($author$project$GameState$widthFloat(state.boardSize) - state.playerPosition.width) / 2;
 	var playerPosX = $elm_explorations$linear_algebra$Math$Vector2$getX(state.playerPosition.pos);
 	var playerPosXLerped = $elm$core$Basics$abs(playerPosX - widthHalf) / widthHalf;
-	var newBgOffset = state.bgOffsetMin + ((state.bgOffsetMax - state.bgOffsetMin) * A2($elm$core$Basics$pow, playerPosXLerped, 2));
+	var newBgOffset = $author$project$GameState$bgOffsetMin + (($author$project$GameState$bgOffsetMax - $author$project$GameState$bgOffsetMin) * A2($elm$core$Basics$pow, playerPosXLerped, 2));
 	return _Utils_update(
 		state,
 		{bgOffset: newBgOffset});
