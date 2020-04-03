@@ -9109,7 +9109,7 @@ var $author$project$Sprites$playerSprite = F2(
 			A2($author$project$Atlas$get, atlas, $author$project$Atlas$User2));
 		var userTexture1 = $elm_community$maybe_extra$Maybe$Extra$toList(
 			A2($author$project$Atlas$get, atlas, $author$project$Atlas$User1));
-		var animationPeriod = 5;
+		var animationPeriod = 4;
 		var frameId = A2(
 			$elm$core$Basics$modBy,
 			3,

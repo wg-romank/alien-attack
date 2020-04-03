@@ -43,7 +43,7 @@ playerSprite atlas state =
         userTexture1 = ME.toList (Atlas.get atlas User1)
         userTexture2 = ME.toList (Atlas.get atlas User2)
         userTexture3 = ME.toList (Atlas.get atlas User3)
-        animationPeriod = 5
+        animationPeriod = 4
         frameId = (state.playerPosition.sinceSpawned / 1000.0 |> round |> modBy animationPeriod) |> modBy 3
     in
     List.map
