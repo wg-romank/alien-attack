@@ -6985,8 +6985,8 @@ var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
-var $author$project$GameState$boardHeight = 240;
-var $author$project$GameState$boardWidth = 160;
+var $author$project$GameState$boardHeight = 295;
+var $author$project$GameState$boardWidth = 240;
 var $author$project$GameState$newPosition = F3(
 	function (width, height, pos) {
 		return {height: height, pos: pos, sinceSpawned: 0.0, width: width};
