@@ -8617,8 +8617,6 @@ var $author$project$Main$messageScreen = F2(
 							A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
 							A2($elm$html$Html$Attributes$style, 'top', '50%'),
 							A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
-							A2($elm$html$Html$Attributes$style, 'font-family', 'arcadeclassic'),
-							A2($elm$html$Html$Attributes$style, 'font-size', '1em'),
 							A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
 							A2(
 							$elm$html$Html$Attributes$style,
@@ -8672,8 +8670,6 @@ var $author$project$Main$hudText = F5(
 				[
 					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 					A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
-					A2($elm$html$Html$Attributes$style, 'font-family', 'arcadeclassic'),
-					A2($elm$html$Html$Attributes$style, 'font-size', '1em'),
 					A2($elm$html$Html$Attributes$style, margin1, margin1Amount),
 					A2($elm$html$Html$Attributes$style, margin2, margin2Amount)
 				]),

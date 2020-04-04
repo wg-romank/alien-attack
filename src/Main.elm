@@ -97,8 +97,6 @@ messageScreen message model =
         style "color" "#FFFFFF",
         style "top" "50%",
         style "position" "absolute",
-        style "font-family" "arcadeclassic",
-        style "font-size" "1em",
         style "text-align" "center",
         style "width" (String.fromInt model.viewportWidth ++ "px")
       ]
@@ -112,8 +110,6 @@ hudText margin1 margin1Amount margin2 margin2Amount t =
     [
       style "position" "absolute",
       style "color" "#FFFFFF",
-      style "font-family" "arcadeclassic",
-      style "font-size" "1em",
       style margin1 margin1Amount,
       style margin2 margin2Amount
     ]
