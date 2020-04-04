@@ -7936,7 +7936,7 @@ var $author$project$GameState$enemySpawnRoll = function (state) {
 		A2(
 			$elm$random$Random$int,
 			1,
-			state.boardSize.width - $elm$core$Basics$round($author$project$GameState$enemySide / 2.0)));
+			state.boardSize.width - $elm$core$Basics$round($author$project$GameState$enemySide)));
 	return A2(
 		$elm$random$Random$andThen,
 		function (len) {

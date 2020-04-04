@@ -73,7 +73,7 @@ enemySpawnRoll state =
     let
         nEnemies = Random.weighted (99, 0) [(1, maxEnemiesToSpawn)]
         enemyCoordinates =
-            Random.int 1 (state.boardSize.width - (enemySide / 2.0 |> round))
+            Random.int 1 (state.boardSize.width - (enemySide |> round))
              |> Random.map (\v -> vec2 (toFloat v) enemySpawnY)
     in
         nEnemies |> Random.andThen (\len -> Random.list len enemyCoordinates)
