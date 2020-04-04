@@ -15,5 +15,12 @@
     "url": "https://github.com/wg-romank"
   },
   "categories": ["games"],
-  "subtitle": "Retro-style arcade game"
+  "locales": {
+    "en-US": {
+      "name": "Alien Attack",
+      "subtitle": "Retro-style arcade game",
+      "description": "Retro-style arcade game. Control a space ship orbiting GREEN planet durin alien invasion. Press '4' and '6' to steer and '5' to fire, but beware of limited fuel for course adjustments! Regain fuel resources by killing aliens and roaming through waves of their invasion. Manuever carefully as this might lead to leaving the orbit."
+    }
+  },
+  "default_locale": "en-US"
 }
