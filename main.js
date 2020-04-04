@@ -7220,13 +7220,13 @@ var $author$project$Atlas$loadAtlas = A2(
 			},
 			_List_fromArray(
 				[
-					_Utils_Tuple2($author$project$Atlas$Enemy1, 'assets/Octo-1.png'),
-					_Utils_Tuple2($author$project$Atlas$Enemy2, 'assets/Octo-2.png'),
-					_Utils_Tuple2($author$project$Atlas$User1, 'assets/Player_v1-1.png'),
-					_Utils_Tuple2($author$project$Atlas$User2, 'assets/Player_v1-2.png'),
-					_Utils_Tuple2($author$project$Atlas$User3, 'assets/Player_v1-3.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, 'assets/2x3/bg_planet.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundStars, 'assets/2x3/bg_stars.png')
+					_Utils_Tuple2($author$project$Atlas$Enemy1, 'alien-attack/assets/Octo-1.png'),
+					_Utils_Tuple2($author$project$Atlas$Enemy2, 'alien-attack/assets/Octo-2.png'),
+					_Utils_Tuple2($author$project$Atlas$User1, 'alien-attack/assets/Player_v1-1.png'),
+					_Utils_Tuple2($author$project$Atlas$User2, 'alien-attack/assets/Player_v1-2.png'),
+					_Utils_Tuple2($author$project$Atlas$User3, 'alien-attack/assets/Player_v1-3.png'),
+					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, 'alien-attack/assets/2x3/bg_planet.png'),
+					_Utils_Tuple2($author$project$Atlas$BackgroundStars, 'alien-attack/assets/2x3/bg_stars.png')
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(

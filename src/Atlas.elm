@@ -32,13 +32,13 @@ loadAtlas =
             |> Task.map (\tex -> (gameObjectTypeToInt typ, tex) )
     )
     [
-        (Enemy1, "assets/Octo-1.png"),
-        (Enemy2, "assets/Octo-2.png"),
-        (User1, "assets/Player_v1-1.png"),
-        (User2, "assets/Player_v1-2.png"),
-        (User3, "assets/Player_v1-3.png"),
-        (BackgroundPlanet, "assets/2x3/bg_planet.png"),
-        (BackgroundStars, "assets/2x3/bg_stars.png")
+        (Enemy1, "alien-attack/assets/Octo-1.png"),
+        (Enemy2, "alien-attack/assets/Octo-2.png"),
+        (User1, "alien-attack/assets/Player_v1-1.png"),
+        (User2, "alien-attack/assets/Player_v1-2.png"),
+        (User3, "alien-attack/assets/Player_v1-3.png"),
+        (BackgroundPlanet, "alien-attack/assets/2x3/bg_planet.png"),
+        (BackgroundStars, "alien-attack/assets/2x3/bg_stars.png")
     ] |> Task.sequence
       |> Task.map Dict.fromList
 
