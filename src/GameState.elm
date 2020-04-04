@@ -13,7 +13,7 @@ enemySpawnY: Float
 enemySpawnY = 24
 
 wavesMax: Int
-wavesMax = 1
+wavesMax = 5
 
 enemySide: Float
 enemySide = 32
@@ -26,6 +26,9 @@ bgOffsetMin = 10
 
 bgOffsetMax: Float
 bgOffsetMax = 20
+
+initialFuel: Float
+initialFuel = 100
 
 
 type alias Position = {
@@ -104,7 +107,7 @@ initialState = {
         score = 0,
         playerDead = False,
         playerDeorbited = False,
-        fuel = 100,
+        fuel = initialFuel,
         course = 0,
         userInput = [],
         bgOffset = 10,
@@ -322,7 +325,7 @@ nextWave: GameState -> GameState
 nextWave state =
     if List.length state.enemies == 0 && state.wave == state.spawned then
         if state.wave < wavesMax then
-            { state | wave = state.wave + 1, spawned = 0 }
+            { state | wave = state.wave + 1, spawned = 0, fuel = initialFuel }
         else
             { state | spawned = 0 }
     else
