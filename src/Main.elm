@@ -98,7 +98,7 @@ messageScreen message model =
         style "top" "50%",
         style "position" "absolute",
         style "font-family" "arcadeclassic",
-        style "font-size" "2em",
+        style "font-size" "1em",
         style "text-align" "center",
         style "width" (String.fromInt model.viewportWidth ++ "px")
       ]
