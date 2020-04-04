@@ -4,10 +4,10 @@ import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 
 boardWidth: Float
-boardWidth = 240
+boardWidth = 160
 
 boardHeight: Float
-boardHeight = 295
+boardHeight = 240
 
 enemySpawnY: Float
 enemySpawnY = 24

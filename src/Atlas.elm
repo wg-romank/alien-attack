@@ -37,8 +37,8 @@ loadAtlas =
         (User1, "/assets/Player_v1-1.png"),
         (User2, "/assets/Player_v1-2.png"),
         (User3, "/assets/Player_v1-3.png"),
-        (BackgroundPlanet, "/assets/3x4/bg_planet.png"),
-        (BackgroundStars, "/assets/3x4/bg_stars.png")
+        (BackgroundPlanet, "/assets/2x3/bg_planet.png"),
+        (BackgroundStars, "/assets/2x3/bg_stars.png")
     ] |> Task.sequence
       |> Task.map Dict.fromList
 

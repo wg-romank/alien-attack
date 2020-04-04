@@ -6985,8 +6985,9 @@ var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
-var $author$project$GameState$boardHeight = 295;
-var $author$project$GameState$boardWidth = 240;
+var $author$project$GameState$boardHeight = 240;
+var $author$project$GameState$boardWidth = 160;
+var $author$project$GameState$initialFuel = 100;
 var $author$project$GameState$newPosition = F3(
 	function (width, height, pos) {
 		return {height: height, pos: pos, sinceSpawned: 0.0, width: width};
@@ -7005,7 +7006,7 @@ var $author$project$GameState$initialState = {
 	enemyRoll: _List_Nil,
 	enemyRounds: _List_Nil,
 	enemySpawnRoll: _List_Nil,
-	fuel: 100,
+	fuel: $author$project$GameState$initialFuel,
 	playerDead: false,
 	playerDeorbited: false,
 	playerPosition: A3(
@@ -7224,8 +7225,8 @@ var $author$project$Atlas$loadAtlas = A2(
 					_Utils_Tuple2($author$project$Atlas$User1, '/assets/Player_v1-1.png'),
 					_Utils_Tuple2($author$project$Atlas$User2, '/assets/Player_v1-2.png'),
 					_Utils_Tuple2($author$project$Atlas$User3, '/assets/Player_v1-3.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, '/assets/3x4/bg_planet.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundStars, '/assets/3x4/bg_stars.png')
+					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, '/assets/2x3/bg_planet.png'),
+					_Utils_Tuple2($author$project$Atlas$BackgroundStars, '/assets/2x3/bg_stars.png')
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
@@ -8145,11 +8146,11 @@ var $author$project$GameState$moveRounds = F2(
 			state,
 			state.rounds);
 	});
-var $author$project$GameState$wavesMax = 1;
+var $author$project$GameState$wavesMax = 5;
 var $author$project$GameState$nextWave = function (state) {
 	return ((!$elm$core$List$length(state.enemies)) && _Utils_eq(state.wave, state.spawned)) ? ((_Utils_cmp(state.wave, $author$project$GameState$wavesMax) < 0) ? _Utils_update(
 		state,
-		{spawned: 0, wave: state.wave + 1}) : _Utils_update(
+		{fuel: $author$project$GameState$initialFuel, spawned: 0, wave: state.wave + 1}) : _Utils_update(
 		state,
 		{spawned: 0})) : state;
 };
