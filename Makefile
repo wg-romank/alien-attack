@@ -9,4 +9,7 @@ opt:
 run:
 	firefox ${PWD}/index.html
 
+package:
+	zip -r package.zip assets/* kaios/* index.html main.js manifest.webapp
+
 .PHONY: build run
