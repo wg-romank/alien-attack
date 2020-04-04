@@ -113,7 +113,7 @@ hudText margin1 margin1Amount margin2 margin2Amount t =
       style "position" "absolute",
       style "color" "#FFFFFF",
       style "font-family" "arcadeclassic",
-      style "font-size" "2em",
+      style "font-size" "1em",
       style margin1 margin1Amount,
       style margin2 margin2Amount
     ]
@@ -223,6 +223,10 @@ toDirection string =
     "ArrowRight" ->
       KeyboardRight
     " " ->
+      KeyboardFire
+    "1" ->
+      KeyboardFire
+    "5" ->
       KeyboardFire
     other ->
       Other other

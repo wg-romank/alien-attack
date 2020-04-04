@@ -3,6 +3,12 @@ module GameState exposing (..)
 import Random
 import Math.Vector2 as Vec2 exposing (vec2, Vec2)
 
+boardWidth: Float
+boardWidth = 160
+
+boardHeight: Float
+boardHeight = 240
+
 enemySpawnY: Float
 enemySpawnY = 24
 
@@ -91,7 +97,7 @@ type alias GameState = {
 
 initialState: GameState
 initialState = {
-        boardSize = { width = 160, height = 240 },
+        boardSize = { width = boardWidth |> round, height = boardHeight |> round },
         score = 0,
         playerDead = False,
         playerDeorbited = False,
@@ -99,7 +105,7 @@ initialState = {
         course = 0,
         userInput = [],
         bgOffset = 10,
-        playerPosition = newPosition playerSide playerSide (vec2 72 222),
+        playerPosition = newPosition playerSide playerSide (vec2 ((boardWidth - playerSide) / 2) (boardHeight - 1.5 * playerSide) ),
         enemies = [],
         rounds = [],
         enemyRounds = [],

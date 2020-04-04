@@ -6985,15 +6985,21 @@ var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$Atlas$emptyAtlas = $elm$core$Dict$empty;
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
+var $author$project$GameState$boardHeight = 240;
+var $author$project$GameState$boardWidth = 160;
 var $author$project$GameState$newPosition = F3(
 	function (width, height, pos) {
 		return {height: height, pos: pos, sinceSpawned: 0.0, width: width};
 	});
 var $author$project$GameState$playerSide = 16;
+var $elm$core$Basics$round = _Basics_round;
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
 var $author$project$GameState$initialState = {
 	bgOffset: 10,
-	boardSize: {height: 240, width: 160},
+	boardSize: {
+		height: $elm$core$Basics$round($author$project$GameState$boardHeight),
+		width: $elm$core$Basics$round($author$project$GameState$boardWidth)
+	},
 	course: 0,
 	enemies: _List_Nil,
 	enemyRoll: _List_Nil,
@@ -7006,7 +7012,7 @@ var $author$project$GameState$initialState = {
 		$author$project$GameState$newPosition,
 		$author$project$GameState$playerSide,
 		$author$project$GameState$playerSide,
-		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 72, 222)),
+		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, ($author$project$GameState$boardWidth - $author$project$GameState$playerSide) / 2, $author$project$GameState$boardHeight - (1.5 * $author$project$GameState$playerSide))),
 	rounds: _List_Nil,
 	score: 0,
 	userInput: _List_Nil
@@ -7244,6 +7250,10 @@ var $author$project$Main$toDirection = function (string) {
 		case 'ArrowRight':
 			return $author$project$Main$KeyboardRight;
 		case ' ':
+			return $author$project$Main$KeyboardFire;
+		case '1':
+			return $author$project$Main$KeyboardFire;
+		case '5':
 			return $author$project$Main$KeyboardFire;
 		default:
 			var other = string;
@@ -7702,7 +7712,6 @@ var $author$project$Main$EnemiesSpawnRoll = function (a) {
 var $author$project$GameState$PlayerFire = {$: 'PlayerFire'};
 var $author$project$GameState$PlayerMoveLeft = {$: 'PlayerMoveLeft'};
 var $author$project$GameState$PlayerMoveRight = {$: 'PlayerMoveRight'};
-var $elm$core$Basics$round = _Basics_round;
 var $author$project$Main$computeViewportSize = F2(
 	function (viewport, model) {
 		var vpm = viewport.viewport.height / model.state.boardSize.height;
@@ -8664,7 +8673,7 @@ var $author$project$Main$hudText = F5(
 					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 					A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
 					A2($elm$html$Html$Attributes$style, 'font-family', 'arcadeclassic'),
-					A2($elm$html$Html$Attributes$style, 'font-size', '2em'),
+					A2($elm$html$Html$Attributes$style, 'font-size', '1em'),
 					A2($elm$html$Html$Attributes$style, margin1, margin1Amount),
 					A2($elm$html$Html$Attributes$style, margin2, margin2Amount)
 				]),
@@ -9074,13 +9083,12 @@ var $author$project$Sprites$depthLayerCharacters = {far: 0.2, near: 0.1};
 var $elm$core$Basics$modBy = _Basics_modBy;
 var $author$project$Sprites$enemySprite = F2(
 	function (atlas, state) {
-		var frameSwitch = 2;
 		return A2(
 			$elm$core$List$concatMap,
 			function (enemy) {
 				var textureKey = (!A2(
 					$elm$core$Basics$modBy,
-					frameSwitch,
+					2,
 					$elm$core$Basics$round(enemy.sinceSpawned / 1000.0))) ? $author$project$Atlas$Enemy1 : $author$project$Atlas$Enemy2;
 				var maybeTexture = A2($author$project$Atlas$get, atlas, textureKey);
 				if (maybeTexture.$ === 'Just') {
