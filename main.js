@@ -7015,7 +7015,8 @@ var $author$project$GameState$initialState = {
 		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, ($author$project$GameState$boardWidth - $author$project$GameState$playerSide) / 2, $author$project$GameState$boardHeight - (1.5 * $author$project$GameState$playerSide))),
 	rounds: _List_Nil,
 	score: 0,
-	userInput: _List_Nil
+	userInput: _List_Nil,
+	wave: 1
 };
 var $author$project$Atlas$BackgroundPlanet = {$: 'BackgroundPlanet'};
 var $author$project$Atlas$BackgroundStars = {$: 'BackgroundStars'};
@@ -7217,13 +7218,13 @@ var $author$project$Atlas$loadAtlas = A2(
 			},
 			_List_fromArray(
 				[
-					_Utils_Tuple2($author$project$Atlas$Enemy1, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
-					_Utils_Tuple2($author$project$Atlas$Enemy2, 'https://wg-romank.github.io/alien-attack/assets/Octo-2.png'),
-					_Utils_Tuple2($author$project$Atlas$User1, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png'),
-					_Utils_Tuple2($author$project$Atlas$User2, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png'),
-					_Utils_Tuple2($author$project$Atlas$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, 'https://wg-romank.github.io/alien-attack/assets/bg_planet.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundStars, 'https://wg-romank.github.io/alien-attack/assets/bg_stars.png')
+					_Utils_Tuple2($author$project$Atlas$Enemy1, '/assets/Octo-1.png'),
+					_Utils_Tuple2($author$project$Atlas$Enemy2, '/assets/Octo-2.png'),
+					_Utils_Tuple2($author$project$Atlas$User1, '/assets/Player_v1-1.png'),
+					_Utils_Tuple2($author$project$Atlas$User2, '/assets/Player_v1-2.png'),
+					_Utils_Tuple2($author$project$Atlas$User3, '/assets/Player_v1-3.png'),
+					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, '/assets/3x4/bg_planet.png'),
+					_Utils_Tuple2($author$project$Atlas$BackgroundStars, '/assets/3x4/bg_stars.png')
 				]))));
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
@@ -7247,6 +7248,10 @@ var $author$project$Main$toDirection = function (string) {
 	switch (string) {
 		case 'ArrowLeft':
 			return $author$project$Main$KeyboardLeft;
+		case '4':
+			return $author$project$Main$KeyboardLeft;
+		case '6':
+			return $author$project$Main$KeyboardRight;
 		case 'ArrowRight':
 			return $author$project$Main$KeyboardRight;
 		case ' ':

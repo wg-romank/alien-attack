@@ -214,18 +214,14 @@ update event model =
 toDirection : String -> Msg
 toDirection string =
   case string of
-    "ArrowLeft" ->
-      KeyboardLeft
-    "ArrowRight" ->
-      KeyboardRight
-    " " ->
-      KeyboardFire
-    "1" ->
-      KeyboardFire
-    "5" ->
-      KeyboardFire
-    other ->
-      Other other
+    "ArrowLeft" -> KeyboardLeft
+    "4" -> KeyboardLeft
+    "6" -> KeyboardRight
+    "ArrowRight" -> KeyboardRight
+    " " -> KeyboardFire
+    "1" -> KeyboardFire
+    "5" -> KeyboardFire
+    other -> Other other
 
 keyDecoder : Decode.Decoder Msg
 keyDecoder =
