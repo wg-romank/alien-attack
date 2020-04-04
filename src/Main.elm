@@ -144,7 +144,8 @@ simulationScreen model =
           container model [] [
             hudText "bottom" "2%" "left" "3%" ("FUEL: " ++ String.fromFloat model.state.fuel),
             hudText "bottom" "6%" "left" "3%" ("COURSE: " ++ String.fromFloat model.state.course),
-            hudText "top" "1%" "left" "3%" ("SCORE: " ++ String.fromInt model.state.score ) ]
+            -- hudText "top" "1%" "left" "3%" ("SCORE: " ++ String.fromInt model.state.score ) ]
+            hudText "top" "1%" "left" "50%" ("WAVE " ++ String.fromInt model.state.wave ) ]
         ]
 
 

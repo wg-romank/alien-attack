@@ -12,8 +12,8 @@ boardHeight = 295
 enemySpawnY: Float
 enemySpawnY = 24
 
-maxEnemiesToSpawn: Int
-maxEnemiesToSpawn = 5
+wavesMax: Int
+wavesMax = 5
 
 enemySide: Float
 enemySide = 32
@@ -71,12 +71,11 @@ enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
 enemySpawnRoll: GameState -> Random.Generator (List Vec2)
 enemySpawnRoll state =
     let
-        nEnemies = Random.weighted (99, 0) [(1, maxEnemiesToSpawn)]
         enemyCoordinates =
             Random.int 1 (state.boardSize.width - (enemySide |> round))
              |> Random.map (\v -> vec2 (toFloat v) enemySpawnY)
     in
-        nEnemies |> Random.andThen (\len -> Random.list len enemyCoordinates)
+        Random.list (state.wave - state.spawned) enemyCoordinates
 
 type alias GameState = {
         boardSize: Size,
@@ -89,6 +88,7 @@ type alias GameState = {
         bgOffset: Float,
         playerPosition: Position,
         wave: Int,
+        spawned: Int,
         enemies: List Position,
         rounds: List Position,
         enemyRounds: List Position,
@@ -108,6 +108,7 @@ initialState = {
         bgOffset = 10,
         playerPosition = newPosition playerSide playerSide (vec2 ((boardWidth - playerSide) / 2) (boardHeight - 1.5 * playerSide) ),
         wave = 1,
+        spawned = 0,
         enemies = [],
         rounds = [],
         enemyRounds = [],
@@ -294,12 +295,14 @@ enemySpawn state =
                     let
                         noIntersections = doNotOverlap l acc
                     in
-                        if noIntersections && List.length acc < maxEnemiesToSpawn  then acc ++ [l]
+                        if noIntersections && List.length acc < state.wave then acc ++ [l]
                         else acc )
             state.enemies
             enemySpawns
+
+        spawnedNow = List.length newEnemies - List.length state.enemies
     in
-        { state | enemies = newEnemies }
+        { state | enemies = newEnemies, spawned = state.spawned + spawnedNow }
 
 
 moveBackground: GameState -> GameState
@@ -313,6 +316,17 @@ moveBackground state =
         { state | bgOffset = newBgOffset }
 
 
+nextWave: GameState -> GameState
+nextWave state =
+    if List.length state.enemies == 0 && state.wave == state.spawned then
+        if state.wave < wavesMax then
+            { state | wave = state.wave + 1, spawned = 0 }
+        else
+            { state | spawned = 0 }
+    else
+        state
+
+
 gameLoop: Float -> GameState -> GameState
 gameLoop timeDelta state =
         state
@@ -324,3 +338,4 @@ gameLoop timeDelta state =
             |> playerMoveFromCourse timeDelta
             |> moveBackground
             |> enemySpawn
+            |> nextWave

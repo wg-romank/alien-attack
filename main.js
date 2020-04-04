@@ -7015,6 +7015,7 @@ var $author$project$GameState$initialState = {
 		A2($elm_explorations$linear_algebra$Math$Vector2$vec2, ($author$project$GameState$boardWidth - $author$project$GameState$playerSide) / 2, $author$project$GameState$boardHeight - (1.5 * $author$project$GameState$playerSide))),
 	rounds: _List_Nil,
 	score: 0,
+	spawned: 0,
 	userInput: _List_Nil,
 	wave: 1
 };
@@ -7877,19 +7878,6 @@ var $author$project$GameState$enemiesRoll = function (state) {
 		$elm$core$List$length(state.enemies),
 		$author$project$GameState$rollEnemyAction);
 };
-var $elm$random$Random$andThen = F2(
-	function (callback, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed) {
-				var _v1 = genA(seed);
-				var result = _v1.a;
-				var newSeed = _v1.b;
-				var _v2 = callback(result);
-				var genB = _v2.a;
-				return genB(newSeed);
-			});
-	});
 var $author$project$GameState$enemySide = 32;
 var $author$project$GameState$enemySpawnY = 24;
 var $elm$random$Random$int = F2(
@@ -7924,15 +7912,7 @@ var $elm$random$Random$int = F2(
 				}
 			});
 	});
-var $author$project$GameState$maxEnemiesToSpawn = 5;
 var $author$project$GameState$enemySpawnRoll = function (state) {
-	var nEnemies = A2(
-		$elm$random$Random$weighted,
-		_Utils_Tuple2(99, 0),
-		_List_fromArray(
-			[
-				_Utils_Tuple2(1, $author$project$GameState$maxEnemiesToSpawn)
-			]));
 	var enemyCoordinates = A2(
 		$elm$random$Random$map,
 		function (v) {
@@ -7942,12 +7922,7 @@ var $author$project$GameState$enemySpawnRoll = function (state) {
 			$elm$random$Random$int,
 			1,
 			state.boardSize.width - $elm$core$Basics$round($author$project$GameState$enemySide)));
-	return A2(
-		$elm$random$Random$andThen,
-		function (len) {
-			return A2($elm$random$Random$list, len, enemyCoordinates);
-		},
-		nEnemies);
+	return A2($elm$random$Random$list, state.wave - state.spawned, enemyCoordinates);
 };
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm_explorations$linear_algebra$Math$Vector2$length = _MJS_v2length;
@@ -7998,16 +7973,17 @@ var $author$project$GameState$enemySpawn = function (state) {
 				var noIntersections = A2($author$project$GameState$doNotOverlap, l, acc);
 				return (noIntersections && (_Utils_cmp(
 					$elm$core$List$length(acc),
-					$author$project$GameState$maxEnemiesToSpawn) < 0)) ? _Utils_ap(
+					state.wave) < 0)) ? _Utils_ap(
 					acc,
 					_List_fromArray(
 						[l])) : acc;
 			}),
 		state.enemies,
 		enemySpawns);
+	var spawnedNow = $elm$core$List$length(newEnemies) - $elm$core$List$length(state.enemies);
 	return _Utils_update(
 		state,
-		{enemies: newEnemies});
+		{enemies: newEnemies, spawned: state.spawned + spawnedNow});
 };
 var $author$project$GameState$bgOffsetMax = 20;
 var $author$project$GameState$bgOffsetMin = 10;
@@ -8143,6 +8119,14 @@ var $author$project$GameState$moveRounds = F2(
 			state,
 			state.rounds);
 	});
+var $author$project$GameState$wavesMax = 5;
+var $author$project$GameState$nextWave = function (state) {
+	return ((!$elm$core$List$length(state.enemies)) && _Utils_eq(state.wave, state.spawned)) ? ((_Utils_cmp(state.wave, $author$project$GameState$wavesMax) < 0) ? _Utils_update(
+		state,
+		{spawned: 0, wave: state.wave + 1}) : _Utils_update(
+		state,
+		{spawned: 0})) : state;
+};
 var $author$project$GameState$moveX = F2(
 	function (amount, p) {
 		return _Utils_update(
@@ -8337,24 +8321,25 @@ var $author$project$GameState$updateTimesSinceSpawned = F2(
 	});
 var $author$project$GameState$gameLoop = F2(
 	function (timeDelta, state) {
-		return $author$project$GameState$enemySpawn(
-			$author$project$GameState$moveBackground(
-				A2(
-					$author$project$GameState$playerMoveFromCourse,
-					timeDelta,
+		return $author$project$GameState$nextWave(
+			$author$project$GameState$enemySpawn(
+				$author$project$GameState$moveBackground(
 					A2(
-						$author$project$GameState$updateTimesSinceSpawned,
+						$author$project$GameState$playerMoveFromCourse,
 						timeDelta,
 						A2(
-							$author$project$GameState$moveEnemyRounds,
+							$author$project$GameState$updateTimesSinceSpawned,
 							timeDelta,
 							A2(
-								$author$project$GameState$performEnemiesActions,
+								$author$project$GameState$moveEnemyRounds,
 								timeDelta,
 								A2(
-									$author$project$GameState$moveRounds,
+									$author$project$GameState$performEnemiesActions,
 									timeDelta,
-									A2($author$project$GameState$performPlayerAction, state.userInput, state))))))));
+									A2(
+										$author$project$GameState$moveRounds,
+										timeDelta,
+										A2($author$project$GameState$performPlayerAction, state.userInput, state)))))))));
 	});
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
@@ -9411,8 +9396,8 @@ var $author$project$Main$simulationScreen = function (model) {
 						'top',
 						'1%',
 						'left',
-						'3%',
-						'SCORE: ' + $elm$core$String$fromInt(model.state.score))
+						'50%',
+						'WAVE ' + $elm$core$String$fromInt(model.state.wave))
 					]))
 			]));
 };
