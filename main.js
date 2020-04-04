@@ -7878,6 +7878,19 @@ var $author$project$GameState$enemiesRoll = function (state) {
 		$elm$core$List$length(state.enemies),
 		$author$project$GameState$rollEnemyAction);
 };
+var $elm$random$Random$andThen = F2(
+	function (callback, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed) {
+				var _v1 = genA(seed);
+				var result = _v1.a;
+				var newSeed = _v1.b;
+				var _v2 = callback(result);
+				var genB = _v2.a;
+				return genB(newSeed);
+			});
+	});
 var $author$project$GameState$enemySide = 32;
 var $author$project$GameState$enemySpawnY = 24;
 var $elm$random$Random$int = F2(
@@ -7913,6 +7926,14 @@ var $elm$random$Random$int = F2(
 			});
 	});
 var $author$project$GameState$enemySpawnRoll = function (state) {
+	var maxToSpawn = state.wave - state.spawned;
+	var nEnemies = A2(
+		$elm$random$Random$weighted,
+		_Utils_Tuple2(99, 0),
+		_List_fromArray(
+			[
+				_Utils_Tuple2(1, maxToSpawn)
+			]));
 	var enemyCoordinates = A2(
 		$elm$random$Random$map,
 		function (v) {
@@ -7922,7 +7943,12 @@ var $author$project$GameState$enemySpawnRoll = function (state) {
 			$elm$random$Random$int,
 			1,
 			state.boardSize.width - $elm$core$Basics$round($author$project$GameState$enemySide)));
-	return A2($elm$random$Random$list, state.wave - state.spawned, enemyCoordinates);
+	return A2(
+		$elm$random$Random$andThen,
+		function (len) {
+			return A2($elm$random$Random$list, len, enemyCoordinates);
+		},
+		nEnemies);
 };
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm_explorations$linear_algebra$Math$Vector2$length = _MJS_v2length;
@@ -8119,7 +8145,7 @@ var $author$project$GameState$moveRounds = F2(
 			state,
 			state.rounds);
 	});
-var $author$project$GameState$wavesMax = 5;
+var $author$project$GameState$wavesMax = 1;
 var $author$project$GameState$nextWave = function (state) {
 	return ((!$elm$core$List$length(state.enemies)) && _Utils_eq(state.wave, state.spawned)) ? ((_Utils_cmp(state.wave, $author$project$GameState$wavesMax) < 0) ? _Utils_update(
 		state,
@@ -8652,6 +8678,25 @@ var $elm$html$Html$Attributes$height = function (n) {
 		'height',
 		$elm$core$String$fromInt(n));
 };
+var $author$project$Main$hudAnnouncement = F2(
+	function (t, model) {
+		return A2(
+			$elm$html$Html$p,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'color', '#FFFFFF'),
+					A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+					A2($elm$html$Html$Attributes$style, 'text-align', 'center'),
+					A2(
+					$elm$html$Html$Attributes$style,
+					'width',
+					$elm$core$String$fromInt(model.viewportWidth) + 'px')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text(t)
+				]));
+	});
 var $author$project$Main$hudText = F5(
 	function (margin1, margin1Amount, margin2, margin2Amount, t) {
 		return A2(
@@ -9391,13 +9436,16 @@ var $author$project$Main$simulationScreen = function (model) {
 						'left',
 						'3%',
 						'COURSE: ' + $elm$core$String$fromFloat(model.state.course)),
-						A5(
+						_Utils_eq(model.state.wave, $author$project$GameState$wavesMax) ? A5(
 						$author$project$Main$hudText,
 						'top',
 						'1%',
 						'left',
-						'50%',
-						'WAVE ' + $elm$core$String$fromInt(model.state.wave))
+						'3%',
+						'SCORE: ' + $elm$core$String$fromInt(model.state.score)) : A2(
+						$author$project$Main$hudAnnouncement,
+						'WAVE ' + $elm$core$String$fromInt(model.state.wave),
+						model)
 					]))
 			]));
 };

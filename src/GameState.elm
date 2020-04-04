@@ -13,7 +13,7 @@ enemySpawnY: Float
 enemySpawnY = 24
 
 wavesMax: Int
-wavesMax = 5
+wavesMax = 1
 
 enemySide: Float
 enemySide = 32
@@ -71,11 +71,13 @@ enemiesRoll state = Random.list (List.length state.enemies) rollEnemyAction
 enemySpawnRoll: GameState -> Random.Generator (List Vec2)
 enemySpawnRoll state =
     let
+        maxToSpawn = state.wave - state.spawned
+        nEnemies = Random.weighted (99, 0) [(1, maxToSpawn)]
         enemyCoordinates =
             Random.int 1 (state.boardSize.width - (enemySide |> round))
              |> Random.map (\v -> vec2 (toFloat v) enemySpawnY)
     in
-        Random.list (state.wave - state.spawned) enemyCoordinates
+        nEnemies |> Random.andThen (\len -> Random.list len enemyCoordinates)
 
 type alias GameState = {
         boardSize: Size,

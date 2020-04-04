@@ -104,6 +104,15 @@ messageScreen message model =
   ]
 
 
+hudAnnouncement: String -> Model -> Html msg
+hudAnnouncement t model =
+  p [
+    style "color" "#FFFFFF",
+    style "position" "absolute",
+    style "text-align" "center",
+    style "width" (String.fromInt model.viewportWidth ++ "px")
+  ] [ text t ]
+
 hudText: String -> String -> String -> String -> String -> Html msg
 hudText margin1 margin1Amount margin2 margin2Amount t =
   p
@@ -144,8 +153,10 @@ simulationScreen model =
           container model [] [
             hudText "bottom" "2%" "left" "3%" ("FUEL: " ++ String.fromFloat model.state.fuel),
             hudText "bottom" "6%" "left" "3%" ("COURSE: " ++ String.fromFloat model.state.course),
-            -- hudText "top" "1%" "left" "3%" ("SCORE: " ++ String.fromInt model.state.score ) ]
-            hudText "top" "1%" "left" "50%" ("WAVE " ++ String.fromInt model.state.wave ) ]
+            if model.state.wave == wavesMax then
+              hudText "top" "1%" "left" "3%" ("SCORE: " ++ String.fromInt model.state.score )
+            else
+              hudAnnouncement ("WAVE " ++ String.fromInt model.state.wave) model ]
         ]
 
 
