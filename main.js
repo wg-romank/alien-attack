@@ -7190,44 +7190,52 @@ var $elm_explorations$webgl$WebGL$Texture$loadWith = F2(
 			});
 		return A4(expand, magnify, minify, horizontalWrap, verticalWrap);
 	});
+var $elm_explorations$webgl$WebGL$Texture$Resize = function (a) {
+	return {$: 'Resize', a: a};
+};
+var $elm_explorations$webgl$WebGL$Texture$nearest = $elm_explorations$webgl$WebGL$Texture$Resize(9728);
 var $elm_explorations$webgl$WebGL$Texture$Wrap = function (a) {
 	return {$: 'Wrap', a: a};
 };
 var $elm_explorations$webgl$WebGL$Texture$clampToEdge = $elm_explorations$webgl$WebGL$Texture$Wrap(33071);
-var $elm_explorations$webgl$WebGL$Texture$Resize = function (a) {
-	return {$: 'Resize', a: a};
-};
 var $elm_explorations$webgl$WebGL$Texture$linear = $elm_explorations$webgl$WebGL$Texture$Resize(9729);
-var $elm_explorations$webgl$WebGL$Texture$nearest = $elm_explorations$webgl$WebGL$Texture$Resize(9728);
 var $elm_explorations$webgl$WebGL$Texture$nonPowerOfTwoOptions = {flipY: true, horizontalWrap: $elm_explorations$webgl$WebGL$Texture$clampToEdge, magnify: $elm_explorations$webgl$WebGL$Texture$linear, minify: $elm_explorations$webgl$WebGL$Texture$nearest, verticalWrap: $elm_explorations$webgl$WebGL$Texture$clampToEdge};
-var $author$project$Atlas$loadAtlas = A2(
-	$elm$core$Task$map,
-	$elm$core$Dict$fromList,
-	$elm$core$Task$sequence(
-		A2(
-			$elm$core$List$map,
-			function (_v0) {
-				var typ = _v0.a;
-				var url = _v0.b;
-				return A2(
-					$elm$core$Task$map,
-					function (tex) {
-						return _Utils_Tuple2(
-							$author$project$Atlas$gameObjectTypeToInt(typ),
-							tex);
-					},
-					A2($elm_explorations$webgl$WebGL$Texture$loadWith, $elm_explorations$webgl$WebGL$Texture$nonPowerOfTwoOptions, url));
-			},
-			_List_fromArray(
-				[
-					_Utils_Tuple2($author$project$Atlas$Enemy1, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
-					_Utils_Tuple2($author$project$Atlas$Enemy2, 'https://wg-romank.github.io/alien-attack/assets/Octo-2.png'),
-					_Utils_Tuple2($author$project$Atlas$User1, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png'),
-					_Utils_Tuple2($author$project$Atlas$User2, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png'),
-					_Utils_Tuple2($author$project$Atlas$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, 'https://wg-romank.github.io/alien-attack/assets/2x3/bg_planet.png'),
-					_Utils_Tuple2($author$project$Atlas$BackgroundStars, 'https://wg-romank.github.io/alien-attack/assets/2x3/bg_stars.png')
-				]))));
+var $author$project$Atlas$loadAtlas = function () {
+	var options = $elm_explorations$webgl$WebGL$Texture$nonPowerOfTwoOptions;
+	return A2(
+		$elm$core$Task$map,
+		$elm$core$Dict$fromList,
+		$elm$core$Task$sequence(
+			A2(
+				$elm$core$List$map,
+				function (_v0) {
+					var typ = _v0.a;
+					var url = _v0.b;
+					return A2(
+						$elm$core$Task$map,
+						function (tex) {
+							return _Utils_Tuple2(
+								$author$project$Atlas$gameObjectTypeToInt(typ),
+								tex);
+						},
+						A2(
+							$elm_explorations$webgl$WebGL$Texture$loadWith,
+							_Utils_update(
+								options,
+								{magnify: $elm_explorations$webgl$WebGL$Texture$nearest}),
+							url));
+				},
+				_List_fromArray(
+					[
+						_Utils_Tuple2($author$project$Atlas$Enemy1, 'https://wg-romank.github.io/alien-attack/assets/Octo-1.png'),
+						_Utils_Tuple2($author$project$Atlas$Enemy2, 'https://wg-romank.github.io/alien-attack/assets/Octo-2.png'),
+						_Utils_Tuple2($author$project$Atlas$User1, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-1.png'),
+						_Utils_Tuple2($author$project$Atlas$User2, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-2.png'),
+						_Utils_Tuple2($author$project$Atlas$User3, 'https://wg-romank.github.io/alien-attack/assets/Player_v1-3.png'),
+						_Utils_Tuple2($author$project$Atlas$BackgroundPlanet, 'https://wg-romank.github.io/alien-attack/assets/2x3/bg_planet.png'),
+						_Utils_Tuple2($author$project$Atlas$BackgroundStars, 'https://wg-romank.github.io/alien-attack/assets/2x3/bg_stars.png')
+					]))));
+}();
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2(
 		{atlas: $author$project$Atlas$emptyAtlas, offset: 0, paused: false, state: $author$project$GameState$initialState, viewportHeight: 0, viewportMultiplier: 1, viewportWidth: 0},
@@ -9402,8 +9410,8 @@ var $author$project$Main$simulationScreen = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$width(model.state.boardSize.width),
-						$elm$html$Html$Attributes$height(model.state.boardSize.height),
+						$elm$html$Html$Attributes$width(model.viewportWidth),
+						$elm$html$Html$Attributes$height(model.viewportHeight),
 						A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
 						A2($elm$html$Html$Attributes$style, 'top', '0'),
 						A2(

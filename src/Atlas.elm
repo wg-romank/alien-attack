@@ -25,10 +25,13 @@ emptyAtlas = Dict.empty
 
 loadAtlas: Task.Task Error Atlas
 loadAtlas =
+    let
+        options = Texture.nonPowerOfTwoOptions
+    in
     List.map
     (
         \(typ, url) ->
-            Texture.loadWith Texture.nonPowerOfTwoOptions url 
+            Texture.loadWith { options | magnify = Texture.nearest } url 
             |> Task.map (\tex -> (gameObjectTypeToInt typ, tex) )
     )
     [

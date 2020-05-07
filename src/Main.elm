@@ -142,8 +142,8 @@ simulationScreen model =
         [
           WebGL.toHtmlWith [ WebGL.alpha True, WebGL.depth 1 ]
           [
-            width model.state.boardSize.width,
-            height model.state.boardSize.height,
+            width model.viewportWidth,
+            height model.viewportHeight,
             style "position" "absolute",
             style "top" "0",
             style "left" (String.fromInt model.offset ++ "px"),
